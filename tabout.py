@@ -131,16 +131,6 @@ class TabOut:
     
     
     def _output_docx(self, file_name: Optional[str] = None, tab_num: Optional[int] = None, **kwargs):
-        # Make a copy of the DataFrame to avoid modifying the original
-        dfs = self.df.copy()
-
-        # Number of headline levels
-        headline_levels = dfs.columns.nlevels
-        # Are there row groups: is the case when dfs.index.nlevels > 1
-        row_groups = (dfs.index.nlevels > 1)
-        # Number of columns
-        ncols = dfs.shape[1] + 1
-
         # Check if the document exists
         if file_name and os.path.exists(file_name):
             document = Document(file_name)
@@ -150,6 +140,7 @@ class TabOut:
             document = Document()
             n_tables = 0
 
+        # Check whether existing table should be replaced
         if n_tables > 0 and tab_num is not None and tab_num <= n_tables:
             # Replace the table at position tab_num
             table = document.tables[tab_num - 1]
@@ -187,9 +178,28 @@ class TabOut:
                 for run in paragraph.runs:
                     run.font.color.rgb = RGBColor(0, 0, 0)
                     run.font.size = Pt(11)
-
-            table = document.add_table(rows=0, cols=ncols)
+            table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
             table.style = 'Table Grid'
+
+        self._build_docx_table(table)
+
+        # Save the document
+        if file_name is not None:
+            document.save(file_name)
+
+        return document
+    
+
+    def _build_docx_table(self, table):
+        # Make a copy of the DataFrame to avoid modifying the original
+        dfs = self.df.copy()
+
+        # Number of headline levels
+        headline_levels = dfs.columns.nlevels
+        # Are there row groups: is the case when dfs.index.nlevels > 1
+        row_groups = (dfs.index.nlevels > 1)
+        # Number of columns
+        ncols = dfs.shape[1] + 1
 
         # Add column headers
         if isinstance(dfs.columns, pd.MultiIndex):
@@ -361,12 +371,11 @@ class TabOut:
             tblCellMar.append(node)
         tblPr.append(tblCellMar)
 
-        # Save the document
-        if file_name is not None:
-            document.save(file_name)
 
-        return document
 
+
+
+        
     def _output_tex(self, file_name: Optional[str] = None, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
