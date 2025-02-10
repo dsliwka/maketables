@@ -22,10 +22,6 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-from pptx import Presentation
-from pptx.util import Inches, Pt
-from pptx.enum.text import PP_ALIGN
-
 import os
 
 def _relabel_index(index, labels=None, stats_labels=None):
@@ -55,13 +51,24 @@ def _relabel_index(index, labels=None, stats_labels=None):
 
 
 class TabOut:
-    def __init__(self, df: pd.DataFrame, 
-                 notes: str = "", 
-                 caption: Optional[str] = None, 
-                 tab_label: Optional[str] = None,
-                 rgroup_sep: str = "tb",
-                 rgroup_display: bool = True,
-                ):
+    # Class attributes for default values
+    DEFAULT_NOTES = ""
+    DEFAULT_CAPTION = None
+    DEFAULT_TAB_LABEL = None
+    DEFAULT_RGROUP_SEP = "tb"
+    DEFAULT_RGROUP_DISPLAY = True
+    DEFAULT_SAVE_PATH = None  # can be string or dict
+
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        notes: str = DEFAULT_NOTES,
+        caption: Optional[str] = DEFAULT_CAPTION,
+        tab_label: Optional[str] = DEFAULT_TAB_LABEL,
+        rgroup_sep: str = DEFAULT_RGROUP_SEP,
+        rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
+        default_path: Union[None, str, dict] = DEFAULT_SAVE_PATH,
+    ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
             "Row index can have at most two levels."
@@ -72,6 +79,12 @@ class TabOut:
         self.tab_label = tab_label
         self.rgroup_sep = rgroup_sep
         self.rgroup_display = rgroup_display
+        if isinstance(default_path, str):
+            self.default_paths = {t: default_path for t in ["gt","tex","docx"]}
+        elif isinstance(default_path, dict):
+            self.default_paths = default_path.copy()
+        else:
+            self.default_paths = {}
     
     def _revise_file_path(self, file_path: str, label: str, extension: str) -> str:
         if extension=='gt':
@@ -94,18 +107,18 @@ class TabOut:
     def make(self, types: Union[str, list[str]], path: Optional[str] = None, **kwargs):
         if isinstance(types, str):
             types = [types]
-        assert all(t in ["gt","tex", "docx", "pptx"] for t in types), "types must be either 'gt', 'tex', 'docx', or 'pptx'."
+        assert all(t in ["gt","tex", "docx"] for t in types), "types must be either 'gt', 'tex', or 'docx'"
         assert path is None or (
-            isinstance(path, str) and (path.endswith((".html", ".tex", ".docx", ".pptx")) or '.' not in path)
-        ), "path must end with '.html', '.tex', '.docx', '.pptx', or have no file extension."
-        # MOVE TO WORD OUTPUT check: tab_num currently only supported for docx and pptx output
-        # assert tab_num is None or any(t in ["docx", "pptx"] for t in types), "tab_num currently only supported for docx and pptx output"
-
+            isinstance(path, str) and (path.endswith((".html", ".tex", ".docx")) or '.' not in path)
+        ), "path must end with '.html', '.tex', '.docx', or have no file extension."
+        
         results = {}
         for t in types:
-            if path is not None:
-                file_name = self._revise_file_path(path, self.tab_label, t)
-            else: 
+            # Use provided path if not None, else use default_paths if available
+            save_path = path or self.default_paths.get(t)
+            if save_path:
+                file_name = self._revise_file_path(save_path, self.tab_label, t)
+            else:
                 file_name = None
             if t == "gt":
                 results[t] = self._output_gt(file_name=file_name, **kwargs)
@@ -113,108 +126,10 @@ class TabOut:
                 results[t] = self._output_tex(file_name=file_name, **kwargs)
             if t == "docx":
                 results[t] = self._output_docx(file_name=file_name, **kwargs)
-            if t == "pptx":
-                results[t] = self._output_pptx(file_name=file_name, **kwargs)
         # Return only the first output type result in the list
         return results[types[0]]
     
-    def _output_pptx(self, file_name: Optional[str] = None, **kwargs):
-        # Make a copy of the DataFrame to avoid modifying the original
-        dfs = self.df.copy()
-
-        # Number of headline levels
-        headline_levels = dfs.columns.nlevels
-        # Are there row groups: is the case when dfs.index.nlevels > 1
-        row_groups = (dfs.index.nlevels > 1)
-        if row_groups:
-            # Determine number of row groups
-            nrow_groups = len(dfs.index.get_level_values(0).unique())
-        # Number of rows (excluding headline rows)
-        nrows = dfs.shape[0]
-        # Number of columns
-        ncols = dfs.shape[1] + 1
-
-        # Create a new presentation or open an existing one
-        if file_name and os.path.exists(file_name):
-            presentation = Presentation(file_name)
-        else:
-            presentation = Presentation()
-
-        # Add a slide with a title and content layout
-        slide_layout = presentation.slide_layouts[5]  # Use a blank layout
-        slide = presentation.slides.add_slide(slide_layout)
-
-        # Add title to the slide
-        if self.caption is not None:
-            title = slide.shapes.title
-            title.text = self.caption
-
-        # Add a table to the slide
-        if self.rgroup_display:
-            table = slide.shapes.add_table(nrows + headline_levels+ nrow_groups, ncols, Inches(0.5), Inches(1.5), Inches(9), Inches(5)).table
-        else:
-            table = slide.shapes.add_table(nrows + headline_levels, ncols, Inches(0.5), Inches(1.5), Inches(9), Inches(5)).table
-        # Set column headers
-        if isinstance(dfs.columns, pd.MultiIndex):
-            # Add multiple headline rows for MultiIndex columns
-            for level in range(headline_levels):
-                prev_val = None
-                start_cell = None
-                for i, val in enumerate(dfs.columns.get_level_values(level)):
-                    if val != prev_val:
-                        if start_cell is not None:
-                            # merge prior cells
-                            start_cell.merge(table.cell(level, i))
-                        # assign index value to cell
-                        table.cell(level, i+1).text = str(val)
-                        # and define this as a new start_cell
-                        start_cell= table.cell(level, i+1)
-                    else:
-                        # if the value is the same as the previous one, we just leave the cell empty
-                        table.cell(level, i+1).text = ""
-                        # if it is the last cell in the row, we merge it with the previous cell
-                        if i == len(dfs.columns.get_level_values(level)) - 1:
-                            start_cell.merge(table.cell(level, i+1))
-                    prev_val = val
-        else:
-            for i, col in enumerate(dfs.columns):
-                table.cell(0, i + 1).text = str(col)
-
-        # Add row names and data
-        if row_groups:
-            current_group = None
-            row_num=headline_levels
-            for i, idx in enumerate(dfs.index):
-                if idx[0] != current_group:
-                    # New row group
-                    current_group = idx[0]
-                    if self.rgroup_display:
-                        # Add group name
-                        table.cell(row_num, 0).text = str(current_group)
-                        row_num += 1
-                table.cell(row_num, 0).text = str(idx[1])
-                for j, val in enumerate(dfs.iloc[i]):
-                    table.cell(row_num, j + 1).text = str(val)
-                row_num += 1
-        else:
-            for i, idx in enumerate(dfs.index):
-                table.cell(i + headline_levels, 0).text = str(idx)
-                for j, val in enumerate(dfs.iloc[i]):
-                    table.cell(i + headline_levels, j + 1).text = str(val)
-
-        # Format the table
-        for row in table.rows:
-            for cell in row.cells:
-                cell.text_frame.paragraphs[0].font.size = Pt(10)
-                #cell.text_frame.paragraphs[0].font.color.rgb = RGBColor(0, 0, 0)
-                cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-
-        # Save the presentation
-        if file_name is not None:
-            presentation.save(file_name)
-
-        return presentation
-
+    
     def _output_docx(self, file_name: Optional[str] = None, tab_num: Optional[int] = None, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
@@ -687,20 +602,3 @@ class TabOut:
 
         return gt
     
-
-    # Sample usage
-    if __name__ == "__main__":
-        # Create a sample DataFrame
-        data = {
-            "Group": ["A", "A", "B", "B"],
-            "Name": ["John", "Alice", "Bob", "Eve"],
-            "Score": [90, 85, 88, 92]
-        }
-        df = pd.DataFrame(data)
-        df.set_index(["Group", "Name"], inplace=True)
-
-        # Create a TabOut object
-        tab_out = TabOut(df, notes="Sample notes", caption="Sample Table", tab_label="tab:sample")
-
-        # Generate tables in different formats
-        tab_out.make(types=["gt", "tex", "docx", "pptx"], path="sample_table")

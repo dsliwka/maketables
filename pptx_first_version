@@ -1,0 +1,96 @@
+def _output_pptx(self, file_name: Optional[str] = None, **kwargs):
+        # Make a copy of the DataFrame to avoid modifying the original
+        dfs = self.df.copy()
+
+        # Number of headline levels
+        headline_levels = dfs.columns.nlevels
+        # Are there row groups: is the case when dfs.index.nlevels > 1
+        row_groups = (dfs.index.nlevels > 1)
+        if row_groups:
+            # Determine number of row groups
+            nrow_groups = len(dfs.index.get_level_values(0).unique())
+        # Number of rows (excluding headline rows)
+        nrows = dfs.shape[0]
+        # Number of columns
+        ncols = dfs.shape[1] + 1
+
+        # Create a new presentation or open an existing one
+        if file_name and os.path.exists(file_name):
+            presentation = Presentation(file_name)
+        else:
+            presentation = Presentation()
+
+        # Add a slide with a title and content layout
+        slide_layout = presentation.slide_layouts[5]  # Use a blank layout
+        slide = presentation.slides.add_slide(slide_layout)
+
+        # Add title to the slide
+        if self.caption is not None:
+            title = slide.shapes.title
+            title.text = self.caption
+
+        # Add a table to the slide
+        if self.rgroup_display:
+            table = slide.shapes.add_table(nrows + headline_levels+ nrow_groups, ncols, Inches(0.5), Inches(1.5), Inches(9), Inches(5)).table
+        else:
+            table = slide.shapes.add_table(nrows + headline_levels, ncols, Inches(0.5), Inches(1.5), Inches(9), Inches(5)).table
+        # Set column headers
+        if isinstance(dfs.columns, pd.MultiIndex):
+            # Add multiple headline rows for MultiIndex columns
+            for level in range(headline_levels):
+                prev_val = None
+                start_cell = None
+                for i, val in enumerate(dfs.columns.get_level_values(level)):
+                    if val != prev_val:
+                        if start_cell is not None:
+                            # merge prior cells
+                            start_cell.merge(table.cell(level, i))
+                        # assign index value to cell
+                        table.cell(level, i+1).text = str(val)
+                        # and define this as a new start_cell
+                        start_cell= table.cell(level, i+1)
+                    else:
+                        # if the value is the same as the previous one, we just leave the cell empty
+                        table.cell(level, i+1).text = ""
+                        # if it is the last cell in the row, we merge it with the previous cell
+                        if i == len(dfs.columns.get_level_values(level)) - 1:
+                            start_cell.merge(table.cell(level, i+1))
+                    prev_val = val
+        else:
+            for i, col in enumerate(dfs.columns):
+                table.cell(0, i + 1).text = str(col)
+
+        # Add row names and data
+        if row_groups:
+            current_group = None
+            row_num=headline_levels
+            for i, idx in enumerate(dfs.index):
+                if idx[0] != current_group:
+                    # New row group
+                    current_group = idx[0]
+                    if self.rgroup_display:
+                        # Add group name
+                        table.cell(row_num, 0).text = str(current_group)
+                        row_num += 1
+                table.cell(row_num, 0).text = str(idx[1])
+                for j, val in enumerate(dfs.iloc[i]):
+                    table.cell(row_num, j + 1).text = str(val)
+                row_num += 1
+        else:
+            for i, idx in enumerate(dfs.index):
+                table.cell(i + headline_levels, 0).text = str(idx)
+                for j, val in enumerate(dfs.iloc[i]):
+                    table.cell(i + headline_levels, j + 1).text = str(val)
+
+        # Format the table
+        for row in table.rows:
+            for cell in row.cells:
+                cell.text_frame.paragraphs[0].font.size = Pt(10)
+                #cell.text_frame.paragraphs[0].font.color.rgb = RGBColor(0, 0, 0)
+                cell.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+
+        # Save the presentation
+        if file_name is not None:
+            presentation.save(file_name)
+
+        return presentation
