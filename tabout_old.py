@@ -24,17 +24,20 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 import os
 
+# To do:
+#
 # Methods
 # -	make: Just return output object (gt, docx, tex, html)
 # -	save: Save output object in new file to path (docx, tex, html) add parameter replace to replace existing file otherwise error message when file exists
 # -	update: Update existing file with output object (so far only docx) at specified position 
 #
 # Note:
-# - both save and update have a parameter show to display the output object in the notebook as gt
-##
+# - both save and update have a parameter show to display the output object in the notebook
+# - default show format is gt but can also be plain text
+#
 # - Handling of paths:
 #     - in save: if file_name is None, use combination of default_path and label as file_name to store the file
-#     - in update: if file_name is relative path and default path is specified, use default_path to update the file_path
+#     - in update: if file_name is not a path but just a name, use default_path to update the file_path
 
 class TabOut:
     # Class attributes for default values
@@ -44,11 +47,6 @@ class TabOut:
     DEFAULT_RGROUP_SEP = "tb"
     DEFAULT_RGROUP_DISPLAY = True
     DEFAULT_SAVE_PATH = None  # can be string or dict
-    DEFAULT_REPLACE = False
-    DEFAULT_MAKE_TYPE = "gt"
-    DEFAULT_SAVE_TYPE = "html"
-    ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
-    ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
 
     def __init__(
         self,
@@ -58,7 +56,7 @@ class TabOut:
         tab_label: Optional[str] = DEFAULT_TAB_LABEL,
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
-        default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
+        default_path: Union[None, str, dict] = DEFAULT_SAVE_PATH,
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -70,179 +68,64 @@ class TabOut:
         self.tab_label = tab_label
         self.rgroup_sep = rgroup_sep
         self.rgroup_display = rgroup_display
-        if isinstance(default_paths, str):
-            self.default_paths = {t: default_paths for t in ADMISSIBLE_SAVE_TYPES}
-        elif isinstance(default_paths, dict):
-            self.default_paths = default_paths.copy()
+        if isinstance(default_path, str):
+            self.default_paths = {t: default_path for t in ["gt","tex","docx"]}
+        elif isinstance(default_path, dict):
+            self.default_paths = default_path.copy()
         else:
             self.default_paths = {}
     
-            
-    def make(self, 
-             type: str = DEFAULT_MAKE_TYPE, 
-             **kwargs):
-        """
-        Create the output object of the table (either gt, tex, docx, or html).
-        
-        Parameters
-        ----------
-        type : str, optional
-            The type of the output object. The default is 'gt'.
-            Default can be set using DEFAULT_MAKE_TYPE class attribute.
-        **kwargs : dict
-            Additional keyword arguments to pass to the output method.
-            
-        Returns
-        -------
-            output : object
-                The output object of the table.
-        """
-        assert type in ADMISSIBLE_TYPES, "types must be either " + ", ".join(ADMISSIBLE_TYPES) 
-        if type == "gt":
-            return self._output_gt(**kwargs)
-        elif type == "tex":
-            return self._output_tex(**kwargs)
-        elif type == "docx":
-            return self._output_docx(**kwargs)
+    def _revise_file_path(self, file_path: str, label: str, extension: str) -> str:
+        if extension=='gt':
+            # gt is always saved as html
+            extension = 'html'
+        if file_path.endswith(extension):
+            # if the path ends with the specified extension, we return it
+            return file_path
+        elif '.' in file_path:
+            # if it has another file extension, we replace it with the specified extension 
+            return file_path.rsplit('.', 1)[0] + extension
+        elif os.path.isdir(file_path):
+            # otherwise we check whether the file_path is a directory, 
+            # and define a new file name in this directory named label.extension
+            return os.path.join(file_path, f"{label}.{extension}")
         else:
-            return self._output_gt(**kwargs).as_raw_html()
-    
-
-    def save(self, 
-             type: str = DEFAULT_SAVE_TYPE, 
-             file_name: str = None, 
-             show: bool=True , 
-             replace: bool=DEFAULT_REPLACE, 
-             **kwargs):
-                def save(self, 
-                 type: str = DEFAULT_SAVE_TYPE, 
-                 file_name: str = None, 
-                 show: bool=True , 
-                 replace: bool=DEFAULT_REPLACE, 
-                 **kwargs):
-            """
-            Save the output object of the table to a file.
+            # otherwise we add the extension to the file_path
+            return f"{file_path}.{extension}"
+            
+    def make(self, types: Union[str, list[str]], path: Optional[str] = None, **kwargs):
+        if isinstance(types, str):
+            types = [types]
+        assert all(t in ["gt","tex", "docx"] for t in types), "types must be either 'gt', 'tex', or 'docx'"
+        assert path is None or (
+            isinstance(path, str) and (path.endswith((".html", ".tex", ".docx")) or '.' not in path)
+        ), "path must end with '.html', '.tex', '.docx', or have no file extension."
         
-            Parameters
-            ----------
-            type : str, optional
-                The type of the output object. The default is 'html'.
-                Must be one of "tex", "docx", "html".
-            file_name : str, optional
-                The name of the file to save the output object to. If None, the file name
-                will be generated using the default path specified in DEFAULT_SAVE_PATH and tab_label.
-            show : bool, optional
-                If True, the output object will be returned and displayed. Default is True.
-            replace : bool, optional
-                If True, an existing file with the same name will be replaced. Default is False.
-                Default can be set using DEFAULT_REPLACE class attribute.
-            **kwargs : dict
-                Additional keyword arguments to pass to the output method.
-        
-            Returns
-            -------
-            output : GT object
-                The table as GT object if show is True.
-            """
-        assert type in ADMISSIBLE_SAVE_TYPES, "types must be either " + ", ".join(ADMISSIBLE_SAVE_TYPES) 
-        if file_name is None:
-            if self.tab_label is None:
-                raise ValueError("tab_label must be provided if file_name is None")
-            if self.default_paths.get(type) is None:
-                raise ValueError(f"Default path for type {type} has to be set if file_name is None")
-            # file name will be default path and tab_label:    
-            file_name = self.default_paths.get(type) + self.tab_label
-        elif not os.path.splitext(file_name)[1]:
-            # if file_name does not have an extension, add the extension
-            file_name += f".{type}"
-        if self.default_paths.get(type) is not None and not os.path.isabs(file_name):
-            # if file_name is not an absolute path, and default path is set, then add default path to file_name
-            file_name = os.path.join(self.default_paths.get(type, ""), file_name)
-        if not replace:
-            # when replace is False, check if file exists & abort if it does
-            if file_name is not None and os.path.exists(file_name):
-                raise ValueError(f"File {file_name} already exists. Set replace=True or use class parameter DEFAULT_REPLACE=True to replace the file.")
-        assert isinstance(file_name, str) and os.path.isdir(os.path.dirname(file_name)), f"{file_name} is not a valid path."
-        if type == "tex":
-            with open(file_name, "w") as f:
-                f.write(self._output_tex(**kwargs))  # Write the latex code to a file
-        elif type == "docx":
-            document = Document(file_name)
-            # Add caption if specified
-            if self.caption is not None:
-                paragraph = document.add_paragraph('Table ', style='Caption')
-                run = paragraph.add_run()
-                r = run._r
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'begin')
-                r.append(fldChar)
-                instrText = OxmlElement('w:instrText')
-                instrText.text = r'SEQ Table \* ARABIC'
-                r.append(instrText)
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'end')
-                r.append(fldChar)
-                bold_run = paragraph.add_run(f': {self.caption}')
-                bold_run.bold = False
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                # Set the font color to black and font size to 11
-                for run in paragraph.runs:
-                    run.font.color.rgb = RGBColor(0, 0, 0)
-                    run.font.size = Pt(11)
-            # Add table
-            table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-            table.style = 'Table Grid'
-            self._build_docx_table(table)
-            document.save(file_name)
-        else:
-            # Save the html code of the table to a file
-            with open(file_name, "w") as f:
-                f.write(self._output_gt(**kwargs).as_raw_html())
-        if show:
-            # return gt table if show is True
-            return self._output_gt(**kwargs)  
+        results = {}
+        for t in types:
+            # Use provided path if not None, else use default_paths if available
+            save_path = path or self.default_paths.get(t)
+            if save_path:
+                file_name = self._revise_file_path(save_path, self.tab_label, t)
+            else:
+                file_name = None
+            if t == "gt":
+                results[t] = self._output_gt(file_name=file_name, **kwargs)
+            if t == "tex":
+                results[t] = self._output_tex(file_name=file_name, **kwargs)
+            if t == "docx":
+                results[t] = self._output_docx(file_name=file_name, **kwargs)
+        # Return only the first output type result in the list
+        return results[types[0]]
     
-
-    def update_doxc(self, file_name: str = None, 
-                    tab_num: Optional[int] = None,
-                    show: bool=True, 
-                    **kwargs):
-        """
-        Update an existing DOCX file with the output object of the table.
-
-        Parameters
-        ----------
-        file_name : str
-            The name of the DOCX file to update. Must be provided.
-        tab_num : int, optional
-            The position of the table to replace in the document. If None, a new table will be added.
-        show : bool, optional
-            If True, the output object will be returned and displayed. Default is True.
-        **kwargs : dict
-            Additional keyword arguments to pass to the output method.
-
-        Returns
-        -------
-        output : GT object
-            The table as GT object if show is True.
-        """
-        assert file_name is not None, "file_name must be provided"
-        # check if file_name is an absolute path, if not add default path
-        if self.default_paths.get("docx") is not None and not os.path.isabs(file_name):
-            file_name = os.path.join(self.default_paths.get("docx", ""), file_name)
-        # check if file has no extension and if yes append docx extension
-        if not os.path.splitext(file_name)[1]:
-            file_name += ".docx"
-        elif not os.path.splitext(file_name)[1] == ".docx":
-            raise ValueError("file_name must have .docx extension")
-        assert isinstance(file_name, str) and os.path.isdir(os.path.dirname(file_name)), f"{file_name} is not a valid path."
+    
+    def _output_docx(self, file_name: Optional[str] = None, tab_num: Optional[int] = None, **kwargs):
         # Check if the document exists
         if file_name and os.path.exists(file_name):
             document = Document(file_name)
             # Determine the number of tables in the document
             n_tables = len(document.tables)
         else:
-            # if the document does not yet exist, create a new one
             document = Document()
             n_tables = 0
 
@@ -292,9 +175,8 @@ class TabOut:
         # Save the document
         if file_name is not None:
             document.save(file_name)
-        # return gt table if show is True
-        if show:
-           return self._output_gt(**kwargs)
+
+        return document
     
 
     def _build_docx_table(self, table):
@@ -601,6 +483,10 @@ class TabOut:
                 "\\end{tabular}", "\\end{tabularx}\n \\vspace{3pt}"
             )
 
+        if file_name is not None:
+            with open(file_name, "w") as f:
+                f.write(latex_res)  # Write the latex code to a file
+
         return latex_res
 
     def _output_gt(self, file_name: Optional[str] = None, full_width: bool = False, **kwargs):
@@ -706,6 +592,11 @@ class TabOut:
             gt = gt.tab_options(row_group_border_bottom_style="none")
         if not self.rgroup_display:
             gt = gt.tab_options(row_group_font_size="0px", row_group_padding="0px")
+
+        # Save the html code of the table to a file
+        if file_name is not None:
+            with open(file_name, "w") as f:
+                f.write(gt.as_raw_html())
 
         return gt
     
