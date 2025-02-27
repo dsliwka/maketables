@@ -71,7 +71,7 @@ class TabOut:
         self.rgroup_sep = rgroup_sep
         self.rgroup_display = rgroup_display
         if isinstance(default_paths, str):
-            self.default_paths = {t: default_paths for t in ADMISSIBLE_SAVE_TYPES}
+            self.default_paths = {t: default_paths for t in self.ADMISSIBLE_SAVE_TYPES}
         elif isinstance(default_paths, dict):
             self.default_paths = default_paths.copy()
         else:
@@ -97,7 +97,7 @@ class TabOut:
             output : object
                 The output object of the table.
         """
-        assert type in ADMISSIBLE_TYPES, "types must be either " + ", ".join(ADMISSIBLE_TYPES) 
+        assert type in self.ADMISSIBLE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_TYPES) 
         if type == "gt":
             return self._output_gt(**kwargs)
         elif type == "tex":
@@ -112,39 +112,33 @@ class TabOut:
              type: str = DEFAULT_SAVE_TYPE, 
              file_name: str = None, 
              show: bool=True , 
-             replace: bool=DEFAULT_REPLACE, 
+             replace: bool= DEFAULT_REPLACE, 
              **kwargs):
-                def save(self, 
-                 type: str = DEFAULT_SAVE_TYPE, 
-                 file_name: str = None, 
-                 show: bool=True , 
-                 replace: bool=DEFAULT_REPLACE, 
-                 **kwargs):
-            """
-            Save the output object of the table to a file.
-        
-            Parameters
-            ----------
-            type : str, optional
-                The type of the output object. The default is 'html'.
-                Must be one of "tex", "docx", "html".
-            file_name : str, optional
-                The name of the file to save the output object to. If None, the file name
-                will be generated using the default path specified in DEFAULT_SAVE_PATH and tab_label.
-            show : bool, optional
-                If True, the output object will be returned and displayed. Default is True.
-            replace : bool, optional
-                If True, an existing file with the same name will be replaced. Default is False.
-                Default can be set using DEFAULT_REPLACE class attribute.
-            **kwargs : dict
-                Additional keyword arguments to pass to the output method.
-        
-            Returns
-            -------
-            output : GT object
-                The table as GT object if show is True.
-            """
-        assert type in ADMISSIBLE_SAVE_TYPES, "types must be either " + ", ".join(ADMISSIBLE_SAVE_TYPES) 
+        """
+        Save the output object of the table to a file.
+    
+        Parameters
+        ----------
+        type : str, optional
+            The type of the output object. The default is 'html'.
+            Must be one of "tex", "docx", "html".
+        file_name : str, optional
+            The name of the file to save the output object to. If None, the file name
+            will be generated using the default path specified in DEFAULT_SAVE_PATH and tab_label.
+        show : bool, optional
+            If True, the output object will be returned and displayed. Default is True.
+        replace : bool, optional
+            If True, an existing file with the same name will be replaced. Default is False.
+            Default can be set using DEFAULT_REPLACE class attribute.
+        **kwargs : dict
+            Additional keyword arguments to pass to the output method.
+    
+        Returns
+        -------
+        output : GT object
+            The table as GT object if show is True.
+        """
+        assert type in self.ADMISSIBLE_SAVE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_SAVE_TYPES) 
         if file_name is None:
             if self.tab_label is None:
                 raise ValueError("tab_label must be provided if file_name is None")
@@ -167,32 +161,7 @@ class TabOut:
             with open(file_name, "w") as f:
                 f.write(self._output_tex(**kwargs))  # Write the latex code to a file
         elif type == "docx":
-            document = Document(file_name)
-            # Add caption if specified
-            if self.caption is not None:
-                paragraph = document.add_paragraph('Table ', style='Caption')
-                run = paragraph.add_run()
-                r = run._r
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'begin')
-                r.append(fldChar)
-                instrText = OxmlElement('w:instrText')
-                instrText.text = r'SEQ Table \* ARABIC'
-                r.append(instrText)
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'end')
-                r.append(fldChar)
-                bold_run = paragraph.add_run(f': {self.caption}')
-                bold_run.bold = False
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                # Set the font color to black and font size to 11
-                for run in paragraph.runs:
-                    run.font.color.rgb = RGBColor(0, 0, 0)
-                    run.font.size = Pt(11)
-            # Add table
-            table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-            table.style = 'Table Grid'
-            self._build_docx_table(table)
+            document = self._output_docx(file_name=file_name, **kwargs)
             document.save(file_name)
         else:
             # Save the html code of the table to a file
@@ -203,9 +172,9 @@ class TabOut:
             return self._output_gt(**kwargs)  
     
 
-    def update_doxc(self, file_name: str = None, 
+    def update_docx(self, file_name: str = None, 
                     tab_num: Optional[int] = None,
-                    show: bool=True, 
+                    show: bool=False, 
                     **kwargs):
         """
         Update an existing DOCX file with the output object of the table.
@@ -262,40 +231,66 @@ class TabOut:
             # Delete all rows in the old table
             for row in table.rows:
                 table._element.remove(row._element)
+            # Build the new table in the existing document
+            self._build_docx_table(table)
         else:
-            # Add caption and new table
+            # Add a caption if specified
             if self.caption is not None:
                 paragraph = document.add_paragraph('Table ', style='Caption')
-                run = paragraph.add_run()
-                r = run._r
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'begin')
-                r.append(fldChar)
-                instrText = OxmlElement('w:instrText')
-                instrText.text = r'SEQ Table \* ARABIC'
-                r.append(instrText)
-                fldChar = OxmlElement('w:fldChar')
-                fldChar.set(qn('w:fldCharType'), 'end')
-                r.append(fldChar)
-                bold_run = paragraph.add_run(f': {self.caption}')
-                bold_run.bold = False
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                # Set the font color to black and font size to 11
-                for run in paragraph.runs:
-                    run.font.color.rgb = RGBColor(0, 0, 0)
-                    run.font.size = Pt(11)
+                self._build_docx_caption(self.caption, paragraph)
+                
+            # Add a new table to the document
             table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
             table.style = 'Table Grid'
-
-        self._build_docx_table(table)
+            self._build_docx_table(table)
 
         # Save the document
-        if file_name is not None:
-            document.save(file_name)
+        document.save(file_name)
+        
         # return gt table if show is True
         if show:
            return self._output_gt(**kwargs)
     
+
+
+    def _output_docx(self, **kwargs):
+        # Create a new Document
+        document = Document()
+
+        # Add caption if specified
+        if self.caption is not None:
+            paragraph = document.add_paragraph('Table ', style='Caption')
+            self._build_docx_caption(self.caption, paragraph)
+
+        # Add table
+        table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
+        table.style = 'Table Grid'
+        self._build_docx_table(table)
+
+        return document
+
+
+    def _build_docx_caption(self, caption: str, paragraph):
+        run = paragraph.add_run()
+        r = run._r
+        fldChar = OxmlElement('w:fldChar')
+        fldChar.set(qn('w:fldCharType'), 'begin')
+        r.append(fldChar)
+        instrText = OxmlElement('w:instrText')
+        instrText.text = r'SEQ Table \* ARABIC'
+        r.append(instrText)
+        fldChar = OxmlElement('w:fldChar')
+        fldChar.set(qn('w:fldCharType'), 'end')
+        r.append(fldChar)
+        bold_run = paragraph.add_run(f': {caption}')
+        bold_run.bold = False
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        # Set the font color to black and font size to 11
+        for run in paragraph.runs:
+            run.font.color.rgb = RGBColor(0, 0, 0)
+            run.font.size = Pt(11)
+
+
 
     def _build_docx_table(self, table):
         # Make a copy of the DataFrame to avoid modifying the original
@@ -483,7 +478,7 @@ class TabOut:
 
 
         
-    def _output_tex(self, file_name: Optional[str] = None, full_width: bool = False, **kwargs):
+    def _output_tex(self, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
@@ -603,7 +598,7 @@ class TabOut:
 
         return latex_res
 
-    def _output_gt(self, file_name: Optional[str] = None, full_width: bool = False, **kwargs):
+    def _output_gt(self, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
@@ -708,4 +703,4 @@ class TabOut:
             gt = gt.tab_options(row_group_font_size="0px", row_group_padding="0px")
 
         return gt
-    
+
