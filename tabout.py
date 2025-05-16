@@ -22,6 +22,9 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from IPython.display import display
+from IPython import get_ipython
+
 import os
 
 # Methods
@@ -101,8 +104,7 @@ class TabOut:
         """
         if type is None:
             # If no type is specified, directly display dual output
-            from IPython.display import display
-
+            
             # Create dual output object for notebook/Quarto compatibility
             class DualOutput:
                 """Display different outputs in notebook vs Quarto rendering."""
@@ -745,4 +747,39 @@ class TabOut:
             gt = gt.tab_options(row_group_font_size="0px", row_group_padding="0px")
 
         return gt
+
+    def __repr__(self):
+        """
+        Return a representation of the table.
+
+        In notebook environments, this will automatically display the table 
+        with dual output format (HTML in notebooks, LaTeX in Quarto) without 
+        requiring an explicit call to make().
+
+        Returns
+        -------
+        str
+            An empty string 
+        """
+        self.make()
+        
+        return ""
+    
+    def __call__(self, type=None, **kwargs):
+        """
+        Make this object callable, equivalent to calling make().
+        
+        Parameters
+        ----------
+        type : str, optional
+            The output type to create. If None, displays dual output.
+        **kwargs : dict
+            Additional parameters to pass to make().
+            
+        Returns
+        -------
+        output : object
+            The output object returned by make().
+        """
+        return self.make(type=type, **kwargs)
 
