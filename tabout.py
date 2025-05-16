@@ -25,12 +25,12 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 import os
 
 # Methods
-# -	make: Just return output object (gt, docx, tex, html)
+# -	make: Just return output object (gt, docx, tex, html) or display directly in notebook or as tex when rendered to pdf in Quarto
 # -	save: Save output object in new file to path (docx, tex, html) add parameter replace to replace existing file otherwise error message when file exists
 # -	update: Update existing file with output object (so far only docx) at specified position 
 #
 # Note:
-# - both save and update have a parameter show to display the output object in the notebook as gt
+# - both save and update have a parameter "show" to display the output object in the notebook as gt
 ##
 # - Handling of paths:
 #     - in save: if file_name is None, use combination of default_path and label as file_name to store the file
@@ -45,7 +45,6 @@ class TabOut:
     DEFAULT_RGROUP_DISPLAY = True
     DEFAULT_SAVE_PATH = None  # can be string or dict
     DEFAULT_REPLACE = False
-    DEFAULT_MAKE_TYPE = "gt"
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
@@ -79,25 +78,65 @@ class TabOut:
     
             
     def make(self, 
-             type: str = DEFAULT_MAKE_TYPE, 
+             type: str = None,  # Change default to None to detect when param is not provided
              **kwargs):
         """
         Create the output object of the table (either gt, tex, docx, or html).
+        If no type is specified, displays both HTML and LaTeX outputs for compatibility
+        with both notebook viewing and Quarto rendering.
         
         Parameters
         ----------
         type : str, optional
-            The type of the output object. The default is 'gt'.
-            Default can be set using DEFAULT_MAKE_TYPE class attribute.
+            The type of the output object. If None, displays dual output.
+            Otherwise must be one of "gt", "tex", "docx", "html".
         **kwargs : dict
             Additional keyword arguments to pass to the output method.
             
         Returns
         -------
             output : object
-                The output object of the table.
+                The output object of the table if type is specified.
+                None if type is None (as output is directly displayed).
         """
+        if type is None:
+            # If no type is specified, directly display dual output
+            from IPython.display import display
+
+            # Create dual output object for notebook/Quarto compatibility
+            class DualOutput:
+                """Display different outputs in notebook vs Quarto rendering."""
+                def __init__(self, notebook_html, quarto_latex):
+                    self.notebook_html = notebook_html
+                    self.quarto_latex = quarto_latex
+                    
+                def _repr_mimebundle_(self, include=None, exclude=None):
+                    return {
+                        'text/html': self.notebook_html,
+                        'text/latex': self.quarto_latex
+                    }
+            
+            # Generate both HTML and LaTeX outputs
+            html_output = self._output_gt(**kwargs).as_raw_html()
+            tex_output = self._output_tex(**kwargs)
+            
+            # Add CSS to remove zebra striping if desired
+            html_output = """
+            <style>
+            table tr:nth-child(even) {
+                background-color: transparent !important;
+            }
+            </style>
+            """ + html_output
+            
+            # Create and display the dual output object
+            dual_output = DualOutput(html_output, tex_output)
+            display(dual_output)
+            return None
+        
+        # For explicitly specified types
         assert type in self.ADMISSIBLE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_TYPES) 
+        
         if type == "gt":
             return self._output_gt(**kwargs)
         elif type == "tex":
@@ -597,6 +636,9 @@ class TabOut:
             )
 
         return latex_res
+
+
+
 
     def _output_gt(self, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
