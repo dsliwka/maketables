@@ -39,6 +39,7 @@ import os
 #     - in save: if file_name is None, use combination of default_path and label as file_name to store the file
 #     - in update: if file_name is relative path and default path is specified, use default_path to update the file_path
 
+
 class TabOut:
     # Class attributes for default values
     DEFAULT_NOTES = ""
