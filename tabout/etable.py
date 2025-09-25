@@ -29,12 +29,25 @@ class ETable(TabOut):
     that can be extended for other packages.
     """
 
+    # ---- Class defaults (single source of truth) ----
+    DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05]
+    DEFAULT_COEF_FMT = "b \n (se)"
+    DEFAULT_MODEL_STATS = ["N", "r2"]
+    DEFAULT_SHOW_SE_TYPE = True
+    DEFAULT_SHOW_FE = True
+    DEFAULT_HEAD_ORDER = "dh"
+    DEFAULT_DIGITS = 3
+    DEFAULT_LABELS: Dict[str, str] = {}
+    DEFAULT_FELABELS: Dict[str, str] = {}
+    DEFAULT_CAT_TEMPLATE = "{variable}={value}"
+    DEFAULT_LINEBREAK = "\n"
+
     def __init__(
         self,
         models: ModelInputType,
         *,
         signif_code: Optional[list] = None,
-        coef_fmt: str = "b \n (se)",
+        coef_fmt: Optional[str] = None,
         model_stats: Optional[list[str]] = None,
         model_stats_labels: Optional[dict[str, str]] = None,
         custom_stats: Optional[dict] = None,
@@ -44,31 +57,36 @@ class ETable(TabOut):
         exact_match: Optional[bool] = False,
         labels: Optional[dict] = None,
         cat_template: Optional[str] = None,
-        show_fe: Optional[bool] = True,
+        show_fe: Optional[bool] = None,
         felabels: Optional[dict] = None,
         notes: str = "",
         model_heads: Optional[list] = None,
-        head_order: Optional[str] = "dh",
+        head_order: Optional[str] = None,
         caption: Optional[str] = None,
         tab_label: Optional[str] = None,
-        digits: int = 3,
+        digits: Optional[int] = None,
         **kwargs,
     ):
-        # --- defaults and checks  ---
-        if signif_code is None:
-            signif_code = [0.001, 0.01, 0.05]
+        # --- defaults from class attributes ---
+        signif_code = self.DEFAULT_SIGNIF_CODE if signif_code is None else signif_code
+        coef_fmt = self.DEFAULT_COEF_FMT if coef_fmt is None else coef_fmt
+        labels = dict(self.DEFAULT_LABELS) if labels is None else labels
+        cat_template = self.DEFAULT_CAT_TEMPLATE if cat_template is None else cat_template
+        show_fe = self.DEFAULT_SHOW_FE if show_fe is None else show_fe
+        felabels = dict(self.DEFAULT_FELABELS) if felabels is None else felabels
+        head_order = self.DEFAULT_HEAD_ORDER if head_order is None else head_order
+        digits = self.DEFAULT_DIGITS if digits is None else digits
+        custom_stats = {} if custom_stats is None else custom_stats
+        keep = [] if keep is None else keep
+        drop = [] if drop is None else drop
+
+        # --- checks  ---
         assert isinstance(signif_code, list) and len(signif_code) == 3
         if signif_code:
             assert all(0 < i < 1 for i in signif_code)
             assert signif_code[0] < signif_code[1] < signif_code[2]
 
-        cat_template = "" if cat_template is None else cat_template
         models = self._normalize_models(models)
-
-        labels = {} if labels is None else labels
-        custom_stats = {} if custom_stats is None else custom_stats
-        keep = [] if keep is None else keep
-        drop = [] if drop is None else drop
 
         if custom_stats:
             assert isinstance(custom_stats, dict)
@@ -90,7 +108,7 @@ class ETable(TabOut):
 
         # --- bottom model stats keys (modular default) ---
         if model_stats is None:
-            model_stats = ["N","r2"]
+            model_stats = list(self.DEFAULT_MODEL_STATS)
         model_stats = list(model_stats)
         assert all(isinstance(s, str) for s in model_stats)
         assert len(model_stats) == len(set(model_stats))
@@ -241,7 +259,7 @@ class ETable(TabOut):
         labels: Dict[str, str],
         cat_template: str,
     ) -> tuple[pd.DataFrame, str]:
-        lbcode = "\n"
+        lbcode = self.DEFAULT_LINEBREAK
         coef_fmt_elements, coef_fmt_title = _parse_coef_fmt(coef_fmt, custom_stats)
 
         cols_per_model = []
