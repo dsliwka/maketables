@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 from typing import Optional
-from .btable import BTable
+from .mtable import MTable
 
-class DTable(BTable):
+class DTable(MTable):
     """
-    DTable extends BTable to provide descriptive statistics table functionality.
+    DTable extends MTable to provide descriptive statistics table functionality.
 
     Parameters
     ----------
@@ -204,7 +204,7 @@ class DTable(BTable):
 
         # --- End dtable logic ---
 
-        # Call BTable constructor with processed table and metadata
+        # Call MTable constructor with processed table and metadata
         super().__init__(
             res,
             notes=notes,

@@ -40,7 +40,7 @@ import os
 #     - in update: if file_name is relative path and default path is specified, use default_path to update the file_path
 
 
-class BTable:
+class MTable:
     # Class attributes for default values
     DEFAULT_NOTES = ""
     DEFAULT_CAPTION = None
@@ -767,7 +767,7 @@ class BTable:
             try:
                 return self.df.to_html()
             except Exception:
-                return "<pre>BTable</pre>"
+                return "<pre>MTable</pre>"
 
     def _repr_mimebundle_(self, include=None, exclude=None):
         return {"text/html": self._repr_html_()}

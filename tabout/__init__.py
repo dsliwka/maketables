@@ -1,4 +1,4 @@
-from .btable import BTable
+from .mtable import MTable
 from .dtable import DTable
 from .etable import ETable
 from .extractors import register_extractor, clear_extractors, ModelExtractor
