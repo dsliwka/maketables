@@ -45,7 +45,6 @@ class ETable(TabOut):
         labels: Optional[dict] = None,
         cat_template: Optional[str] = None,
         show_fe: Optional[bool] = True,
-        show_se_type: Optional[bool] = True,
         felabels: Optional[dict] = None,
         notes: str = "",
         model_heads: Optional[list] = None,
@@ -91,7 +90,7 @@ class ETable(TabOut):
 
         # --- bottom model stats keys (modular default) ---
         if model_stats is None:
-            model_stats = self._default_model_stats(models, show_se_type)
+            model_stats = ["N","r2"]
         model_stats = list(model_stats)
         assert all(isinstance(s, str) for s in model_stats)
         assert len(model_stats) == len(set(model_stats))
@@ -152,7 +151,7 @@ class ETable(TabOut):
         if notes == "":
             notes = (
                 f"Significance levels: * p < {signif_code[2]}, ** p < {signif_code[1]}, *** p < {signif_code[0]}. "
-                + f"Format of coefficient cell:\n{coef_fmt_title}"
+                + f"Format of coefficient cell: {coef_fmt_title}"
             )
 
         super().__init__(
@@ -326,17 +325,6 @@ class ETable(TabOut):
         labels = labels or {}
         fe_df.index = fe_df.index.to_series().apply(lambda x: felabels.get(x, labels.get(x, x)))
         return fe_df
-
-    def _default_model_stats(self, models: List[Any], show_se_type: bool) -> List[str]:
-        any_within = any(
-            hasattr(m, "_r2_within") and not math.isnan(getattr(m, "_r2_within", float("nan")))
-            for m in models
-        )
-        keys = ["N"]
-        if show_se_type:
-            keys.append("se_type")
-        keys += ["r2", "r2_within" if any_within else "adj_r2"]
-        return keys
 
     def _build_model_stats(
         self,
@@ -548,40 +536,6 @@ def _number_formatter(x: float, **kwargs) -> str:
     _float = _float.ljust(digits, "0")
     return _int if digits == 0 else f"{_int}.{_float}"
 
-
-def _extract(model, key: str, **kwargs):
-    """
-    Extract the value of a model statistics from a model.
-
-    Parameters
-    ----------
-    model: Any
-        The model from which to extract the value.
-    key: str
-        The name of the statistic to extract. The method adds _ to the key and calls getattr on the model.
-
-    Returns
-    -------
-    value: Any
-        The extracted and formatted value.
-    """
-    if key == "se_type":
-        if getattr(model, "_vcov_type", "") == "CRV":
-            return "by: " + "+".join(getattr(model, "_clustervar", []))
-        return getattr(model, "_vcov_type", None)
-    attr_name = f"_{key}"
-    val = getattr(model, attr_name, None)
-    if val is None:
-        return "-"
-    if isinstance(val, (int, np.integer)):
-        return _number_formatter(float(val), integer=True, **kwargs)
-    if isinstance(val, (float, np.floating)):
-        if math.isnan(val):
-            return "-"
-        return _number_formatter(float(val), **kwargs)
-    if isinstance(val, bool):
-        return str(val)
-    return str(val)
 
 
 def _relabel_index(index, labels=None, stats_labels=None):

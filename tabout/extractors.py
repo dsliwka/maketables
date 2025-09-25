@@ -54,7 +54,6 @@ class PyFixestExtractor:
 
     def coef_table(self, model: Any) -> pd.DataFrame:
         df = model.tidy()
-
         if "Estimate" not in df.columns or "Std. Error" not in df.columns:
             raise ValueError("PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'.")
 
@@ -145,9 +144,22 @@ class StatsmodelsExtractor:
     def stat(self, model: Any, key: str) -> Any:
         if key == "se_type":
             return getattr(model, "cov_type", None)
-        mapping = {"N": "nobs", "r2": "rsquared", "adj_r2": "rsquared_adj", "aic": "aic", "bic": "bic"}
+        mapping = {"N": "nobs", 
+                   "r2": "rsquared", 
+                   "adj_r2": "rsquared_adj", 
+                   "aic": "aic", 
+                   "bic": "bic",
+                   "f_pvalue": "f_pvalue",
+                   "fvalue": "fvalue"}
         attr = mapping.get(key)
-        return getattr(model, attr, None) if attr else None
+        value = getattr(model, attr, None) if attr else None
+        # For N, convert to int if possible
+        if key == "N" and value is not None:
+            try:
+                value = int(value)
+            except Exception:
+                pass
+        return value
 
     def vcov_info(self, model: Any) -> Dict[str, Any]:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
