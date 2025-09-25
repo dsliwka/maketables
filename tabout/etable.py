@@ -27,13 +27,15 @@ class ETable(MTable):
     Regression table builder on top of MTable.
 
     ETable extracts coefficients and model statistics from supported model
-    objects (e.g., pyfixest Feols/Fepois/Feiv, FixestMulti), assembles a
+    objects (e.g., pyfixest Feols/Fepois/Feiv, FixestMulti, and statsmodels
+    fitted results such as OLS/GLM), assembles a
     publication-style table, and delegates rendering/export to MTable.
 
     Parameters
     ----------
-    models : FixestMulti | Feols | Fepois | Feiv | list[Feols | Fepois | Feiv]
+    models : FixestMulti | Feols | Fepois | Feiv | statsmodels results | list[...
         One or more fitted models. A FixestMulti is expanded into its models.
+        Statsmodels support includes fitted results objects.
     signif_code : list[float], optional
         Three ascending p-value cutoffs for significance stars, default
         ETable.DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05].
@@ -103,6 +105,14 @@ class ETable(MTable):
       formula encodings that expose variable/value names.
     - Column header structure is built from dependent variable names (relabeled
       via labels), optional model_heads, and model numbers, in head_order.
+    - Statsmodels usage: pass fitted results (e.g., from statsmodels.formula.api).
+      Coefficients, standard errors, p-values, R², and N are extracted automatically.
+
+    Examples
+    --------
+    >>> import statsmodels.formula.api as smf
+    >>> fit_sm = smf.ols("Y ~ X1 + X2", data=df).fit()
+    >>> ETable([fit_sm])  # displays in notebooks; use .make(...) to export
 
     Returns
     -------
