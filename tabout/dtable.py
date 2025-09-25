@@ -209,8 +209,6 @@ class DTable(TabOut):
         super().__init__(
             res,
             notes=notes,
-            caption=kwargs.get("caption", None),
-            tab_label=kwargs.get("tab_label", None),
             rgroup_display=rgroup_display,
             **kwargs
         )

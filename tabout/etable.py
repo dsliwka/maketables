@@ -84,6 +84,9 @@ class ETable(TabOut):
 
         # --- metadata from models (modular) ---
         dep_var_list = [self._extract_depvar(m) for m in models]
+        # relabel dependent variables
+        if labels:
+            dep_var_list = [labels.get(d, d) for d in dep_var_list]
         fixef_list = self._collect_fixef_list(models, show_fe)
 
         # --- bottom model stats keys (modular default) ---

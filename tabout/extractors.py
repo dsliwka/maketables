@@ -54,38 +54,19 @@ class PyFixestExtractor:
 
     def coef_table(self, model: Any) -> pd.DataFrame:
         df = model.tidy()
-        if df.index.name != "Coefficient":
-            df.index.name = "Coefficient"
 
-        cols = {c.lower(): c for c in df.columns}
+        if "Estimate" not in df.columns or "Std. Error" not in df.columns:
+            raise ValueError("PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'.")
 
-        def pick(*names):
-            for n in names:
-                if n in cols:
-                    return cols[n]
-            return None
-
-        est = pick("estimate", "est", "coef", "coefficient", "beta")
-        se = pick("std. error", "std_error", "stderr", "std err", "se")
-        t = pick("t value", "t", "t_stat", "tvalue", "z value", "z", "z_stat", "zvalue")
-        p = pick("pr(>|t|)", "p>|t|", "pvalue", "p", "pr(>|z|)", "p>|z|")
-
-        rename: Dict[str, str] = {}
-        if est and est != "Estimate":
-            rename[est] = "Estimate"
-        if se and se != "Std. Error":
-            rename[se] = "Std. Error"
-        if t and t != "t value":
-            rename[t] = "t value"
-        if p and p != "Pr(>|t|)":
-            rename[p] = "Pr(>|t|)"
-        if rename:
-            df = df.rename(columns=rename)
-
-        needed = ["Estimate", "Std. Error", "Pr(>|t|)"]
-        missing = [k for k in needed if k not in df.columns]
-        if missing:
-            raise ValueError(f"PyFixestExtractor: tidy() missing columns: {missing}")
+        # Map z to t if needed (e.g., Poisson)
+        if "t value" not in df.columns and "z value" in df.columns:
+            df = df.rename(columns={"z value": "t value"})
+        # Map p-value column if needed
+        if "Pr(>|t|)" not in df.columns:
+            if "Pr(>|z|)" in df.columns:
+                df = df.rename(columns={"Pr(>|z|)": "Pr(>|t|)"})
+            else:
+                raise ValueError("PyFixestExtractor: tidy() must contain 'Pr(>|t|)' (or 'Pr(>|z|)').")
 
         keep = ["Estimate", "Std. Error", "Pr(>|t|)"]
         if "t value" in df.columns:
