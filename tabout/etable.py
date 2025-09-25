@@ -24,12 +24,93 @@ ModelInputType = Union[
 
 class ETable(MTable):
     """
-    ETable extends TabOut to generate regression tables from models.
-    The class is modular: model extraction is delegated to helper methods
-    that can be extended for other packages.
-    """
+    Regression table builder on top of MTable.
 
-    # ---- Class defaults (single source of truth) ----
+    ETable extracts coefficients and model statistics from supported model
+    objects (e.g., pyfixest Feols/Fepois/Feiv, FixestMulti), assembles a
+    publication-style table, and delegates rendering/export to MTable.
+
+    Parameters
+    ----------
+    models : FixestMulti | Feols | Fepois | Feiv | list[Feols | Fepois | Feiv]
+        One or more fitted models. A FixestMulti is expanded into its models.
+    signif_code : list[float], optional
+        Three ascending p-value cutoffs for significance stars, default
+        ETable.DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05].
+    coef_fmt : str, optional
+        Cell layout for each coefficient. Tokens:
+          - 'b' (estimate), 'se' (std. error), 't' (t value), 'p' (p-value),
+          - whitespace, ',', parentheses '(', ')', brackets '[', ']', and
+          - '\\n' for line breaks.
+        You may also reference keys from custom_stats to inject custom values.
+        Default ETable.DEFAULT_COEF_FMT = "b \\n (se)".
+    model_stats : list[str], optional
+        Bottom panel statistics to display (order is kept). Examples:
+        'N', 'r2', 'adj_r2', 'r2_within', 'se_type'. If None, defaults to
+        ETable.DEFAULT_MODEL_STATS (currently ['N','r2']).
+    model_stats_labels : dict[str, str], optional
+        Mapping from stat key to display label (e.g., {'N': 'Observations'}).
+    custom_stats : dict, optional
+        Custom per-coefficient values to splice into coef cells via coef_fmt.
+        Shape: {key: list_of_per_model_lists}, where for each key in coef_fmt,
+        custom_stats[key][i] is a list aligned to model i’s coefficient index.
+    custom_model_stats : dict, optional
+        Additional bottom rows. Shape: {'Row label': [val_m1, val_m2, ...]}.
+    keep : list[str] | str, optional
+        Regex patterns (or exact names with exact_match=True) to keep and order
+        coefficients. If provided, output order follows the pattern order.
+    drop : list[str] | str, optional
+        Regex patterns (or exact names with exact_match=True) to exclude after
+        applying keep.
+    exact_match : bool, default False
+        If True, treat keep/drop patterns as exact names (no regex).
+    labels : dict, optional
+        Variable labels for relabeling dependent vars, regressors, and (if not
+        provided in felabels) fixed effects. If None, defaults to
+        MTable.DEFAULT_LABELS so all children share the same label source.
+    cat_template : str, optional
+        Template to relabel categorical terms, using placeholders
+        '{variable}' and '{value}'. Default ETable.DEFAULT_CAT_TEMPLATE
+        = "{variable}={value}". Use "{value}" to show only category names.
+    show_fe : bool, optional
+        Whether to add a fixed-effects presence panel. Defaults to
+        ETable.DEFAULT_SHOW_FE (True).
+    felabels : dict, optional
+        Custom labels for the fixed-effects rows; falls back to labels when
+        not provided.
+    notes : str, optional
+        Table notes. If "", a default note with significance levels and the
+        coef cell format is generated.
+    model_heads : list[str], optional
+        Optional model headers (e.g., country names).
+    head_order : {"dh","hd","d","h",""}, optional
+        Header level order: d=dep var, h=model header. "" shows only model numbers.
+        Default ETable.DEFAULT_HEAD_ORDER = "dh".
+    caption : str, optional
+        Table caption (passed to MTable).
+    tab_label : str, optional
+        Label/anchor for LaTeX/HTML (passed to MTable).
+    digits : int, optional
+        Rounding for numeric values (estimates, SEs, stats). Default
+        ETable.DEFAULT_DIGITS = 3.
+    **kwargs
+        Forwarded to MTable (e.g., rgroup_display, rendering options).
+
+    Notes
+    -----
+    - To display the SE type, include "se_type" in model_stats.
+    - Categorical term relabeling applies to plain categorical columns and to
+      formula encodings that expose variable/value names.
+    - Column header structure is built from dependent variable names (relabeled
+      via labels), optional model_heads, and model numbers, in head_order.
+
+    Returns
+    -------
+    ETable
+        An object holding the assembled table data (as a DataFrame in MTable)
+        and rendering helpers (via MTable.make/save).
+    """
+    # ---- Class defaults ----
     DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05]
     DEFAULT_COEF_FMT = "b \n (se)"
     DEFAULT_MODEL_STATS = ["N", "r2"]
@@ -37,40 +118,36 @@ class ETable(MTable):
     DEFAULT_SHOW_FE = True
     DEFAULT_HEAD_ORDER = "dh"
     DEFAULT_DIGITS = 3
-    DEFAULT_LABELS: Dict[str, str] = {}
     DEFAULT_FELABELS: Dict[str, str] = {}
     DEFAULT_CAT_TEMPLATE = "{variable}={value}"
     DEFAULT_LINEBREAK = "\n"
 
-    def __init__(
-        self,
-        models: ModelInputType,
-        *,
-        signif_code: Optional[list] = None,
-        coef_fmt: Optional[str] = None,
-        model_stats: Optional[list[str]] = None,
-        model_stats_labels: Optional[dict[str, str]] = None,
-        custom_stats: Optional[dict] = None,
-        custom_model_stats: Optional[dict] = None,
-        keep: Optional[Union[list, str]] = None,
-        drop: Optional[Union[list, str]] = None,
-        exact_match: Optional[bool] = False,
-        labels: Optional[dict] = None,
-        cat_template: Optional[str] = None,
-        show_fe: Optional[bool] = None,
-        felabels: Optional[dict] = None,
-        notes: str = "",
-        model_heads: Optional[list] = None,
-        head_order: Optional[str] = None,
-        caption: Optional[str] = None,
-        tab_label: Optional[str] = None,
-        digits: Optional[int] = None,
-        **kwargs,
-    ):
+    def __init__(self, models: ModelInputType, *, 
+                 signif_code: Optional[list] = None,
+                 coef_fmt: Optional[str] = None,
+                 model_stats: Optional[list[str]] = None,
+                 model_stats_labels: Optional[dict[str, str]] = None,
+                 custom_stats: Optional[dict] = None,
+                 custom_model_stats: Optional[dict] = None,
+                 keep: Optional[Union[list, str]] = None,
+                 drop: Optional[Union[list, str]] = None,
+                 exact_match: Optional[bool] = False,
+                 labels: Optional[dict] = None,
+                 cat_template: Optional[str] = None,
+                 show_fe: Optional[bool] = None,
+                 felabels: Optional[dict] = None,
+                 notes: str = "",
+                 model_heads: Optional[list] = None,
+                 head_order: Optional[str] = None,
+                 caption: Optional[str] = None,
+                 tab_label: Optional[str] = None,
+                 digits: Optional[int] = None,
+                 **kwargs):
         # --- defaults from class attributes ---
         signif_code = self.DEFAULT_SIGNIF_CODE if signif_code is None else signif_code
         coef_fmt = self.DEFAULT_COEF_FMT if coef_fmt is None else coef_fmt
-        labels = dict(self.DEFAULT_LABELS) if labels is None else labels
+        # Always take default labels from MTable
+        labels = dict(MTable.DEFAULT_LABELS) if labels is None else labels
         cat_template = self.DEFAULT_CAT_TEMPLATE if cat_template is None else cat_template
         show_fe = self.DEFAULT_SHOW_FE if show_fe is None else show_fe
         felabels = dict(self.DEFAULT_FELABELS) if felabels is None else felabels

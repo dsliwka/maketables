@@ -2,7 +2,7 @@ import re
 import warnings
 from collections import Counter
 from collections.abc import ValuesView
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 import numpy as np
 import pandas as pd
@@ -52,6 +52,9 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html", "nb"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
+
+    # Shared defaults (override per subclass if needed)
+    DEFAULT_LABELS: Dict[str, str] = {}
 
     def __init__(
         self,

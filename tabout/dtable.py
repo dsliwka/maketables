@@ -24,7 +24,9 @@ class DTable(MTable):
         Type of table to be created. The default is 'gt'.
         Type can be 'gt' for great_tables, 'tex' for LaTeX or 'df' for dataframe.
     labels : dict, optional
-        Dictionary containing the labels for the variables. The default is None.
+        Dictionary containing display labels for variables. If None, the class default
+        labels are used (MTable.DEFAULT_LABELS). When provided, this mapping replaces
+        the default mapping (no automatic merge).
     stats_labels : dict, optional
         Dictionary containing the labels for the statistics. The default is None.
     digits : int, optional
@@ -70,10 +72,11 @@ class DTable(MTable):
         # --- Begin dtable logic ---
         if stats is None:
             stats = ["count", "mean", "std"]
-        if labels is None:
-            labels = {}
-        if stats_labels is None:
-            stats_labels = {}
+
+        # Pull defaults from MTable (or subclass) and merge with user input
+        base_labels = getattr(self, "DEFAULT_LABELS", {})
+        labels = dict(base_labels) if labels is None else dict(labels)
+
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert all(pd.api.types.is_numeric_dtype(df[var]) for var in vars), (
             "Variables must be numerical."
@@ -97,7 +100,8 @@ class DTable(MTable):
             "var": "Variance",
             "median": "Median",
         }
-        stats_dict.update(stats_labels or {})
+        if stats_labels:
+            stats_dict.update(stats_labels)
 
         # If counts_row_below is True add count to stats if not already present
         if counts_row_below:
