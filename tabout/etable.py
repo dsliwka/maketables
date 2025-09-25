@@ -15,14 +15,14 @@ from pyfixest.estimation.fepois_ import Fepois
 from pyfixest.estimation.FixestMulti_ import FixestMulti
 from pyfixest.report.utils import _relabel_expvar
 
-from .tabout import TabOut
+from .btable import BTable
 from .extractors import ModelExtractor, get_extractor
 
 ModelInputType = Union[
     FixestMulti, Feols, Fepois, Feiv, list[Union[Feols, Fepois, Feiv]]
 ]
 
-class ETable(TabOut):
+class ETable(BTable):
     """
     ETable extends TabOut to generate regression tables from models.
     The class is modular: model extraction is delegated to helper methods

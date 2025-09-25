@@ -1,12 +1,11 @@
 import numpy as np
 import pandas as pd
-from great_tables import GT
 from typing import Optional
-from .tabout import TabOut
+from .btable import BTable
 
-class DTable(TabOut):
+class DTable(BTable):
     """
-    DTable extends TabOut to provide descriptive statistics table functionality.
+    DTable extends BTable to provide descriptive statistics table functionality.
 
     Parameters
     ----------
@@ -205,7 +204,7 @@ class DTable(TabOut):
 
         # --- End dtable logic ---
 
-        # Call TabOut constructor with processed table and metadata
+        # Call BTable constructor with processed table and metadata
         super().__init__(
             res,
             notes=notes,

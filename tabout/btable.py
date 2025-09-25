@@ -40,7 +40,7 @@ import os
 #     - in update: if file_name is relative path and default path is specified, use default_path to update the file_path
 
 
-class TabOut:
+class BTable:
     # Class attributes for default values
     DEFAULT_NOTES = ""
     DEFAULT_CAPTION = None
@@ -760,18 +760,15 @@ class TabOut:
         """
         try:
             gt_obj = self._output_gt()
-            # Prefer GT's own rich repr if available
             if hasattr(gt_obj, "_repr_html_"):
                 return gt_obj._repr_html_()
             return gt_obj.as_raw_html()
         except Exception:
-            # Fallback to a plain DataFrame HTML
             try:
                 return self.df.to_html()
             except Exception:
-                return "<pre>TabOut</pre>"
+                return "<pre>BTable</pre>"
 
-    # Optional: richer bundle (HTML) for other frontends
     def _repr_mimebundle_(self, include=None, exclude=None):
         return {"text/html": self._repr_html_()}
 
