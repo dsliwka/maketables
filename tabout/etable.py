@@ -15,8 +15,8 @@ from pyfixest.estimation.fepois_ import Fepois
 from pyfixest.estimation.FixestMulti_ import FixestMulti
 from pyfixest.report.utils import _relabel_expvar
 
-
 from .tabout import TabOut
+from .extractors import ModelExtractor, get_extractor
 
 ModelInputType = Union[
     FixestMulti, Feols, Fepois, Feiv, list[Union[Feols, Fepois, Feiv]]
@@ -26,7 +26,7 @@ class ETable(TabOut):
     """
     ETable extends TabOut to generate regression tables from models.
     The class is modular: model extraction is delegated to helper methods
-    that can be extended for other packages (e.g., statsmodels).
+    that can be extended for other packages.
     """
 
     def __init__(
@@ -64,7 +64,7 @@ class ETable(TabOut):
             assert signif_code[0] < signif_code[1] < signif_code[2]
 
         cat_template = "" if cat_template is None else cat_template
-        models = _post_processing_input_checks(models)
+        models = self._normalize_models(models)
 
         labels = {} if labels is None else labels
         custom_stats = {} if custom_stats is None else custom_stats
@@ -163,72 +163,51 @@ class ETable(TabOut):
 
     # ---------- Dispatch helpers (package detection) ----------
 
-    def _is_pyfixest(self, model: Any) -> bool:
-        try:
-            return isinstance(model, (Feols, Fepois, Feiv))
-        except Exception:
-            return False
+    def _normalize_models(self, models: Any) -> List[Any]:
+        # Expand FixestMulti if present, otherwise wrap single model into a list
+        if isinstance(models, FixestMulti):
+            return models.to_list()
+        if isinstance(models, (Feols, Fepois, Feiv)):
+            return [models]
+        if isinstance(models, (list, tuple, ValuesView)):
+            return list(models)
+        return [models]
 
-    # ---------- Package-specific extraction ----------
+    def _get_extractor(self, model: Any) -> ModelExtractor:
+        return get_extractor(model)
+
+    # --- delegate helpers to extractor ---
 
     def _extract_depvar(self, model: Any) -> str:
-        # pyfixest
-        if self._is_pyfixest(model) and hasattr(model, "_depvar"):
-            return model._depvar
-        # generic fallback
-        for attr in ("endog_name", "dependent_variable", "depvar", "y_name"):
-            if hasattr(model, attr):
-                return getattr(model, attr)
-        return "y"
+        return self._get_extractor(model).depvar(model)
 
     def _extract_fixef_string(self, model: Any) -> Optional[str]:
-        # pyfixest
-        if self._is_pyfixest(model) and hasattr(model, "_fixef"):
-            return model._fixef
-        # generic fallback: no fixed effects info by default
-        return None
+        return self._get_extractor(model).fixef_string(model)
 
     def _extract_vcov_info(self, model: Any) -> Dict[str, Any]:
-        # pyfixest: vcov type + cluster vars
-        if self._is_pyfixest(model):
-            return {
-                "vcov_type": getattr(model, "_vcov_type", None),
-                "clustervar": getattr(model, "_clustervar", None),
-            }
-        # generic fallback
-        return {"vcov_type": getattr(model, "vcov_type", None), "clustervar": None}
+        return self._get_extractor(model).vcov_info(model)
 
     def _extract_tidy_df(self, model: Any) -> pd.DataFrame:
-        # pyfixest: normalize tidy() to have a 'Coefficient' column and canonical metric names
-        if self._is_pyfixest(model) and hasattr(model, "tidy"):
-            model_tidy_df = model.tidy()
-            # model_tidy_df.reset_index(inplace=True)
-            return model_tidy_df
-
-        # future: add adapters for other packages here
-        raise TypeError("No extractor for this model type. Add an adapter in _extract_tidy_df.")
+        df = self._get_extractor(model).coef_table(model)
+        # enforce index name
+        if df.index.name != "Coefficient":
+            df.index.name = "Coefficient"
+        return df
 
     def _extract_stat(self, model: Any, key: str, digits: int) -> str:
-        # pyfixest: reuse the original helper for now
-        if self._is_pyfixest(model):
-            return _extract(model, key, digits=digits)
-        # generic fallback: try simple attribute (without leading underscore)
+        raw = self._get_extractor(model).stat(model, key)
+        # format uniformly
         if key == "se_type":
-            vcov = self._extract_vcov_info(model)
-            if vcov["vcov_type"] == "CRV" and vcov["clustervar"]:
-                return "by: " + "+".join(vcov["clustervar"])
-            return vcov["vcov_type"] or "-"
-        val = getattr(model, key, None)
-        if val is None:
+            return raw or "-"
+        if raw is None:
             return "-"
-        if isinstance(val, (int, np.integer)):
-            return _number_formatter(float(val), integer=True, digits=digits)
-        if isinstance(val, (float, np.floating)):
-            return "-" if math.isnan(val) else _number_formatter(float(val), digits=digits)
-        return str(val)
+        if isinstance(raw, (int, np.integer)):
+            return _number_formatter(float(raw), integer=True, digits=digits)
+        if isinstance(raw, (float, np.floating)):
+            return "-" if math.isnan(raw) else _number_formatter(float(raw), digits=digits)
+        return str(raw)
 
-    # ---------- Block builders ----------
-
+ 
     def _collect_fixef_list(self, models: List[Any], show_fe: bool) -> List[str]:
         if not show_fe:
             return []
