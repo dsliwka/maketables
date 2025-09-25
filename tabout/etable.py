@@ -356,6 +356,9 @@ class ETable(TabOut):
             res_all = pd.concat([res, fe_df, model_stats_df], keys=["coef", "fe", "stats"])
             res_all.columns = pd.Index(id_num)
         else:
+            # Drop "h" from head_order if no model_heads provided
+            if model_heads is None and "h" in head_order:
+                head_order = head_order.replace("h", "")
             res_all = pd.concat([res, fe_df, model_stats_df], keys=["coef", "fe", "stats"])
             cindex = [{"h": id_head, "d": id_dep}[c] for c in head_order] + [id_num]
             res_all.columns = pd.MultiIndex.from_arrays(cindex)
