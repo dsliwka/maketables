@@ -89,14 +89,13 @@ class MTable:
              **kwargs):
         """
         Create the output object of the table (either gt, tex, docx, or html).
-        If no type is specified, displays both HTML and LaTeX outputs for compatibility
+        With type="nb", displays both HTML and LaTeX outputs for compatibility
         with both notebook viewing and Quarto rendering.
         
         Parameters
         ----------
         type : str, optional
-            The type of the output object. If None, displays dual output.
-            Otherwise must be one of "gt", "tex", "docx", "html".
+            The type of the output object ("gt", "tex", "docx", "html","nb").
         **kwargs : dict
             Additional keyword arguments to pass to the output method.
             
@@ -104,7 +103,6 @@ class MTable:
         -------
             output : object
                 The output object of the table if type is specified.
-                None if type is None (as output is directly displayed).
         """
         
         # For explicitly specified types
