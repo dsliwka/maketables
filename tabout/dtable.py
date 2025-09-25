@@ -1,7 +1,8 @@
+import numpy as np
 import pandas as pd
+from great_tables import GT
 from typing import Optional
-from tabout import TabOut
-
+from .tabout import TabOut
 
 class DTable(TabOut):
     """
@@ -267,10 +268,17 @@ def _format_mean_std(
     mean = data.mean()
     std = data.std()
     if newline:
-        if type == "gt":
-            return f"{mean:.{digits}f}<br>({std:.{digits}f})"
-        elif type == "tex":
-            return f"{mean:.{digits}f}\\\\({std:.{digits}f})"
-    return f"{mean:.{digits}f} ({std:.{digits}f})"
+        return f"{mean:.{digits}f}\n({std:.{digits}f})"
+    else:
+        return f"{mean:.{digits}f} ({std:.{digits}f})"
+    #     if type == "gt":
+    #         return f"{mean:.{digits}f}<br>({std:.{digits}f})"
+    #     elif type == "tex":
+    #         return f"{mean:.{digits}f}\\\\({std:.{digits}f})"
+    #     elif type == "df":
+    #         return f"{mean:.{digits}f}\n({std:.{digits}f})"
+    #     elif type == "docx":
+    #         return f"{mean:.{digits}f}\n({std:.{digits}f})"
+    # return f"{mean:.{digits}f} ({std:.{digits}f})"
 
 

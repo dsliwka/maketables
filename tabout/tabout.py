@@ -359,7 +359,9 @@ class TabOut:
                         prev_col = col
                         prev_cell_index = cell_index
                     else:
-                        hdr_cells[prev_cell_index].merge(hdr_cells[cell_index])
+                        # Only merge if prev_cell_index is not None and cell_index is valid
+                        if prev_cell_index is not None and cell_index < len(hdr_cells):
+                            hdr_cells[prev_cell_index].merge(hdr_cells[cell_index])
         else:
             hdr_cells = table.add_row().cells
             for i, col in enumerate(dfs.columns):
@@ -403,18 +405,17 @@ class TabOut:
                 for paragraph in cell.paragraphs:
                     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # Add notes if provided
-        if self.notes:
-            # Add row to the table that consists only of one cell with the notes
-            notes_row = table.add_row().cells
-            notes_row[0].text = self.notes
-            # Merge the cell with the notes
-            table.cell(-1, 0).merge(table.cell(-1, ncols - 1))
-            # Set alignment and font size for the notes
-            for paragraph in notes_row[0].paragraphs:
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                for run in paragraph.runs:
-                    run.font.size = Pt(9)
+        # Add notes (Note: we alsways add notes, even if empty)
+        # Add row to the table that consists only of one cell with the notes
+        notes_row = table.add_row().cells
+        notes_row[0].text = self.notes
+        # Merge the cell with the notes
+        table.cell(-1, 0).merge(table.cell(-1, ncols - 1))
+        # Set alignment and font size for the notes
+        for paragraph in notes_row[0].paragraphs:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            for run in paragraph.runs:
+                run.font.size = Pt(9)
 
         # First hide all borders
         for row in table.rows:
@@ -518,14 +519,16 @@ class TabOut:
 
 
 
-
         
     def _output_tex(self, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
+        
+        # Replace all occurrences of '\n' with '\\\\' in each cell
+        dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
 
-        # First wrap all cells which contain a line break in a makecell command
-        dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and "\\\\" in x else x)
+        # Now wrap all cells which contain a LaTeX line break in a makecell command
+        dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
         row_levels = dfs.index.nlevels
         # when the row index has more than one level, we will store
         # the top level to use later to add clines and row group titles
@@ -646,6 +649,9 @@ class TabOut:
     def _output_gt(self, full_width: bool = False, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
+        
+        # In all cells replace line breaks with <br> 
+        dfs = dfs.replace(r'\n', '<br>', regex=True)
 
         # GT does not support MultiIndex columns, so we need to flatten the columns
         if isinstance(dfs.columns, pd.MultiIndex):
@@ -783,4 +789,6 @@ class TabOut:
             The output object returned by make().
         """
         return self.make(type=type, **kwargs)
+
+
 
