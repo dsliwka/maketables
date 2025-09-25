@@ -3,7 +3,7 @@ import re
 import warnings
 from collections import Counter
 from collections.abc import ValuesView
-from typing import Optional, Union
+from typing import Optional, Union, Any, List, Dict
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ from pyfixest.estimation.feols_ import Feols
 from pyfixest.estimation.fepois_ import Fepois
 from pyfixest.estimation.FixestMulti_ import FixestMulti
 from pyfixest.report.utils import _relabel_expvar
-from pyfixest.utils.dev_utils import _select_order_coefs
+
 
 from .tabout import TabOut
 
@@ -24,56 +24,9 @@ ModelInputType = Union[
 
 class ETable(TabOut):
     """
-    ETable extends TabOut to generate regression tables from pyfixest models.
-    It builds the table once in __init__ and then uses TabOut's output methods.
-
-    Parameters
-    ----------
-    models : list[Feols|Fepois|Feiv] | FixestMulti | single model
-        Models to summarize.
-    signif_code : list[float], optional
-        Significance thresholds [0.001, 0.01, 0.05] (None for no stars).
-    coef_fmt : str, optional
-        Format string using tokens 'b','se','t','p' and newline '\\n', e.g. "b \\n (se)".
-    model_stats : list[str], optional
-        Model stats to show (attribute names without leading '_'), e.g. ["N","r2","adj_r2"].
-    model_stats_labels : dict[str,str], optional
-        Mapping of stat name -> display label.
-    custom_stats : dict[str, list[list]], optional
-        Custom per-coefficient statistics per model used in coef_fmt.
-    custom_model_stats : dict[str, list], optional
-        Extra bottom-panel model stats, keyed by row-label with values per model.
-    keep, drop : list|str, optional
-        Regex or exact-matching patterns to keep/drop coefficient rows.
-    exact_match : bool, optional
-        Use exact matching for keep/drop.
-    labels : dict, optional
-        Variable label mapping for relabeling coefficients (also applied to interactions).
-    cat_template : str, optional
-        Template for categorical variable relabels, e.g. "{variable}::{value}".
-    show_fe : bool, optional
-        Whether to show fixed-effects markers.
-    show_se_type : bool, optional
-        Whether to show standard error type in model stats when model_stats not provided.
-    felabels : dict, optional
-        Optional relabels for FE names.
-    notes : str, optional
-        Table notes. If empty, a generic note is generated.
-    model_heads : list[str], optional
-        Optional column headers per model.
-    head_order : str, optional
-        One of "dh","hd","d","h","". Controls depvar/headline order in top header.
-    caption, tab_label : str, optional
-        Table caption and label.
-    digits : int, optional
-        Rounding digits used in number formatting helpers.
-
-    Usage
-    -----
-    et = ETable(models, caption="My table")
-    et.make(type="gt")      # display in notebook (HTML)
-    et.save(type="tex", file_name="...")  # TeX
-    et.save(type="docx", file_name="...") # Word
+    ETable extends TabOut to generate regression tables from models.
+    The class is modular: model extraction is delegated to helper methods
+    that can be extended for other packages (e.g., statsmodels).
     """
 
     def __init__(
@@ -102,19 +55,13 @@ class ETable(TabOut):
         digits: int = 3,
         **kwargs,
     ):
-        # 1) Copy of validations/defaults from function etable (minus `type`)
+        # --- defaults and checks  ---
         if signif_code is None:
             signif_code = [0.001, 0.01, 0.05]
-        assert isinstance(signif_code, list) and len(signif_code) == 3, (
-            "signif_code must be a list of length 3"
-        )
+        assert isinstance(signif_code, list) and len(signif_code) == 3
         if signif_code:
-            assert all([0 < i < 1 for i in signif_code]), (
-                "All values of signif_code must be between 0 and 1"
-            )
-            assert signif_code[0] < signif_code[1] < signif_code[2], (
-                "signif_code must be in increasing order"
-            )
+            assert all(0 < i < 1 for i in signif_code)
+            assert signif_code[0] < signif_code[1] < signif_code[2]
 
         cat_template = "" if cat_template is None else cat_template
         models = _post_processing_input_checks(models)
@@ -125,263 +72,365 @@ class ETable(TabOut):
         drop = [] if drop is None else drop
 
         if custom_stats:
-            assert isinstance(custom_stats, dict), "custom_stats must be a dict"
+            assert isinstance(custom_stats, dict)
             for key in custom_stats:
-                assert isinstance(custom_stats[key], list), "custom_stats values must be a list"
-                assert len(custom_stats[key]) == len(models), (
-                    f"custom_stats {key} must have the same number as models"
-                )
+                assert isinstance(custom_stats[key], list)
+                assert len(custom_stats[key]) == len(models)
 
         if model_heads is not None:
-            assert len(model_heads) == len(models), (
-                "model_heads must have the same length as models"
-            )
+            assert len(model_heads) == len(models)
 
-        assert head_order in ["dh", "hd", "d", "h", ""], "head_order must be one of 'd','h','dh','hd',''"
+        assert head_order in ["dh", "hd", "d", "h", ""]
 
-        # 2) Collect basic model info
-        dep_var_list: list[str] = []
-        fixef_list: list[str] = []
+        # --- metadata from models (modular) ---
+        dep_var_list = [self._extract_depvar(m) for m in models]
+        fixef_list = self._collect_fixef_list(models, show_fe)
 
-        # For output-agnostic build we use literal newline; TabOut will convert for tex/html
-        lbcode = "\n"
-
-        for model in models:
-            dep_var_list.append(model._depvar)
-            if model._fixef is not None and model._fixef != "0":
-                fixef_list += model._fixef.split("+")
-
-        if show_fe:
-            fixef_list = [x for x in fixef_list if x]
-            fixef_list = list(set(fixef_list))
-            n_fixef = len(fixef_list)
-        else:
-            fixef_list = []
-            n_fixef = 0
-
-        # Default model stats if not provided (legacy emulation)
+        # --- bottom model stats keys (modular default) ---
         if model_stats is None:
-            any_within = any(
-                hasattr(m, "_r2_within")
-                and not math.isnan(getattr(m, "_r2_within", float("nan")))
-                for m in models
-            )
-            model_stats = ["N"]
-            if show_se_type:
-                model_stats.append("se_type")
-            model_stats += ["r2", "r2_within" if any_within else "adj_r2"]
-
+            model_stats = self._default_model_stats(models, show_se_type)
         model_stats = list(model_stats)
-        assert all(isinstance(s, str) for s in model_stats), "model_stats entries must be strings"
-        assert len(model_stats) == len(set(model_stats)), "model_stats contains duplicate entries"
+        assert all(isinstance(s, str) for s in model_stats)
+        assert len(model_stats) == len(set(model_stats))
 
-        # 3) Build bottom model stats
-        def _default_label_plain(stat: str) -> str:
-            mapping = {
-                "N": "Observations",
-                "se_type": "S.E. type",
-                "r2": "R2",
-                "adj_r2": "Adj. R2",
-                "r2_within": "R2 Within",
-            }
-            return mapping.get(stat, stat)
+        # --- build blocks (modular) ---
+        res, coef_fmt_title = self._build_coef_table(
+            models=models,
+            coef_fmt=coef_fmt,
+            signif_code=signif_code,
+            digits=digits,
+            custom_stats=custom_stats,
+            keep=keep,
+            drop=drop,
+            exact_match=exact_match,
+            labels=labels,
+            cat_template=cat_template,
+        )
 
-        model_stats_rows: dict[str, list[str]] = {}
-        for stat in model_stats:
-            values = [_extract(m, stat, digits=digits) for m in models]
-            label = _default_label_plain(stat)
-            if model_stats_labels and stat in model_stats_labels:
-                label = model_stats_labels[stat]
-            model_stats_rows[label] = values
+        fe_df = self._build_fe_df(
+            models=models,
+            fixef_list=fixef_list,
+            show_fe=show_fe,
+            labels=labels,
+            felabels=felabels,
+            like_columns=res.columns,
+        )
 
-        if custom_model_stats is not None and len(custom_model_stats) > 0:
-            custom_df = pd.DataFrame.from_dict(custom_model_stats, orient="index")
+        model_stats_df = self._build_model_stats(
+            models=models,
+            stat_keys=model_stats,
+            stat_labels=model_stats_labels,
+            custom_model_stats=custom_model_stats,
+            digits=digits,
+            like_index=res.index,
+            like_columns=res.columns,
+        )
+
+        # --- assemble columns header (modular) ---
+        header = self._build_header_columns(
+            dep_var_list=dep_var_list,
+            model_heads=model_heads,
+            head_order=head_order,
+            n_models=len(models),
+        )
+
+        # --- assemble final df ---
+        res_all = pd.concat([res, fe_df, model_stats_df], keys=["coef", "fe", "stats"])
+        if isinstance(header, list):
+            res_all.columns = pd.Index(header)
         else:
-            custom_df = pd.DataFrame()
+            res_all.columns = header
+        try:
+            res_all.columns.names = [None] * res_all.columns.nlevels
+        except Exception:
+            pass
 
-        builtin_df = pd.DataFrame.from_dict(model_stats_rows, orient="index") if model_stats_rows else pd.DataFrame()
-
-        if not custom_df.empty and not builtin_df.empty:
-            model_stats_df = pd.concat([custom_df, builtin_df], axis=0)
-        elif not custom_df.empty:
-            model_stats_df = custom_df
-        else:
-            model_stats_df = builtin_df
-
-        if model_stats_df.shape[1] == 0:
-            model_stats_df = pd.DataFrame(
-                index=pd.Index([], name=None), columns=None
-            )
-
-        # 4) FE markers
-        if show_fe and fixef_list:
-            fe_rows = {}
-            for fixef in fixef_list:
-                row = []
-                for model in models:
-                    has = (
-                        model._fixef is not None
-                        and fixef in model._fixef.split("+")
-                        and not model._use_mundlak
-                    )
-                    row.append("x" if has else "-")
-                fe_rows[fixef] = row
-            fe_df = pd.DataFrame.from_dict(fe_rows, orient="index")
-        else:
-            fe_df = pd.DataFrame()
-            show_fe = False
-
-        # 5) Coefficients block construction (same as function, but output-agnostic)
-        coef_fmt_elements, coef_fmt_title = _parse_coef_fmt(coef_fmt, custom_stats)
-        etable_list = []
-        for i, model in enumerate(models):
-            model_tidy_df = model.tidy()
-            model_tidy_df.reset_index(inplace=True)
-            model_tidy_df["stars"] = (
-                np.where(
-                    model_tidy_df["Pr(>|t|)"] < signif_code[0],
-                    "***",
-                    np.where(
-                        model_tidy_df["Pr(>|t|)"] < signif_code[1],
-                        "**",
-                        np.where(model_tidy_df["Pr(>|t|)"] < signif_code[2], "*", ""),
-                    ),
-                )
-                if signif_code
-                else ""
-            )
-            model_tidy_df[coef_fmt_title] = ""
-            for element in coef_fmt_elements:
-                if element == "b":
-                    model_tidy_df[coef_fmt_title] += (
-                        model_tidy_df["Estimate"].apply(_number_formatter, digits=digits)
-                        + model_tidy_df["stars"]
-                    )
-                elif element == "se":
-                    model_tidy_df[coef_fmt_title] += model_tidy_df["Std. Error"].apply(
-                        _number_formatter, digits=digits
-                    )
-                elif element == "t":
-                    model_tidy_df[coef_fmt_title] += model_tidy_df["t value"].apply(
-                        _number_formatter, digits=digits
-                    )
-                elif element == "p":
-                    model_tidy_df[coef_fmt_title] += model_tidy_df["Pr(>|t|)"].apply(
-                        _number_formatter, digits=digits
-                    )
-                elif element in custom_stats:
-                    assert len(custom_stats[element][i]) == len(model_tidy_df["Estimate"]), (
-                        f"custom_stats {element} has unequal length to the number of coefficients in model_tidy_df {i}"
-                    )
-                    model_tidy_df[coef_fmt_title] += pd.Series(
-                        custom_stats[element][i]
-                    ).apply(_number_formatter, digits=digits)
-                elif element == "\n":
-                    model_tidy_df[coef_fmt_title] += lbcode
-                else:
-                    model_tidy_df[coef_fmt_title] += element
-            model_tidy_df[coef_fmt_title] = pd.Categorical(model_tidy_df[coef_fmt_title])
-            model_tidy_df = model_tidy_df[["Coefficient", coef_fmt_title]]
-            model_tidy_df = pd.melt(
-                model_tidy_df,
-                id_vars=["Coefficient"],
-                var_name="Metric",
-                value_name=f"est{i + 1}",
-            )
-            model_tidy_df = model_tidy_df.drop("Metric", axis=1).set_index("Coefficient")
-            etable_list.append(model_tidy_df)
-
-        res = pd.concat(etable_list, axis=1)
-
-        # 6) Keep/drop and relabels
-        if keep or drop:
-            idxs = _select_order_coefs(res.index.tolist(), keep, drop, exact_match)
-        else:
-            idxs = res.index
-        res = res.loc[idxs, :].reset_index()
-
-        # Clean NA vs categorical
-        for column in res.columns:
-            if (
-                isinstance(res[column].dtype, pd.CategoricalDtype)
-                and "" not in res[column].cat.categories
-            ):
-                res[column] = res[column].cat.add_categories([""])
-            res[column] = res[column].fillna("")
-
-        res.rename(columns={"Coefficient": "index"}, inplace=True)
-        res.set_index("index", inplace=True)
-
-        # Move intercept to bottom
-        if "Intercept" in res.index:
-            intercept_row = res.loc["Intercept"]
-            res = res.drop("Intercept")
-            res = pd.concat([res, pd.DataFrame([intercept_row])])
-
-        # Relabel variables (depvar and coefficients)
-        if (labels != {}) or (cat_template != ""):
-            dep_var_list = [labels.get(k, k) for k in dep_var_list]
-            res_index = res.index.to_series()
-            res_index = res_index.apply(
-                lambda x: _relabel_expvar(x, labels or {}, " x ", cat_template)
-            )
-            res.set_index(res_index, inplace=True)
-
-        # Relabel FE names
-        if show_fe:
-            if felabels is None:
-                felabels = dict()
-            if labels is None:
-                labels = dict()
-            fe_index = fe_df.index.to_series()
-            fe_index = fe_index.apply(lambda x: felabels.get(x, labels.get(x, x)))
-            fe_df.set_index(fe_index, inplace=True)
-
-        # Align stats/fes columns to match res
-        model_stats_df = model_stats_df.copy()
-        if model_stats_df.shape[1] == 0:
-            model_stats_df = pd.DataFrame(
-                index=pd.Index([], name=res.index.name), columns=res.columns
-            )
-        else:
-            model_stats_df.columns = res.columns
-        if show_fe and not fe_df.empty:
-            fe_df.columns = res.columns
-
-        # Top header MultiIndex columns
-        id_dep = dep_var_list
-        id_head = [""] * len(models) if model_heads is None else model_heads
-        id_num = [f"({s})" for s in range(1, len(models) + 1)]
-        if head_order == "":
-            res_all = pd.concat([res, fe_df, model_stats_df], keys=["coef", "fe", "stats"])
-            res_all.columns = pd.Index(id_num)
-        else:
-            # Drop "h" from head_order if no model_heads provided
-            if model_heads is None and "h" in head_order:
-                head_order = head_order.replace("h", "")
-            res_all = pd.concat([res, fe_df, model_stats_df], keys=["coef", "fe", "stats"])
-            cindex = [{"h": id_head, "d": id_dep}[c] for c in head_order] + [id_num]
-            res_all.columns = pd.MultiIndex.from_arrays(cindex)
-
-        # Notes
+        # --- notes ---
         if notes == "":
             notes = (
                 f"Significance levels: * p < {signif_code[2]}, ** p < {signif_code[1]}, *** p < {signif_code[0]}. "
                 + f"Format of coefficient cell:\n{coef_fmt_title}"
             )
 
-        # Show row groups? For regression tables typically False here
-        rgroup_display = False
-
-        # 7) Initialize TabOut with the assembled DataFrame
         super().__init__(
             res_all,
             notes=notes,
             caption=caption,
             tab_label=tab_label,
-            rgroup_display=rgroup_display,
+            rgroup_display=False,
             **kwargs,
         )
+
+    # ---------- Dispatch helpers (package detection) ----------
+
+    def _is_pyfixest(self, model: Any) -> bool:
+        try:
+            return isinstance(model, (Feols, Fepois, Feiv))
+        except Exception:
+            return False
+
+    # ---------- Package-specific extraction ----------
+
+    def _extract_depvar(self, model: Any) -> str:
+        # pyfixest
+        if self._is_pyfixest(model) and hasattr(model, "_depvar"):
+            return model._depvar
+        # generic fallback
+        for attr in ("endog_name", "dependent_variable", "depvar", "y_name"):
+            if hasattr(model, attr):
+                return getattr(model, attr)
+        return "y"
+
+    def _extract_fixef_string(self, model: Any) -> Optional[str]:
+        # pyfixest
+        if self._is_pyfixest(model) and hasattr(model, "_fixef"):
+            return model._fixef
+        # generic fallback: no fixed effects info by default
+        return None
+
+    def _extract_vcov_info(self, model: Any) -> Dict[str, Any]:
+        # pyfixest: vcov type + cluster vars
+        if self._is_pyfixest(model):
+            return {
+                "vcov_type": getattr(model, "_vcov_type", None),
+                "clustervar": getattr(model, "_clustervar", None),
+            }
+        # generic fallback
+        return {"vcov_type": getattr(model, "vcov_type", None), "clustervar": None}
+
+    def _extract_tidy_df(self, model: Any) -> pd.DataFrame:
+        # pyfixest: normalize tidy() to have a 'Coefficient' column and canonical metric names
+        if self._is_pyfixest(model) and hasattr(model, "tidy"):
+            model_tidy_df = model.tidy()
+            # model_tidy_df.reset_index(inplace=True)
+            return model_tidy_df
+
+        # future: add adapters for other packages here
+        raise TypeError("No extractor for this model type. Add an adapter in _extract_tidy_df.")
+
+    def _extract_stat(self, model: Any, key: str, digits: int) -> str:
+        # pyfixest: reuse the original helper for now
+        if self._is_pyfixest(model):
+            return _extract(model, key, digits=digits)
+        # generic fallback: try simple attribute (without leading underscore)
+        if key == "se_type":
+            vcov = self._extract_vcov_info(model)
+            if vcov["vcov_type"] == "CRV" and vcov["clustervar"]:
+                return "by: " + "+".join(vcov["clustervar"])
+            return vcov["vcov_type"] or "-"
+        val = getattr(model, key, None)
+        if val is None:
+            return "-"
+        if isinstance(val, (int, np.integer)):
+            return _number_formatter(float(val), integer=True, digits=digits)
+        if isinstance(val, (float, np.floating)):
+            return "-" if math.isnan(val) else _number_formatter(float(val), digits=digits)
+        return str(val)
+
+    # ---------- Block builders ----------
+
+    def _collect_fixef_list(self, models: List[Any], show_fe: bool) -> List[str]:
+        if not show_fe:
+            return []
+        fixef_list: List[str] = []
+        for m in models:
+            fx = self._extract_fixef_string(m)
+            if fx and fx != "0":
+                fixef_list += fx.split("+")
+        fixef_list = [x for x in fixef_list if x]
+        return sorted(set(fixef_list))
+
+    def _compute_stars(self, p: pd.Series, signif_code: List[float]) -> pd.Series:
+        if not signif_code:
+            return pd.Series([""] * len(p), index=p.index)
+        s = pd.Series("", index=p.index, dtype=object)
+        s = np.where(p < signif_code[0], "***", np.where(p < signif_code[1], "**", np.where(p < signif_code[2], "*", "")))
+        return pd.Series(s, index=p.index)
+
+    def _build_coef_table(
+        self,
+        models: List[Any],
+        coef_fmt: str,
+        signif_code: List[float],
+        digits: int,
+        custom_stats: Dict[str, List[list]],
+        keep: List[str],
+        drop: List[str],
+        exact_match: bool,
+        labels: Dict[str, str],
+        cat_template: str,
+    ) -> tuple[pd.DataFrame, str]:
+        lbcode = "\n"
+        coef_fmt_elements, coef_fmt_title = _parse_coef_fmt(coef_fmt, custom_stats)
+
+        cols_per_model = []
+        for i, model in enumerate(models):
+            tidy = self._extract_tidy_df(model)  
+            stars = self._compute_stars(tidy["Pr(>|t|)"], signif_code)
+
+            cell = pd.Series("", index=tidy.index, dtype=object)
+            for element in coef_fmt_elements:
+                if element == "b":
+                    cell += tidy["Estimate"].apply(_number_formatter, digits=digits) + stars
+                elif element == "se":
+                    cell += tidy["Std. Error"].apply(_number_formatter, digits=digits)
+                elif element == "t":
+                    if "t value" in tidy.columns:
+                        cell += tidy["t value"].apply(_number_formatter, digits=digits)
+                elif element == "p":
+                    cell += tidy["Pr(>|t|)"].apply(_number_formatter, digits=digits)
+                elif element in custom_stats:
+                    assert len(custom_stats[element][i]) == len(tidy["Estimate"])
+                    cell += pd.Series(custom_stats[element][i], index=tidy.index).apply(_number_formatter, digits=digits)
+                elif element == "\n":
+                    cell += lbcode
+                else:
+                    cell += element
+
+            # one column per model, indexed by 'Coefficient'
+            df_i = pd.DataFrame({f"est{i+1}": pd.Categorical(cell)}, index=tidy.index)
+            df_i.index.name = "Coefficient"
+            cols_per_model.append(df_i)
+
+        # align on coefficient names
+        res = pd.concat(cols_per_model, axis=1)
+        res.index.name = "Coefficient"
+
+        # keep/drop ordering on the index (no reset)
+        idxs = _select_order_coefs(res.index.tolist(), keep, drop, exact_match) if (keep or drop) else res.index.tolist()
+        res = res.loc[idxs]
+
+        # fill NA and ensure empty category exists
+        for c in res.columns:
+            col = res[c]
+            if isinstance(col.dtype, pd.CategoricalDtype) and "" not in col.cat.categories:
+                res[c] = col.cat.add_categories([""])
+            res[c] = res[c].fillna("")
+
+        # move intercept to bottom
+        if "Intercept" in res.index:
+            order = [ix for ix in res.index if ix != "Intercept"] + ["Intercept"]
+            res = res.loc[order]
+
+        # relabel coefficient index
+        if (labels != {}) or (cat_template != ""):
+            res.index = res.index.to_series().apply(lambda x: _relabel_expvar(x, labels or {}, " x ", cat_template))
+            res.index.name = "Coefficient"
+
+        return res, coef_fmt_title
+
+    def _build_fe_df(
+        self,
+        models: List[Any],
+        fixef_list: List[str],
+        show_fe: bool,
+        labels: Dict[str, str],
+        felabels: Optional[Dict[str, str]],
+        like_columns: pd.Index,
+    ) -> pd.DataFrame:
+        if not (show_fe and fixef_list):
+            return pd.DataFrame(index=pd.Index([], name=None), columns=like_columns)
+        rows = {}
+        for fx in fixef_list:
+            row = []
+            for m in models:
+                fx_str = self._extract_fixef_string(m) or ""
+                has = (fx_str != "") and (fx in fx_str.split("+")) and not getattr(m, "_use_mundlak", False)
+                row.append("x" if has else "-")
+            rows[fx] = row
+        fe_df = pd.DataFrame.from_dict(rows, orient="index", columns=list(like_columns))
+        # relabel FE names
+        felabels = felabels or {}
+        labels = labels or {}
+        fe_df.index = fe_df.index.to_series().apply(lambda x: felabels.get(x, labels.get(x, x)))
+        return fe_df
+
+    def _default_model_stats(self, models: List[Any], show_se_type: bool) -> List[str]:
+        any_within = any(
+            hasattr(m, "_r2_within") and not math.isnan(getattr(m, "_r2_within", float("nan")))
+            for m in models
+        )
+        keys = ["N"]
+        if show_se_type:
+            keys.append("se_type")
+        keys += ["r2", "r2_within" if any_within else "adj_r2"]
+        return keys
+
+    def _build_model_stats(
+        self,
+        models: List[Any],
+        stat_keys: List[str],
+        stat_labels: Optional[Dict[str, str]],
+        custom_model_stats: Optional[Dict[str, list]],
+        digits: int,
+        like_index: pd.Index,
+        like_columns: pd.Index,
+    ) -> pd.DataFrame:
+        # builtin stats via extractor
+        def label_of(k: str) -> str:
+            default = {
+                "N": "Observations",
+                "se_type": "S.E. type",
+                "r2": "R2",
+                "adj_r2": "Adj. R2",
+                "r2_within": "R2 Within",
+            }.get(k, k)
+            return stat_labels.get(k, default) if stat_labels else default
+
+        rows = {label_of(k): [self._extract_stat(m, k, digits) for m in models] for k in stat_keys}
+        builtin_df = pd.DataFrame.from_dict(rows, orient="index") if rows else pd.DataFrame()
+
+        # custom bottom rows
+        custom_df = pd.DataFrame.from_dict(custom_model_stats, orient="index") if custom_model_stats else pd.DataFrame()
+
+        if not custom_df.empty and not builtin_df.empty:
+            out = pd.concat([custom_df, builtin_df], axis=0)
+        elif not custom_df.empty:
+            out = custom_df
+        else:
+            out = builtin_df
+
+        if out.shape[1] == 0:
+            out = pd.DataFrame(index=pd.Index([], name=like_index.name), columns=like_columns)
+        else:
+            out.columns = like_columns
+        return out
+
+    def _build_header_columns(
+        self,
+        dep_var_list: List[str],
+        model_heads: Optional[List[str]],
+        head_order: str,
+        n_models: int,
+    ) -> Union[List[str], pd.MultiIndex]:
+        id_dep = dep_var_list
+        id_num = [f"({s})" for s in range(1, n_models + 1)]
+
+        id_head = None
+        if model_heads is not None:
+            id_head = list(model_heads)
+            if not any(str(h).strip() for h in id_head):
+                id_head = None
+
+        if head_order == "":
+            return id_num
+
+        header_levels: List[List[str]] = []
+        for c in head_order:
+            if c == "h" and id_head is not None:
+                header_levels.append(id_head)
+            if c == "d":
+                header_levels.append(id_dep)
+        header_levels.append(id_num)
+
+        # filter out fully empty levels
+        def non_empty(arr: List[str]) -> bool:
+            return any((v is not None and str(v) != "") for v in arr)
+        header_levels = [lvl for lvl in header_levels if non_empty(lvl)]
+
+        if len(header_levels) == 1:
+            return header_levels[0]
+        return pd.MultiIndex.from_arrays(header_levels)
 
 
 def _post_processing_input_checks(
@@ -467,101 +516,7 @@ def _post_processing_input_checks(
     return models_list
 
 
-def _tabulate_etable_md(df, n_coef, n_fixef, n_models, n_model_stats):
-    """
-    Format and tabulate a DataFrame.
 
-    Parameters
-    ----------
-    - df (pandas.DataFrame): The DataFrame to be formatted and tabulated.
-    - n_coef (int): The number of coefficients.
-    - n_fixef (int): The number of fixed effects.
-    - n_models (int): The number of models.
-    - n_model_stats (int): The number of rows with model statistics.
-
-    Returns
-    -------
-    - formatted_table (str): The formatted table as a string.
-    """
-    # Format the DataFrame for tabulate
-    table = tabulate(
-        df,
-        headers="keys",
-        showindex=False,
-        colalign=["left"] + n_models * ["right"],
-    )
-
-    # Split the table into header and body
-    header, body = table.split("\n", 1)
-
-    # Add separating line after the third row
-    body_lines = body.split("\n")
-    body_lines.insert(2, "-" * len(body_lines[0]))
-    if n_fixef > 0:
-        body_lines.insert(-n_model_stats - n_fixef, "-" * len(body_lines[0]))
-    body_lines.insert(-n_model_stats, "-" * len(body_lines[0]))
-    body_lines.append("-" * len(body_lines[0]))
-
-    # Join the lines back together
-    formatted_table = "\n".join([header, "\n".join(body_lines)])
-
-    # Print the formatted table
-    return formatted_table
-
-
-def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
-    """
-    Parse the coef_fmt string.
-
-    Parameters
-    ----------
-    coef_fmt: str
-        The coef_fmt string.
-    custom_stats: dict
-        A dictionary of custom statistics. Key should be lowercased (e.g., simul_intv).
-        If you provide "b", "se", "t", or "p" as a key, it will overwrite the default
-        values.
-
-    Returns
-    -------
-    coef_fmt_elements: str
-        The parsed coef_fmt string.
-    coef_fmt_title: str
-        The title for the coef_fmt string.
-    """
-    custom_elements = list(custom_stats.keys())
-    if any([x in ["b", "se", "t", "p"] for x in custom_elements]):
-        raise ValueError(
-            "You cannot use 'b', 'se', 't', or 'p' as a key in custom_stats."
-        )
-
-    title_map = {
-        "b": "Coefficient",
-        "se": "Std. Error",
-        "t": "t-stats",
-        "p": "p-value",
-    }
-
-    allowed_elements = [
-        "b",
-        "se",
-        "t",
-        "p",
-        " ",
-        "\n",
-        r"\(",
-        r"\)",
-        r"\[",
-        r"\]",
-        ",",
-        *custom_elements,
-    ]
-    allowed_elements.sort(key=len, reverse=True)
-
-    coef_fmt_elements = re.findall("|".join(allowed_elements), coef_fmt)
-    coef_fmt_title = "".join([title_map.get(x, x) for x in coef_fmt_elements])
-
-    return coef_fmt_elements, coef_fmt_title
 
 
 def _number_formatter(x: float, **kwargs) -> str:
@@ -672,35 +627,132 @@ def _relabel_index(index, labels=None, stats_labels=None):
     return index
 
 
-def _format_mean_std(
-    data: pd.Series, digits: int = 2, newline: bool = True, type=str
-) -> str:
+
+def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
     """
-    Calculate the mean and standard deviation of a pandas Series and return as a string of the format "mean /n (std)".
+    Parse the coef_fmt string.
 
     Parameters
     ----------
-    data : pd.Series
-        The pandas Series for which to calculate the mean and standard deviation.
-    digits : int, optional
-        The number of decimal places to round the mean and standard deviation to. The default is 2.
-    newline : bool, optional
-        Whether to add a newline character between the mean and standard deviation. The default is True.
-    type : str, optional
-        The type of the table output.
+    coef_fmt: str
+        The coef_fmt string.
+    custom_stats: dict
+        A dictionary of custom statistics. Key should be lowercased (e.g., simul_intv).
+        If you provide "b", "se", "t", or "p" as a key, it will overwrite the default
+        values.
 
     Returns
     -------
-    _format_mean_std : str
-        The mean and standard deviation of the pandas Series formated as a string.
-
+    coef_fmt_elements: str
+        The parsed coef_fmt string.
+    coef_fmt_title: str
+        The title for the coef_fmt string.
     """
-    mean = data.mean()
-    std = data.std()
-    if newline:
-        if type == "gt":
-            return f"{mean:.{digits}f}<br>({std:.{digits}f})"
-        elif type == "tex":
-            return f"{mean:.{digits}f}\\\\({std:.{digits}f})"
-    return f"{mean:.{digits}f} ({std:.{digits}f})"
+    custom_elements = list(custom_stats.keys())
+    if any([x in ["b", "se", "t", "p"] for x in custom_elements]):
+        raise ValueError(
+            "You cannot use 'b', 'se', 't', or 'p' as a key in custom_stats."
+        )
 
+    title_map = {
+        "b": "Coefficient",
+        "se": "Std. Error",
+        "t": "t-stats",
+        "p": "p-value",
+    }
+
+    allowed_elements = [
+        "b",
+        "se",
+        "t",
+        "p",
+        " ",
+        "\n",
+        r"\(",
+        r"\)",
+        r"\[",
+        r"\]",
+        ",",
+        *custom_elements,
+    ]
+    allowed_elements.sort(key=len, reverse=True)
+
+    coef_fmt_elements = re.findall("|".join(allowed_elements), coef_fmt)
+    coef_fmt_title = "".join([title_map.get(x, x) for x in coef_fmt_elements])
+
+    return coef_fmt_elements, coef_fmt_title
+
+
+
+
+def _select_order_coefs(
+    coefs: list,
+    keep: Optional[Union[list, str]] = None,
+    drop: Optional[Union[list, str]] = None,
+    exact_match: Optional[bool] = False,
+):
+    r"""
+    Select and order the coefficients based on the pattern.
+
+    Parameters
+    ----------
+    coefs: list
+        Coefficient names to be selected and ordered.
+    keep: str or list of str, optional
+        The pattern for retaining coefficient names. You can pass a string (one
+        pattern) or a list (multiple patterns). Default is keeping all coefficients.
+        You should use regular expressions to select coefficients.
+            "age",            # would keep all coefficients containing age
+            r"^tr",           # would keep all coefficients starting with tr
+            r"\\d$",          # would keep all coefficients ending with number
+        Output will be in the order of the patterns.
+    drop: str or list of str, optional
+        The pattern for excluding coefficient names. You can pass a string (one
+        pattern) or a list (multiple patterns). Syntax is the same as for `keep`.
+        Default is keeping all coefficients. Parameter `keep` and `drop` can be
+        used simultaneously.
+    exact_match: bool, optional
+        Whether to use exact match for `keep` and `drop`. Default is False.
+        If True, the pattern will be matched exactly to the coefficient name
+        instead of using regular expressions.
+
+    Returns
+    -------
+    res: list
+        The filtered and ordered coefficient names.
+    """
+    if keep is None:
+        keep = []
+    if drop is None:
+        drop = []
+
+    if isinstance(keep, str):
+        keep = [keep]
+    if isinstance(drop, str):
+        drop = [drop]
+
+    coefs = list(coefs)
+    res = [] if keep else coefs[:]  # Store matched coefs
+    for pattern in keep:
+        _coefs = []  # Store remaining coefs
+        for coef in coefs:
+            if (exact_match and pattern == coef) or (
+                exact_match is False and re.findall(pattern, coef)
+            ):
+                res.append(coef)
+            else:
+                _coefs.append(coef)
+        coefs = _coefs
+
+    for pattern in drop:
+        _coefs = []
+        for coef in res:  # Remove previously matched coefs that match the drop pattern
+            if (exact_match and pattern == coef) or (
+                exact_match is False and re.findall(pattern, coef)
+            ):
+                continue
+            else:
+                _coefs.append(coef)
+        res = _coefs
+
+    return res
