@@ -52,6 +52,9 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
+    # Global render defaults (user can override at class level)
+    DEFAULT_FULL_WIDTH: bool = False
+    DEFAULT_FIRST_COL_WIDTH: Optional[str] = None
 
     # Shared defaults (override per subclass if needed)
     DEFAULT_LABELS: Dict[str, str] = {}
@@ -125,6 +128,9 @@ class MTable:
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
         docx_style: Optional[Dict[str, object]] = None,
         gt_style: Optional[Dict[str, object]] = None,
+        # Render defaults (use class defaults when None)
+        full_width: Optional[bool] = None,
+        first_col_width: Optional[str] = None,
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -150,6 +156,9 @@ class MTable:
         self.gt_style = dict(self.DEFAULT_GT_STYLE)
         if gt_style:
              self.gt_style.update(gt_style)
+        # Render defaults stored on the instance (fall back to class defaults)
+        self.full_width = bool(self.DEFAULT_FULL_WIDTH if full_width is None else full_width)
+        self.first_col_width = self.DEFAULT_FIRST_COL_WIDTH if first_col_width is None else first_col_width
 
     
     def make(self, 
@@ -172,6 +181,12 @@ class MTable:
             output : object
                 The output object of the table if type is specified.
         """
+
+        # Inject instance defaults if not explicitly provided
+        if "full_width" not in kwargs:
+            kwargs["full_width"] = getattr(self, "full_width", False)
+        if "first_col_width" not in kwargs and getattr(self, "first_col_width", None) is not None:
+            kwargs["first_col_width"] = self.first_col_width
 
         if type is None:
             # If no type is specified, directly display dual output
@@ -252,6 +267,12 @@ class MTable:
         output : GT object
             The table as GT object if show is True.
         """
+        # Inject instance defaults if not explicitly provided
+        if "full_width" not in kwargs:
+            kwargs["full_width"] = getattr(self, "full_width", False)
+        if "first_col_width" not in kwargs and getattr(self, "first_col_width", None) is not None:
+            kwargs["first_col_width"] = self.first_col_width
+
         assert type in self.ADMISSIBLE_SAVE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_SAVE_TYPES) 
         if file_name is None:
             if self.tab_label is None:
@@ -620,93 +641,79 @@ class MTable:
 
 
         
-    def _output_tex(self, full_width: bool = False, **kwargs):
+    def _output_tex(self, full_width: bool = False, first_col_width: Optional[str] = None, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
-        
-        # Replace all occurrences of '\n' with '\\\\' in each cell
-        dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
 
-        # Now wrap all cells which contain a LaTeX line break in a makecell command
+        dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
         dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
+
         row_levels = dfs.index.nlevels
-        # when the row index has more than one level, we will store
-        # the top level to use later to add clines and row group titles
-        # and then remove it
         if row_levels > 1:
-            # Store the top level of the row index
             top_row_id = dfs.index.get_level_values(0).to_list()
-            # Generate a list of the distinct values
             row_groups = list(dict.fromkeys(top_row_id))
-            # Generate a list containing the number of rows for each group
             row_groups_len = [top_row_id.count(group) for group in row_groups]
-            # Drop the top level of the row index:
             dfs.index = dfs.index.droplevel(0)
 
-        # Style the table
-        styler = dfs.style
+        # Stub (index) and data columns after droplevel
+        stub_cols = dfs.index.nlevels
+        data_cols = dfs.shape[1]
 
-        # Generate LaTeX code
+        # Build column_format for pandas styler (non-full-width)
+        if first_col_width and not full_width:
+            first_stub = f"p{{{first_col_width}}}"
+        else:
+            first_stub = "l"
+        other_stubs = "l" * max(0, stub_cols - 1)
+        data_spec = "c" * data_cols
+        colfmt = first_stub + other_stubs + data_spec
+
+        styler = dfs.style
         latex_res = styler.to_latex(
             hrules=True,
             multicol_align="c",
             multirow_align="t",
-            column_format="l" + "c" * (dfs.shape[1] + dfs.index.nlevels),
+            column_format=colfmt,
         )
 
-        # First split the LaTeX code into lines
         lines = latex_res.splitlines()
-        # Find the line number of the \midrule
         line_at = next(i for i, line in enumerate(lines) if "\\midrule" in line)
-        # Add space after this \midrule:
         lines.insert(line_at + 1, "\\addlinespace")
         line_at += 1
 
-        # When there are row groups then insert midrules and groupname
         if row_levels > 1 and len(row_groups) > 1:
-            # Insert a midrule after each row group
             for i in range(len(row_groups)):
                 if self.rgroup_display:
-                    # Insert a line with the row group name & same space around it
                     lines.insert(line_at + 1, "\\emph{" + row_groups[i] + "} \\\\")
                     lines.insert(line_at + 2, "\\addlinespace")
                     lines.insert(line_at + 3 + row_groups_len[i], "\\addlinespace")
                     line_at += 3
                 if (self.rgroup_sep != "") and (i < len(row_groups) - 1):
-                    # For tex output we only either at a line between the row groups or not
-                    # And we don't add a line after the last row group
                     line_at += row_groups_len[i] + 1
                     lines.insert(line_at, "\\midrule")
                     lines.insert(line_at + 1, "\\addlinespace")
                     line_at += 1
         else:
-            # Add line space before the end of the table
             lines.insert(line_at + dfs.shape[0] + 1, "\\addlinespace")
 
-        # Insert cmidrules (equivalent to column spanners in gt)
-        # First find the first line with an occurrence of "multicolumn"
-        cmidrule_line_number = None
+        # cmidrules under multicolumn header
         for i, line in enumerate(lines):
             if "multicolumn" in line:
                 cmidrule_line_number = i + 1
-                # Regular expression to find \multicolumn{number}
                 pattern = r"\\multicolumn\{(\d+)\}"
-                # Find all matches (i.e. values of d) in the LaTeX string & convert to integers
                 ncols = [int(match) for match in re.findall(pattern, line)]
-
                 cmidrule_string = ""
-                leftcol = 2
+                leftcol = stub_cols + 1
                 for n in ncols:
                     cmidrule_string += (
                         r"\cmidrule(lr){" + str(leftcol) + "-" + str(leftcol + n - 1) + "} "
                     )
                     leftcol += n
                 lines.insert(cmidrule_line_number, cmidrule_string)
+                break
 
-        # Put the lines back together
         latex_res = "\n".join(lines)
 
-        # Wrap in threeparttable to allow for table notes
         if self.notes is not None:
             latex_res = (
                 "\\begin{threeparttable}\n"
@@ -718,7 +725,6 @@ class MTable:
         else:
             latex_res = "\\begin{threeparttable}\n" + latex_res + "\n\\end{threeparttable}"
 
-        # If caption or label specified then wrap in table environment
         if (self.caption is not None) or (self.tab_label is not None):
             latex_res = (
                 "\\begin{table}[" + kwargs.get("texlocation", "htbp") + "]\n"
@@ -729,17 +735,27 @@ class MTable:
                 + "\n\\end{table}"
             )
 
-        # Set cell alignment to top
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
-        # Set table width to full page width if full_width is True
+        # Full width: switch to tabularx and use X for all flexible columns
         if full_width:
-            latex_res = latex_res.replace(
-                "\\begin{tabular}{l", "\\begin{tabularx}{\\linewidth}{X"
+            # Center flexible columns; keep stub left
+            centered_X = r">{\centering\arraybackslash}X"
+            n_flex = max(0, stub_cols - 1) + data_cols
+            rest_spec = centered_X * n_flex
+            if first_col_width:
+                first_spec = f"p{{{first_col_width}}}"
+            else:
+                first_spec = r">{\raggedright\arraybackslash}X"
+            colfmt_x = first_spec + rest_spec
+
+            latex_res = re.sub(
+                r"\\begin\{tabular\}\{[^}]*\}",
+                lambda m: f"\\begin{{tabularx}}{{\\linewidth}}{{{colfmt_x}}}",
+                latex_res,
+                count=1,
             )
-            latex_res = latex_res.replace(
-                "\\end{tabular}", "\\end{tabularx}\n \\vspace{3pt}"
-            )
+            latex_res = latex_res.replace("\\end{tabular}", "\\end{tabularx}\n \\vspace{3pt}")
 
         return latex_res
 

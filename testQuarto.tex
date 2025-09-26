@@ -192,7 +192,7 @@ mollit anim id est laborum.
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lccccc}
+\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} 
@@ -201,25 +201,26 @@ mollit anim id est laborum.
 \addlinespace
 \emph{Gr 1} \\
 \addlinespace
-Var 1 & 0.469000 & -0.946000 & -0.854000 & 1.703000 \\
-Var 2 & 2.112000 & -1.240000 & 0.320000 & -0.993000 \\
-Var 3 & 2.408000 & -1.297000 & 0.691000 & 0.740000 \\
+Var 1 & -0.047000 & -0.845000 & 0.009000 & 0.140000 \\
+Var 2 & -1.662000 & -0.049000 & 1.605000 & -0.807000 \\
+Var 3 & -0.486000 & -1.213000 & 1.435000 & -0.505000 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 2} \\
 \addlinespace
-Var 4 & 0.541000 & -0.006000 & -1.704000 & -1.120000 \\
-Var 5 & 1.822000 & -2.384000 & -1.149000 & -0.098000 \\
+Var 4 & 0.163000 & 0.020000 & 1.347000 & -1.367000 \\
+Var 5 & -1.254000 & 0.171000 & -1.493000 & 0.318000 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 3} \\
 \addlinespace
-Var 6 & 0.018000 & 0.834000 & 1.406000 & -0.139000 \\
+Var 6 & -0.759000 & -1.624000 & 1.143000 & 2.105000 \\
 \addlinespace
 \bottomrule
-\end{tabular}
+\end{tabularx}
+ \vspace{3pt}
 \footnotesize Sample notes!
 \end{threeparttable}
 
@@ -238,18 +239,19 @@ Var 6 & 0.018000 & 0.834000 & 1.406000 & -0.139000 \\
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lcccc}
+\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Control & Treatment 1 & Treatment 2 \\
 \midrule
 \addlinespace
-Ability (test score) & \makecell{99.17\\(15.14)} & \makecell{100.11\\(16.31)} & \makecell{100.20\\(15.25)} \\
-Age (years) & \makecell{38.34\\(11.10)} & \makecell{37.45\\(12.07)} & \makecell{38.64\\(12.07)} \\
+Ability (test score) & \makecell{99.29\\(16.79)} & \makecell{98.61\\(15.53)} & \makecell{98.80\\(14.56)} \\
+Age (years) & \makecell{40.39\\(12.02)} & \makecell{40.15\\(12.39)} & \makecell{38.44\\(11.39)} \\
 \midrule
 \addlinespace
-N & 344 & 336 & 320 \\
+N & 350 & 300 & 350 \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
+ \vspace{3pt}
 \footnotesize Note: Displayed statistics are Mean (Std. Dev.).
 \end{threeparttable}
 
@@ -268,25 +270,25 @@ N & 344 & 336 & 320 \\
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lccc}
+\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{Sales (Euro)} \\
 \cmidrule(lr){2-3} 
  & (1) & (2) \\
 \midrule
 \addlinespace
-Ability (test score) & \makecell{107.761*** \\ (12.984)} & \makecell{103.963*** \\ (10.271)} \\
-Age (years) & \makecell{40.133* \\ (17.214)} & \makecell{32.363* \\ (13.619)} \\
-training &  & \makecell{8325.724*** \\ (340.581)} \\
-Intercept & \makecell{1.876E+04*** \\ (1463.468)} & \makecell{1.671E+04*** \\ (1160.607)} \\
+Ability (test score) & \makecell{88.238*** \\ (13.330)} & \makecell{90.443*** \\ (10.774)} \\
+Age (years) & \makecell{20.084 \\ (17.469)} & \makecell{18.278 \\ (14.119)} \\
+training &  & \makecell{8283.795*** \\ (359.742)} \\
+Intercept & \makecell{2.175E+04*** \\ (1502.583)} & \makecell{1.891E+04*** \\ (1220.675)} \\
 \midrule
 \addlinespace
 Observations & 1000 & 1000 \\
-R² & 0.070 & 0.418 \\
+R² & 0.043 & 0.376 \\
 \bottomrule
-\end{tabular}
-\footnotesize Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient 
- (Std. Error)
+\end{tabularx}
+ \vspace{3pt}
+\footnotesize Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)
 \end{threeparttable}
 
 \begin{verbatim}

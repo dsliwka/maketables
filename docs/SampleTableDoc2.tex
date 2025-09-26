@@ -7,6 +7,7 @@
 \usepackage{booktabs}%
 \usepackage{threeparttable}%
 \usepackage{makecell}%
+\usepackage{tabularx}%
 %
 %
 %
@@ -19,29 +20,22 @@
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lccccccc}
+\begin{tabularx}{\linewidth}{p{3cm}XX}
 \toprule
- & \multicolumn{2}{c}{US} & \multicolumn{2}{c}{China} & \multicolumn{2}{c}{EU} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} 
- & Wage & Wealth & Wage & Wealth & Wage & Wealth \\
- & (1) & (2) & (3) & (4) & (5) & (6) \\
+ & Hello & There \\
 \midrule
 \addlinespace
-Age & \makecell{-0.95*** \\ (0.07)} & \makecell{-1.27*** \\ (0.17)} & \makecell{-0.92*** \\ (0.06)} & \makecell{-1.23*** \\ (0.20)} & \makecell{-0.92*** \\ (0.06)} & \makecell{-1.23*** \\ (0.19)} \\
-Years of Schooling & \makecell{-0.17*** \\ (0.02)} & \makecell{-0.13*** \\ (0.04)} & \makecell{-0.17*** \\ (0.01)} & \makecell{-0.12*** \\ (0.04)} & \makecell{-0.19*** \\ (0.03)} & \makecell{-0.07 \\ (0.11)} \\
-Age x Years of Schooling &  &  &  &  & \makecell{0.01 \\ (0.02)} & \makecell{-0.04 \\ (0.08)} \\
-\midrule
+Var 1 & -0.400000 & 0.510000 \\
+Var 2 & -0.310000 & -0.070000 \\
+Var 3 & -0.440000 & 0.720000 \\
+Var 4 & 0.220000 & -1.150000 \\
+Var 5 & 1.350000 & 0.550000 \\
+Var 6 & -0.970000 & 0.890000 \\
 \addlinespace
-Industry & x & x & x & x & x & x \\
-Year & - & - & x & x & x & x \\
-\midrule
-\addlinespace
-Number of Clusters & 42 & 42 & 42 & 37 & 37 & 37 \\
-Observations & 997 & 998 & 997 & 998 & 997 & 998 \\
-R² & 0.49 & 0.12 & 0.66 & 0.17 & 0.66 & 0.17 \\
 \bottomrule
-\end{tabular}
-\footnotesize Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+\end{tabularx}
+ \vspace{3pt}
+\footnotesize 
 \end{threeparttable}%
 \end{table}
 
