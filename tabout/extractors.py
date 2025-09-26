@@ -1,7 +1,8 @@
 from typing import Any, Dict, List, Protocol, runtime_checkable
-
 import numpy as np
 import pandas as pd
+from typing import Optional
+from .importdta import get_var_labels
 
 # Optional imports for built-ins
 try:
@@ -20,6 +21,7 @@ class ModelExtractor(Protocol):
     def fixef_string(self, model: Any) -> str | None: ...
     def stat(self, model: Any, key: str) -> Any: ...
     def vcov_info(self, model: Any) -> Dict[str, Any]: ...
+    def var_labels(self, model: Any) -> Optional[Dict[str, str]]: ...
 
 
 _EXTRACTOR_REGISTRY: List[ModelExtractor] = []
@@ -99,6 +101,25 @@ class PyFixestExtractor:
             "clustervar": getattr(model, "_clustervar", None),
         }
 
+    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+        df = getattr(model, "_data", None)
+        if isinstance(df, pd.DataFrame):
+            try:
+                return get_var_labels(df, include_defaults=True)
+            except Exception:
+                return None
+        return None
+
+
+def _follow(obj: Any, chain: List[str]) -> Any:
+    cur = obj
+    for a in chain:
+        if hasattr(cur, a):
+            cur = getattr(cur, a)
+        else:
+            return None
+    return cur
+
 
 class StatsmodelsExtractor:
     def can_handle(self, model: Any) -> bool:
@@ -163,6 +184,21 @@ class StatsmodelsExtractor:
 
     def vcov_info(self, model: Any) -> Dict[str, Any]:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
+
+    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+        # Try common statsmodels formula-api locations for the original DataFrame
+        candidates = [
+            ("model", "model", "data", "frame"),
+            ("model", "data", "frame"),
+        ]
+        for chain in candidates:
+            df = _follow(model, list(chain))
+            if isinstance(df, pd.DataFrame):
+                try:
+                    return get_var_labels(df, include_defaults=True)
+                except Exception:
+                    return None
+        return None
 
 
 # Register built-ins

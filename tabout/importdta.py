@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Tuple, Optional
+from typing import Dict, Optional, Union, Tuple
 from os import PathLike
 import warnings
 import os
@@ -16,59 +16,72 @@ def import_dta(
     path: str | PathLike[str],
     *,
     convert_categoricals: bool = True,
-    encoding: Optional[str] = None,  # ignored; pandas reads encoding from file header
-    update_defaults: bool = True,
+    store_in_attrs: bool = True,
+    update_mtable_defaults: bool = False,
     override: bool = False,
     return_labels: bool = False,
-) -> Tuple[pd.DataFrame, Dict[str, str]]:
+) -> Union[pd.DataFrame, Tuple[pd.DataFrame, Dict[str, str]]]:
     """
-    Import a Stata .dta into a pandas DataFrame, preserve value labels as categoricals,
-    and update MTable.DEFAULT_LABELS with variable labels.
+    Import a Stata .dta into a pandas DataFrame.
+
+    Behavior
+    - Preserves Stata value labels by reading labeled variables as pandas.Categorical
+      when convert_categoricals=True.
+    - Extracts variable (column) labels from the file.
+    - Stores variable labels in df.attrs['variable_labels'] by default (store_in_attrs=True).
+    - Optionally merges labels into MTable.DEFAULT_LABELS for package-wide defaults.
 
     Parameters
     ----------
-    path : str | PathLike
-        Path to the .dta file.
+    path : str | os.PathLike
+        Local filesystem path to a .dta file.
     convert_categoricals : bool, default True
-        Convert Stata value labels to pandas.Categorical (preserves labeled values).
-    encoding : str | None
-        Text encoding override if needed.
-    update_defaults : bool, default True
-        If True, update MTable.DEFAULT_LABELS with the extracted variable labels.
+        Convert Stata value labels to pandas.Categorical (recommended to preserve value labels).
+    store_in_attrs : bool, default True
+        If True, save extracted variable labels under df.attrs['variable_labels'].
+    update_mtable_defaults : bool, default False
+        If True, merge extracted labels into MTable.DEFAULT_LABELS.
     override : bool, default False
-        If True, new labels overwrite existing defaults for the same keys.
-        If False, existing defaults are kept (only fill missing keys).
+        Controls merging into MTable.DEFAULT_LABELS when update_mtable_defaults=True:
+        - True: overwrite existing keys with new labels.
+        - False: only fill keys that are missing.
     return_labels : bool, default False
-        If True, return the variable labels dict along with the DataFrame.
+        If True, also return the labels dict in addition to the DataFrame.
 
     Returns
     -------
-    (df, var_labels) : (pandas.DataFrame, dict[str, str])
-        DataFrame with categorized columns (where value labels exist) and
-        a dict of variable labels {column_name: label}.
-    """
-    # Stata encoding is stored in the file; pandas handles it. Warn if user passed one.
-    if encoding is not None:
-        warnings.warn("import_stata: 'encoding' is ignored; Stata files carry encoding in the header.", RuntimeWarning)
+    DataFrame or (DataFrame, dict)
+        - If return_labels=False: the DataFrame.
+        - If return_labels=True: (df, labels) where labels is {column_name: label}.
 
-    # Pass convert_categoricals on the constructor when supported; fall back otherwise.
+    Notes
+    -----
+    - pandas handles Stata encodings from the file header.
+    - API works across pandas versions; if StataReader constructor does not support
+      convert_categoricals, it falls back and applies it at read time if needed.
+
+    Examples
+    --------
+    >>> df = import_dta("data/auto.dta")
+    >>> df.attrs["variable_labels"]["price"]
+    >>> df, labels = import_dta("data/auto.dta", update_mtable_defaults=True, return_labels=True)
+    """
     try:
         with StataReader(path, convert_categoricals=convert_categoricals) as rdr:
             var_labels: Dict[str, str] = {k: v for k, v in rdr.variable_labels().items() if v}
             df = rdr.read()
     except TypeError:
-        # Older/newer pandas signature without convert_categoricals
         with StataReader(path) as rdr:
             var_labels = {k: v for k, v in rdr.variable_labels().items() if v}
             df = rdr.read()
 
-    # Attach labels to DataFrame metadata for downstream access
-    try:
-        df.attrs["variable_labels"] = dict(var_labels)
-    except Exception:
-        pass
+    if store_in_attrs:
+        try:
+            df.attrs["variable_labels"] = dict(var_labels)
+        except Exception:
+            pass
 
-    if update_defaults:
+    if update_mtable_defaults:
         if override:
             MTable.DEFAULT_LABELS = {**MTable.DEFAULT_LABELS, **var_labels}
         else:
@@ -97,48 +110,60 @@ def export_dta(
     time_stamp: Optional[datetime] = None,
 ) -> None:
     """
-    Export a DataFrame to a Stata .dta file and write variable labels.
+    Export a DataFrame to a Stata .dta file, writing variable labels.
 
-    Variable labels priority (later wins):
+    Variable label sources (later wins on key conflicts):
       1) MTable.DEFAULT_LABELS (if use_defaults=True)
       2) df.attrs['variable_labels'] (if use_df_attrs=True)
-      3) labels argument (explicit overrides)
+      3) labels argument (highest priority)
 
-    Notes
-    - Stata value labels: pandas writes Categorical columns as labeled values
-      automatically (use pandas Categorical dtype to preserve them).
-    - Stata variable label length is limited (80 chars). Longer labels are truncated.
+    Stata value labels
+    - pandas writes Categorical columns with their categories as Stata value labels.
+      Ensure columns that should carry value labels are dtype 'category'.
 
     Parameters
     ----------
     df : pandas.DataFrame
         Data to export.
-    path : str | PathLike
-        Output .dta file path.
+    path : str | os.PathLike
+        Output .dta path. Existing file is preserved unless overwrite=True.
     labels : dict, optional
-        Mapping {column_name: variable_label}. Highest priority.
+        Explicit variable labels {column: label} to apply (highest priority).
     use_defaults : bool, default True
         Include labels from MTable.DEFAULT_LABELS.
     use_df_attrs : bool, default True
         Include labels from df.attrs['variable_labels'] if present.
     overwrite : bool, default False
-        Overwrite the file if it already exists.
+        If False and file exists, raise FileExistsError.
     data_label : str, optional
-        Dataset label stored in the Stata file.
+        Stata dataset label.
     version : int, default 118
-        Stata file version (117 = Stata 13, 118 = Stata 14+). 118 recommended.
+        Stata file version (118 recommended; 117 is Stata 13).
     write_index : bool, default False
-        Whether to write the index to Stata.
+        Whether to write the index as a Stata variable.
     compression : {'zip','gzip','bz2','xz','zst','infer',None}, optional
-        Compression mode.
+        Compression mode for the output.
     time_stamp : datetime, optional
-        Timestamp stored in the file header.
+        Timestamp written to the Stata file header.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    - Stata variable labels are limited to 80 characters; longer labels are truncated.
+    - Some older pandas versions may not support variable_labels=; a warning is emitted and
+      the file is written without variable labels in that case.
+
+    Examples
+    --------
+    >>> export_dta(df, "data/auto_out.dta", overwrite=True)
+    >>> export_dta(df, "data/auto_out.dta", labels={"price": "Vehicle price"}, overwrite=True)
     """
-    # Check overwrite
     if os.path.exists(path) and not overwrite:
         raise FileExistsError(f"File exists: {path}. Set overwrite=True to replace.")
 
-    # Assemble variable labels with priority
     var_labels: Dict[str, str] = {}
     if use_defaults and getattr(MTable, "DEFAULT_LABELS", None):
         for k, v in MTable.DEFAULT_LABELS.items():
@@ -153,7 +178,6 @@ def export_dta(
             if k in df.columns and v:
                 var_labels[k] = str(v)
 
-    # Enforce Stata's variable label length limit (80 chars)
     trimmed = {}
     for k, v in var_labels.items():
         s = str(v)
@@ -163,7 +187,6 @@ def export_dta(
         trimmed[k] = s
     var_labels = trimmed
 
-    # Write .dta (pandas will write Categoricals as value labels)
     try:
         df.to_stata(
             path,
@@ -176,7 +199,6 @@ def export_dta(
             compression=compression,
         )
     except TypeError:
-        # Older pandas without variable_labels support
         warnings.warn("This pandas version does not support writing variable_labels. Writing without labels.", RuntimeWarning)
         df.to_stata(
             path,
@@ -187,3 +209,98 @@ def export_dta(
             time_stamp=time_stamp,
             compression=compression,
         )
+
+
+def get_var_labels(df: pd.DataFrame, *, include_defaults: bool = False) -> Dict[str, str]:
+    """
+    Get variable labels for a DataFrame.
+
+    Reads df.attrs['variable_labels'] and optionally fills missing labels from
+    MTable.DEFAULT_LABELS.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame to inspect.
+    include_defaults : bool, default False
+        If True, add labels from MTable.DEFAULT_LABELS for columns missing a label.
+
+    Returns
+    -------
+    dict
+        Mapping {column_name: label}.
+
+    Examples
+    --------
+    >>> get_var_labels(df)
+    >>> get_var_labels(df, include_defaults=True)
+    """
+    labels: Dict[str, str] = {}
+    attr = df.attrs.get("variable_labels")
+    if isinstance(attr, dict):
+        labels.update({k: str(v) for k, v in attr.items() if v})
+    if include_defaults and getattr(MTable, "DEFAULT_LABELS", None):
+        for k, v in MTable.DEFAULT_LABELS.items():
+            if k not in labels and k in df.columns and v:
+                labels[k] = str(v)
+    return labels
+
+
+def set_var_labels(
+    df: pd.DataFrame,
+    labels: Dict[str, str],
+    *,
+    overwrite: bool = True,
+    update_mtable_defaults: bool = False,
+) -> Dict[str, str]:
+    """
+    Set variable labels on a DataFrame and optionally sync them to MTable.DEFAULT_LABELS.
+
+    Labels are stored in df.attrs['variable_labels'] as a plain dict. Only columns
+    present in df are written.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame to modify.
+    labels : dict
+        Mapping {column_name: label} to set.
+    overwrite : bool, default True
+        If True, replace existing labels for given columns; if False, only fill missing.
+    update_mtable_defaults : bool, default False
+        If True, merge the resulting labels dict into MTable.DEFAULT_LABELS
+        (respecting the overwrite policy).
+
+    Returns
+    -------
+    dict
+        The updated df.attrs['variable_labels'] mapping.
+
+    Examples
+    --------
+    >>> set_var_labels(df, {"mpg": "Miles per gallon"}, update_mtable_defaults=True)
+    >>> get_var_labels(df)
+    """
+    current: Dict[str, str] = {}
+    if isinstance(df.attrs.get("variable_labels"), dict):
+        current.update(df.attrs["variable_labels"])
+
+    for k, v in labels.items():
+        if k not in df.columns:
+            continue
+        if overwrite or k not in current:
+            current[k] = str(v) if v is not None else v
+
+    df.attrs["variable_labels"] = current
+
+    if update_mtable_defaults:
+        if overwrite:
+            MTable.DEFAULT_LABELS = {**MTable.DEFAULT_LABELS, **{k: v for k, v in current.items() if v}}
+        else:
+            merged = dict(MTable.DEFAULT_LABELS)
+            for k, v in current.items():
+                if v and k not in merged:
+                    merged[k] = v
+            MTable.DEFAULT_LABELS = merged
+
+    return current

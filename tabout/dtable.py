@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import Optional
 from .mtable import MTable
+from .importdta import get_var_labels
 
 class DTable(MTable):
     """
@@ -24,9 +25,10 @@ class DTable(MTable):
         Type of table to be created. The default is 'gt'.
         Type can be 'gt' for great_tables, 'tex' for LaTeX or 'df' for dataframe.
     labels : dict, optional
-        Dictionary containing display labels for variables. If None, the class default
-        labels are used (MTable.DEFAULT_LABELS). When provided, this mapping replaces
-        the default mapping (no automatic merge).
+        Dictionary containing display labels for variables. If None, labels are taken
+        from the DataFrame via get_var_labels(df) (which reads df.attrs['variable_labels']
+        and fills missing entries from MTable.DEFAULT_LABELS). When provided, this mapping
+        is used as-is (no automatic merge).
     stats_labels : dict, optional
         Dictionary containing the labels for the statistics. The default is None.
     digits : int, optional
@@ -73,9 +75,15 @@ class DTable(MTable):
         if stats is None:
             stats = ["count", "mean", "std"]
 
-        # Pull defaults from MTable (or subclass) and merge with user input
-        base_labels = getattr(self, "DEFAULT_LABELS", {})
-        labels = dict(base_labels) if labels is None else dict(labels)
+        # Determine labels: prefer DataFrame attrs; fall back to MTable defaults
+        try:
+            df_labels = get_var_labels(df, include_defaults=True)
+        except Exception:
+            df_labels = dict(getattr(MTable, "DEFAULT_LABELS", {}))
+        if labels is None:
+            labels = df_labels
+        else:
+            labels = dict(labels)
 
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert all(pd.api.types.is_numeric_dtype(df[var]) for var in vars), (

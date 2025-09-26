@@ -33,9 +33,9 @@ class ETable(MTable):
 
     Parameters
     ----------
-    models : FixestMulti | Feols | Fepois | Feiv | statsmodels results | list[...
+    models : FixestMulti | Feols | Fepois | Feiv | statsmodels results | list[...]
         One or more fitted models. A FixestMulti is expanded into its models.
-        Statsmodels support includes fitted results objects.
+        Statsmodels support includes fitted results.
     signif_code : list[float], optional
         Three ascending p-value cutoffs for significance stars, default
         ETable.DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05].
@@ -68,8 +68,10 @@ class ETable(MTable):
         If True, treat keep/drop patterns as exact names (no regex).
     labels : dict, optional
         Variable labels for relabeling dependent vars, regressors, and (if not
-        provided in felabels) fixed effects. If None, defaults to
-        MTable.DEFAULT_LABELS so all children share the same label source.
+        provided in felabels) fixed effects. If None, labels are collected from
+        each model’s source DataFrame via the extractor (e.g., PyFixest: model._data;
+        Statsmodels: result.model.data.frame), merged across models (first seen wins),
+        and any missing entries are filled from MTable.DEFAULT_LABELS.
     cat_template : str, optional
         Template to relabel categorical terms, using placeholders
         '{variable}' and '{value}'. Default ETable.DEFAULT_CAT_TEMPLATE
@@ -103,8 +105,9 @@ class ETable(MTable):
     - To display the SE type, include "se_type" in model_stats.
     - Categorical term relabeling applies to plain categorical columns and to
       formula encodings that expose variable/value names.
-    - Column header structure is built from dependent variable names (relabeled
-      via labels), optional model_heads, and model numbers, in head_order.
+    - When labels is None, labels are sourced from each model’s DataFrame (if
+      available) and supplemented by MTable.DEFAULT_LABELS. Use set_var_labels()
+      or import_dta() to populate df.attrs['variable_labels'].
     - Statsmodels usage: pass fitted results (e.g., from statsmodels.formula.api).
       Coefficients, standard errors, p-values, R², and N are extracted automatically.
 
@@ -156,8 +159,6 @@ class ETable(MTable):
         # --- defaults from class attributes ---
         signif_code = self.DEFAULT_SIGNIF_CODE if signif_code is None else signif_code
         coef_fmt = self.DEFAULT_COEF_FMT if coef_fmt is None else coef_fmt
-        # Always take default labels from MTable
-        labels = dict(MTable.DEFAULT_LABELS) if labels is None else labels
         cat_template = self.DEFAULT_CAT_TEMPLATE if cat_template is None else cat_template
         show_fe = self.DEFAULT_SHOW_FE if show_fe is None else show_fe
         felabels = dict(self.DEFAULT_FELABELS) if felabels is None else felabels
@@ -174,6 +175,14 @@ class ETable(MTable):
             assert signif_code[0] < signif_code[1] < signif_code[2]
 
         models = self._normalize_models(models)
+
+        # Determine labels:
+        # 1) if user provided labels, use them as-is
+        # 2) otherwise, collect from models' DataFrames and fill from MTable defaults
+        if labels is None:
+            labels = self._collect_labels_from_models(models)
+        else:
+            labels = dict(labels)
 
         if custom_stats:
             assert isinstance(custom_stats, dict)
@@ -314,7 +323,31 @@ class ETable(MTable):
             return "-" if math.isnan(raw) else _number_formatter(float(raw), digits=digits)
         return str(raw)
 
- 
+    def _collect_labels_from_models(self, models: List[Any]) -> Dict[str, str]:
+        """
+        Gather variable labels from each model via its extractor, merging across
+        models (first seen wins), then fill missing entries from MTable.DEFAULT_LABELS.
+        """
+        merged: Dict[str, str] = {}
+        for m in models:
+            try:
+                extractor = self._get_extractor(m)
+                model_labels = extractor.var_labels(m) if hasattr(extractor, "var_labels") else None
+            except Exception:
+                model_labels = None
+            if isinstance(model_labels, dict):
+                for k, v in model_labels.items():
+                    if v and (k not in merged):
+                        merged[k] = v
+        # Fill remaining with global defaults
+        try:
+            for k, v in getattr(MTable, "DEFAULT_LABELS", {}).items():
+                if v and (k not in merged):
+                    merged[k] = v
+        except Exception:
+            pass
+        return merged
+
     def _collect_fixef_list(self, models: List[Any], show_fe: bool) -> List[str]:
         if not show_fe:
             return []
