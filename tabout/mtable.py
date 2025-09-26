@@ -55,6 +55,28 @@ class MTable:
 
     # Shared defaults (override per subclass if needed)
     DEFAULT_LABELS: Dict[str, str] = {}
+    # Simple default DOCX styling. Users can tweak this globally or per instance.
+    DEFAULT_DOCX_STYLE: Dict[str, object] = {
+        "font_name": "Times New Roman",
+        "font_color_rgb": (0, 0, 0),
+        "font_size_pt": 11,       # body and header
+        "notes_font_size_pt": 9,  # notes row
+        # Caption-specific defaults
+        "caption_font_name": "Times New Roman",
+        "caption_font_size_pt": 11,
+        "caption_align": "center",    # left|center|right|justify
+        "notes_align": "justify",     # left|center|right|justify
+        "align_center_cells": True,   # center all cells except first column
+        # borders (Word size units; 4=thin, 8=thick)
+        "border_top_rule_sz": 8,      # top rule above first header row
+        "border_header_rule_sz": 4,   # bottom rule under last header row
+        "border_bottom_rule_sz": 8,   # bottom rule under last data row
+        "border_group_rule_sz": 4,    # lines above/below row group labels
+        # table cell margins (dxa; 20 dxa = 1 pt)
+        "cell_margins_dxa": {"left": 0, "right": 0, "top": 60, "bottom": 60},
+        # optional table style name in Word (None => 'Table Grid')
+        "table_style_name": None,
+    }
 
     def __init__(
         self,
@@ -65,6 +87,7 @@ class MTable:
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
+        docx_style: Optional[Dict[str, object]] = None,
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -82,6 +105,10 @@ class MTable:
             self.default_paths = default_paths.copy()
         else:
             self.default_paths = {}
+        # Instance-level style (defaults merged with user overrides)
+        self.docx_style = dict(self.DEFAULT_DOCX_STYLE)
+        if docx_style:
+            self.docx_style.update(docx_style)
     
             
     def make(self, 
@@ -284,10 +311,9 @@ class MTable:
             if self.caption is not None:
                 paragraph = document.add_paragraph('Table ', style='Caption')
                 self._build_docx_caption(self.caption, paragraph)
-                
             # Add a new table to the document
             table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-            table.style = 'Table Grid'
+            table.style = self.docx_style.get("table_style_name") or 'Table Grid'
             self._build_docx_table(table)
 
         # Save the document
@@ -310,13 +336,14 @@ class MTable:
 
         # Add table
         table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-        table.style = 'Table Grid'
+        table.style = self.docx_style.get("table_style_name") or 'Table Grid'
         self._build_docx_table(table)
 
         return document
 
 
     def _build_docx_caption(self, caption: str, paragraph):
+        s = self.docx_style
         run = paragraph.add_run()
         r = run._r
         fldChar = OxmlElement('w:fldChar')
@@ -330,15 +357,25 @@ class MTable:
         r.append(fldChar)
         bold_run = paragraph.add_run(f': {caption}')
         bold_run.bold = False
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        # Set the font color to black and font size to 11
-        for run in paragraph.runs:
-            run.font.color.rgb = RGBColor(0, 0, 0)
-            run.font.size = Pt(11)
-
+        align_map = {
+            "left": WD_ALIGN_PARAGRAPH.LEFT,
+            "center": WD_ALIGN_PARAGRAPH.CENTER,
+            "right": WD_ALIGN_PARAGRAPH.RIGHT,
+            "justify": WD_ALIGN_PARAGRAPH.JUSTIFY,
+        }
+        paragraph.alignment = align_map.get(str(s.get("caption_align", "center")).lower(), WD_ALIGN_PARAGRAPH.CENTER)
+        # Font settings
+        rgb = tuple(s.get("font_color_rgb", (0, 0, 0)))
+        cap_font_name = str(s.get("caption_font_name", s.get("font_name", "Times New Roman")))
+        cap_font_size = Pt(int(s.get("caption_font_size_pt", 11)))
+        for r_ in paragraph.runs:
+            r_.font.name = cap_font_name
+            r_.font.color.rgb = RGBColor(*rgb)
+            r_.font.size = cap_font_size
 
 
     def _build_docx_table(self, table):
+        s = self.docx_style
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
@@ -404,10 +441,11 @@ class MTable:
                     row_cells[i + 1].text = str(val)
 
         # Center all columns except the first one
-        for row in table.rows:
-            for cell in row.cells[1:]:
-                for paragraph in cell.paragraphs:
-                    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if s.get("align_center_cells", True):
+            for row in table.rows:
+                for cell in row.cells[1:]:
+                    for paragraph in cell.paragraphs:
+                        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
         # Add notes (Note: we alsways add notes, even if empty)
         # Add row to the table that consists only of one cell with the notes
@@ -417,9 +455,32 @@ class MTable:
         table.cell(-1, 0).merge(table.cell(-1, ncols - 1))
         # Set alignment and font size for the notes
         for paragraph in notes_row[0].paragraphs:
-            paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            align_map = {
+                "left": WD_ALIGN_PARAGRAPH.LEFT,
+                "center": WD_ALIGN_PARAGRAPH.CENTER,
+                "right": WD_ALIGN_PARAGRAPH.RIGHT,
+                "justify": WD_ALIGN_PARAGRAPH.JUSTIFY,
+            }
+            paragraph.alignment = align_map.get(str(s.get("notes_align", "justify")).lower(), WD_ALIGN_PARAGRAPH.JUSTIFY)
             for run in paragraph.runs:
-                run.font.size = Pt(9)
+                run.font.name = str(s.get("font_name", "Times New Roman"))
+                run.font.size = Pt(int(s.get("notes_font_size_pt", 9)))
+                rgb = tuple(s.get("font_color_rgb", (0, 0, 0)))
+                run.font.color.rgb = RGBColor(*rgb)
+
+        # Apply font to all table cells
+        rgb_all = tuple(s.get("font_color_rgb", (0, 0, 0)))
+        base_size = Pt(int(s.get("font_size_pt", 11)))
+        notes_size = Pt(int(s.get("notes_font_size_pt", 9)))
+        for ridx, row in enumerate(table.rows):
+            is_notes_row = ridx == len(table.rows) - 1
+            size = notes_size if is_notes_row else base_size
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.name = str(s.get("font_name", "Times New Roman"))
+                        run.font.color.rgb = RGBColor(*rgb_all)
+                        run.font.size = size
 
         # First hide all borders
         for row in table.rows:
@@ -446,7 +507,7 @@ class MTable:
             borders = OxmlElement('w:tcBorders')
             top_border = OxmlElement('w:top')
             top_border.set(qn('w:val'), 'single')
-            top_border.set(qn('w:sz'), '8')
+            top_border.set(qn('w:sz'), str(int(s.get("border_top_rule_sz", 8))))
             borders.append(top_border)
             tcPr.append(borders)
 
@@ -456,7 +517,7 @@ class MTable:
             borders = OxmlElement('w:tcBorders')
             bottom_border = OxmlElement('w:bottom')
             bottom_border.set(qn('w:val'), 'single')
-            bottom_border.set(qn('w:sz'), '4')
+            bottom_border.set(qn('w:sz'), str(int(s.get("border_header_rule_sz", 4))))
             borders.append(bottom_border)
             tcPr.append(borders)
 
@@ -468,31 +529,28 @@ class MTable:
                 borders = OxmlElement('w:tcBorders')
                 top_border = OxmlElement('w:top')
                 top_border.set(qn('w:val'), 'single')
-                top_border.set(qn('w:sz'), '4')
+                top_border.set(qn('w:sz'), str(int(s.get("border_header_rule_sz", 4))))
                 borders.append(top_border)
                 tcPr.append(borders)
 
-        # Loop over all lines in row_group_rows
-        # And add lines above and below the row group names depending on rgroup_display and rgroup_sep
+        # Row group lines
         for row in row_group_rows:
             if "t" in self.rgroup_sep:
-                # Add a line above the row group name
                 for cell in table.rows[row].cells:
                     tcPr = cell._element.get_or_add_tcPr()
                     borders = OxmlElement('w:tcBorders')
                     top_border = OxmlElement('w:top')
                     top_border.set(qn('w:val'), 'single')
-                    top_border.set(qn('w:sz'), '4')
+                    top_border.set(qn('w:sz'), str(int(s.get("border_group_rule_sz", 4))))
                     borders.append(top_border)
                     tcPr.append(borders)
             if self.rgroup_display and "b" in self.rgroup_sep:
-                # Add a line below the row group name
                 for cell in table.rows[row].cells:
                     tcPr = cell._element.get_or_add_tcPr()
                     borders = OxmlElement('w:tcBorders')
                     bottom_border = OxmlElement('w:bottom')
                     bottom_border.set(qn('w:val'), 'single')
-                    bottom_border.set(qn('w:sz'), '4')
+                    bottom_border.set(qn('w:sz'), str(int(s.get("border_group_rule_sz", 4))))
                     borders.append(bottom_border)
                     tcPr.append(borders)
 
@@ -502,7 +560,7 @@ class MTable:
             borders = OxmlElement('w:tcBorders')
             bottom_border = OxmlElement('w:bottom')
             bottom_border.set(qn('w:val'), 'single')
-            bottom_border.set(qn('w:sz'), '8')
+            bottom_border.set(qn('w:sz'), str(int(s.get("border_bottom_rule_sz", 8))))
             borders.append(bottom_border)
             tcPr.append(borders)
 
@@ -510,16 +568,13 @@ class MTable:
         tc = table._element
         tblPr = tc.tblPr
         tblCellMar = OxmlElement('w:tblCellMar')
-        # set left and right margins to zero
-        # and top and bottom margins to 60 dxa
-        kwargs = {"left": 0, "right": 0, "top": 60, "bottom": 60}
-        for m in ["left", "right", "top", "bottom"]:
-            node = OxmlElement("w:{}".format(m))
-            node.set(qn('w:w'), str(kwargs.get(m)))
+        _margins = s.get("cell_margins_dxa", {"left": 0, "right": 0, "top": 60, "bottom": 60})
+        for m in ("left", "right", "top", "bottom"):
+            node = OxmlElement(f"w:{m}")
+            node.set(qn('w:w'), str(int(_margins.get(m, 0))))
             node.set(qn('w:type'), 'dxa')
             tblCellMar.append(node)
         tblPr.append(tblCellMar)
-
 
 
 

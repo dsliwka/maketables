@@ -291,6 +291,8 @@ class ETable(MTable):
                 f"Significance levels: * p < {signif_code[2]}, ** p < {signif_code[1]}, *** p < {signif_code[0]}. "
                 + f"Format of coefficient cell: {coef_fmt_title}"
             )
+            # Remove line breaks from notes "\n"
+            notes = notes.replace("\n", " ")
 
         super().__init__(
             res_all,
