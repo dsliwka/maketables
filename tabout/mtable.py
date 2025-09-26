@@ -50,7 +50,7 @@ class MTable:
     DEFAULT_SAVE_PATH = None  # can be string or dict
     DEFAULT_REPLACE = False
     DEFAULT_SAVE_TYPE = "html"
-    ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html", "nb"]
+    ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
 
     # Shared defaults (override per subclass if needed)
@@ -85,17 +85,17 @@ class MTable:
     
             
     def make(self, 
-             type: str = "gt",  
+             type: str = None,  
              **kwargs):
         """
         Create the output object of the table (either gt, tex, docx, or html).
-        With type="nb", displays both HTML and LaTeX outputs for compatibility
+        If type is None, displays both HTML and LaTeX outputs for compatibility
         with both notebook viewing and Quarto rendering.
         
         Parameters
         ----------
         type : str, optional
-            The type of the output object ("gt", "tex", "docx", "html","nb").
+            The type of the output object ("gt", "tex", "docx", "html").
         **kwargs : dict
             Additional keyword arguments to pass to the output method.
             
@@ -104,17 +104,10 @@ class MTable:
             output : object
                 The output object of the table if type is specified.
         """
-        
-        # For explicitly specified types
-        assert type in self.ADMISSIBLE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_TYPES) 
-        
-        if type == "gt":
-            return self._output_gt(**kwargs)
-        elif type == "tex":
-            return self._output_tex(**kwargs)
-        elif type == "docx":
-            return self._output_docx(**kwargs)
-        elif type=="nb":
+
+        if type is None:
+            # If no type is specified, directly display dual output
+            
             # Create dual output object for notebook/Quarto compatibility
             class DualOutput:
                 """Display different outputs in notebook vs Quarto rendering."""
@@ -127,21 +120,35 @@ class MTable:
                         'text/html': self.notebook_html,
                         'text/latex': self.quarto_latex
                     }
+            
             # Generate both HTML and LaTeX outputs
             html_output = self._output_gt(**kwargs).as_raw_html()
-            tex_output = self._output_tex(**kwargs)  
-            # # Add CSS to remove zebra striping if desired
-            # html_output = """
-            # <style>
-            # table tr:nth-child(even) {
-            #     background-color: transparent !important;
-            # }
-            # </style>
-            # """ + html_output
+            tex_output = self._output_tex(**kwargs)
+            
+            # Add CSS to remove zebra striping if desired
+            html_output = """
+            <style>
+            table tr:nth-child(even) {
+                background-color: transparent !important;
+            }
+            </style>
+            """ + html_output
+            
             # Create and display the dual output object
             dual_output = DualOutput(html_output, tex_output)
             display(dual_output)
             return None
+
+
+        # For explicitly specified types
+        assert type in self.ADMISSIBLE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_TYPES) 
+        
+        if type == "gt":
+            return self._output_gt(**kwargs)
+        elif type == "tex":
+            return self._output_tex(**kwargs)
+        elif type == "docx":
+            return self._output_docx(**kwargs)
         else:
             return self._output_gt(**kwargs).as_raw_html()
 
@@ -755,23 +762,36 @@ class MTable:
 
         return gt
 
-    def _repr_html_(self):
+    def __repr__(self):
         """
-        Rich HTML repr for notebooks. Renders the GT table.
+        Return a representation of the table.
+
+        In notebook environments, this will automatically display the table 
+        with dual output format (HTML in notebooks, LaTeX in Quarto) without 
+        requiring an explicit call to make().
+
+        Returns
+        -------
+        str
+            An empty string 
         """
-        try:
-            gt_obj = self._output_gt()
-            if hasattr(gt_obj, "_repr_html_"):
-                return gt_obj._repr_html_()
-            return gt_obj.as_raw_html()
-        except Exception:
-            try:
-                return self.df.to_html()
-            except Exception:
-                return "<pre>MTable</pre>"
+        self.make()
+        return ""
 
-    def _repr_mimebundle_(self, include=None, exclude=None):
-        return {"text/html": self._repr_html_()}
-
-
-
+    def __call__(self, type=None, **kwargs):
+        """
+        Make this object callable, equivalent to calling make().
+        
+        Parameters
+        ----------
+        type : str, optional
+            The output type to create. If None, displays dual output.
+        **kwargs : dict
+            Additional parameters to pass to make().
+            
+        Returns
+        -------
+        output : object
+            The output object returned by make().
+        """
+        return self.make(type=type, **kwargs)
