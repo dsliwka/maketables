@@ -77,6 +77,42 @@ class MTable:
         # optional table style name in Word (None => 'Table Grid')
         "table_style_name": None,
     }
+    # Default GT styling (override globally via MTable.DEFAULT_GT_STYLE.update({...})
+    # or per instance via MTable(..., gt_style={...}))
+    DEFAULT_GT_STYLE: Dict[str, object] = {
+        "align": "center",                 # left | center | right
+        "table_width": None,               # e.g., "100%" or None
+        "data_row_padding": "4px",
+        "column_labels_padding": "4px",
+        # Column label borders
+        "column_labels_border_top_style": "solid",
+        "column_labels_border_top_color": "black",
+        "column_labels_border_top_width": "1px",
+        "column_labels_border_bottom_style": "solid",
+        "column_labels_border_bottom_color": "black",
+        "column_labels_border_bottom_width": "0.5px",
+        "column_labels_vlines_color": "white",
+        "column_labels_vlines_width": "0px",
+        # Table body borders
+        "table_body_border_top_style": "solid",
+        "table_body_border_top_width": "0.5px",
+        "table_body_border_top_color": "black",
+        "table_body_border_bottom_style": "solid",
+        "table_body_border_bottom_width": "1px",
+        "table_body_border_bottom_color": "black",
+        "table_body_hlines_style": "none",
+        "table_body_vlines_color": "white",
+        "table_body_vlines_width": "0px",
+        # Row group borders
+        "row_group_border_top_style": "solid",
+        "row_group_border_top_width": "0.5px",
+        "row_group_border_top_color": "black",
+        "row_group_border_bottom_style": "solid",
+        "row_group_border_bottom_width": "0.5px",
+        "row_group_border_bottom_color": "black",
+        "row_group_border_left_color": "white",
+        "row_group_border_right_color": "white",
+    }
 
     def __init__(
         self,
@@ -88,6 +124,7 @@ class MTable:
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
         docx_style: Optional[Dict[str, object]] = None,
+        gt_style: Optional[Dict[str, object]] = None,
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -109,8 +146,12 @@ class MTable:
         self.docx_style = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
             self.docx_style.update(docx_style)
+        # Instance-level GT style
+        self.gt_style = dict(self.DEFAULT_GT_STYLE)
+        if gt_style:
+             self.gt_style.update(gt_style)
+
     
-            
     def make(self, 
              type: str = None,  
              **kwargs):
@@ -765,47 +806,46 @@ class MTable:
                 # Restore column names
                 gt = gt.cols_label(**col_dict)
 
-        # Customize the table layout
-        gt = (
-            gt.tab_source_note(self.notes)
-            .tab_stub(rowname_col=rowname_col, groupname_col=groupname_col)
-            .tab_options(
+        # Customize the table layout using GT style defaults
+        s = self.gt_style
+        gt = gt.tab_source_note(self.notes).tab_stub(rowname_col=rowname_col, groupname_col=groupname_col)
+        gt = gt.tab_options(
             table_border_bottom_style="hidden",
             stub_border_style="hidden",
-            column_labels_border_top_style="solid",
-            column_labels_border_top_color="black",
-            column_labels_border_top_width="1px",
-            column_labels_border_bottom_style="solid",
-            column_labels_border_bottom_color="black",
-            column_labels_border_bottom_width="0.5px",
-            column_labels_vlines_color="white",
-            column_labels_vlines_width="0px",
-            table_body_border_top_style="solid",
-            table_body_border_top_width="0.5px",
-            table_body_border_top_color="black",
-            table_body_border_bottom_width="1px",
-            table_body_border_bottom_color="black",
-            table_body_border_bottom_style="solid",
-            table_body_hlines_style="none",
-            table_body_vlines_color="white",
-            table_body_vlines_width="0px",
-            row_group_border_top_style="solid",
-            row_group_border_top_width="0.5px",
-            row_group_border_top_color="black",
-            row_group_border_bottom_style="solid",
-            row_group_border_bottom_width="0.5px",
-            row_group_border_bottom_color="black",
-            row_group_border_left_color="white",
-            row_group_border_right_color="white",
-            data_row_padding="4px",
-            column_labels_padding="4px",
-            )
-            .cols_align(align="center")
-        )
+            column_labels_border_top_style=s["column_labels_border_top_style"],
+            column_labels_border_top_color=s["column_labels_border_top_color"],
+            column_labels_border_top_width=s["column_labels_border_top_width"],
+            column_labels_border_bottom_style=s["column_labels_border_bottom_style"],
+            column_labels_border_bottom_color=s["column_labels_border_bottom_color"],
+            column_labels_border_bottom_width=s["column_labels_border_bottom_width"],
+            column_labels_vlines_color=s["column_labels_vlines_color"],
+            column_labels_vlines_width=s["column_labels_vlines_width"],
+            table_body_border_top_style=s["table_body_border_top_style"],
+            table_body_border_top_width=s["table_body_border_top_width"],
+            table_body_border_top_color=s["table_body_border_top_color"],
+            table_body_border_bottom_width=s["table_body_border_bottom_width"],
+            table_body_border_bottom_color=s["table_body_border_bottom_color"],
+            table_body_border_bottom_style=s["table_body_border_bottom_style"],
+            table_body_hlines_style=s["table_body_hlines_style"],
+            table_body_vlines_color=s["table_body_vlines_color"],
+            table_body_vlines_width=s["table_body_vlines_width"],
+            row_group_border_top_style=s["row_group_border_top_style"],
+            row_group_border_top_width=s["row_group_border_top_width"],
+            row_group_border_top_color=s["row_group_border_top_color"],
+            row_group_border_bottom_style=s["row_group_border_bottom_style"],
+            row_group_border_bottom_width=s["row_group_border_bottom_width"],
+            row_group_border_bottom_color=s["row_group_border_bottom_color"],
+            row_group_border_left_color=s["row_group_border_left_color"],
+            row_group_border_right_color=s["row_group_border_right_color"],
+            data_row_padding=s["data_row_padding"],
+            column_labels_padding=s["column_labels_padding"],
+        ).cols_align(align=s.get("align", "center"))
 
         # Full page width
         if full_width:
             gt = gt.tab_options(table_width="100%")
+        elif s.get("table_width"):
+            gt = gt.tab_options(table_width=str(s["table_width"]))
 
         # Customize row group display
         if "t" not in self.rgroup_sep:
