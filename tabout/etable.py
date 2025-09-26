@@ -135,6 +135,7 @@ class ETable(MTable):
         "r2": "R²",
         "adj_r2": "Adj. R²",
         "r2_within": "Within R²",
+        "r2_between": "Between R²",
         "adj_r2_within": "Within Adj. R²",
         "pseudo_r2": "Pseudo R²",
         "ll": "Log-likelihood",

@@ -12,6 +12,12 @@ try:
 except Exception:
     Feols = Fepois = Feiv = tuple()  # type: ignore
 
+try:
+    from linearmodels.panel import PanelOLSResults, RandomEffectsResults
+    from linearmodels.iv import IV2SLSResults, IVGMMResults
+except Exception:
+    PanelOLSResults = RandomEffectsResults = IV2SLSResults = IVGMMResults = tuple()  # type: ignore
+
 
 @runtime_checkable
 class ModelExtractor(Protocol):
@@ -254,7 +260,142 @@ class StatsmodelsExtractor:
         return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
 
 
+class LinearmodelsExtractor:
+    def can_handle(self, model: Any) -> bool:
+        mod = type(model).__module__ or ""
+        if mod.startswith("linearmodels."):
+            # Core results interface in linearmodels
+            return hasattr(model, "params") and hasattr(model, "pvalues") and hasattr(model, "std_errors")
+        # Fallback: attribute-based detection (avoid grabbing statsmodels)
+        return False
+
+    def coef_table(self, model: Any) -> pd.DataFrame:
+        params = pd.Series(model.params)
+        se = pd.Series(getattr(model, "std_errors", np.nan), index=params.index)
+        pvalues = pd.Series(getattr(model, "pvalues", np.nan), index=params.index)
+        tstats = getattr(model, "tstats", None)
+
+        df = pd.DataFrame(
+            {
+                "Estimate": pd.to_numeric(params, errors="coerce"),
+                "Std. Error": pd.to_numeric(se, errors="coerce"),
+                "Pr(>|t|)": pd.to_numeric(pvalues, errors="coerce"),
+            },
+            index=params.index,
+        )
+        if tstats is not None:
+            df["t value"] = pd.to_numeric(pd.Series(tstats, index=params.index), errors="coerce")
+            df = df[["Estimate", "Std. Error", "t value", "Pr(>|t|)"]]
+        return df
+
+    def depvar(self, model: Any) -> str:
+        # Try common locations
+        for chain in [
+            ("model", "formula"),                 # 'y ~ x1 + x2'
+            ("model", "dependent", "name"),
+            ("model", "dependent", "var_name"),
+            ("model", "dependent", "pandas", "name"),
+        ]:
+            val = _follow(model, list(chain))
+            if isinstance(val, str):
+                if chain[-1] == "formula" and "~" in val:
+                    return val.split("~", 1)[0].strip()
+                return val
+        return "y"
+
+    def fixef_string(self, model: Any) -> str | None:
+        mdl = getattr(model, "model", None)
+        if mdl is None:
+            return None
+        parts = []
+        if getattr(mdl, "entity_effects", False):
+            parts.append("entity")
+        if getattr(mdl, "time_effects", False):
+            parts.append("time")
+        other = getattr(mdl, "other_effects", None)
+        if other:
+            parts.append("other")
+        return "+".join(parts) if parts else None
+
+    # Unified stat keys -> linearmodels attributes/callables
+    STAT_MAP: Dict[str, Any] = {
+        # Sizes / DoF
+        "N": "nobs",
+        "df_model": "df_model",
+        "df_resid": "df_resid",
+
+        # VCOV type
+        "se_type": "cov_type",
+
+        # R-squared family
+        "r2": "rsquared",
+        "adj_r2": "rsquared_adj",
+        "r2_within": "rsquared_within",
+        "r2_between": "rsquared_between",
+        "r2_overall": "rsquared_overall",
+
+        # Information criteria / likelihood (if exposed)
+        "aic": "aic",
+        "bic": "bic",
+        "ll": "loglik",
+
+        # F-stat (when available)
+        "fvalue": lambda m: getattr(getattr(m, "f_statistic", None), "stat", None),
+        "f_pvalue": lambda m: getattr(getattr(m, "f_statistic", None), "pval", None),
+
+        # Error scale / RMSE
+        "rmse": lambda m: (
+            getattr(m, "root_mean_squared_error", None)
+            if hasattr(m, "root_mean_squared_error")
+            else (float(getattr(m, "s2")) ** 0.5 if hasattr(m, "s2") and getattr(m, "s2") is not None else None)
+        ),
+
+        # IV diagnostics (if present on IV results)
+        "j_stat": lambda m: getattr(getattr(m, "j_statistic", None), "stat", None),
+        "j_pvalue": lambda m: getattr(getattr(m, "j_statistic", None), "pval", None),
+        "first_stage_f": lambda m: (
+            # take the first-stage F from the first endogenous if available
+            (lambda fs: getattr(next(iter(fs.values())), "f_statistic", None).stat if isinstance(fs, dict) and fs else None)
+            (getattr(m, "first_stage", None))
+        ),
+    }
+
+    def stat(self, model: Any, key: str) -> Any:
+        spec = self.STAT_MAP.get(key)
+        if spec is None:
+            return None
+        val = _get_attr(model, spec)
+        if key == "N" and val is not None:
+            try:
+                return int(val)
+            except Exception:
+                return val
+        return val
+
+    def vcov_info(self, model: Any) -> Dict[str, Any]:
+        return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
+
+    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+        # Try to locate original DataFrame
+        candidates = [
+            ("model", "data", "frame"),
+            ("model", "dataframe"),
+        ]
+        for chain in candidates:
+            df = _follow(model, list(chain))
+            if isinstance(df, pd.DataFrame):
+                try:
+                    return get_var_labels(df, include_defaults=True)
+                except Exception:
+                    return None
+        return None
+
+    def supported_stats(self, model: Any) -> set[str]:
+        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
+
+
 # Register built-ins
 clear_extractors()
 register_extractor(PyFixestExtractor())
+register_extractor(LinearmodelsExtractor())
 register_extractor(StatsmodelsExtractor())
