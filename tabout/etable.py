@@ -52,6 +52,7 @@ class ETable(MTable):
         ETable.DEFAULT_MODEL_STATS (currently ['N','r2']).
     model_stats_labels : dict[str, str], optional
         Mapping from stat key to display label (e.g., {'N': 'Observations'}).
+        Defaults come from ETable.DEFAULT_STAT_LABELS; user-provided entries override.
     custom_stats : dict, optional
         Custom per-coefficient values to splice into coef cells via coef_fmt.
         Shape: {key: list_of_per_model_lists}, where for each key in coef_fmt,
@@ -127,6 +128,28 @@ class ETable(MTable):
     DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05]
     DEFAULT_COEF_FMT = "b \n (se)"
     DEFAULT_MODEL_STATS = ["N", "r2"]
+    # Canonical stat key -> printable label (used if model_stats_labels is None)
+    DEFAULT_STAT_LABELS: Dict[str, str] = {
+        "N": "Observations",
+        "se_type": "S.E. type",
+        "r2": "R²",
+        "adj_r2": "Adj. R²",
+        "r2_within": "Within R²",
+        "adj_r2_within": "Within Adj. R²",
+        "pseudo_r2": "Pseudo R²",
+        "ll": "Log-likelihood",
+        "llnull": "Null log-likelihood",
+        "aic": "AIC",
+        "bic": "BIC",
+        "df_model": "df(model)",
+        "df_resid": "df(resid)",
+        "deviance": "Deviance",
+        "null_deviance": "Null deviance",
+        "fvalue": "F statistic",
+        "f_pvalue": "F p-value",
+        "rmse": "RMSE",
+        "fstat_1st": "First-stage F",
+    }
     DEFAULT_SHOW_SE_TYPE = True
     DEFAULT_SHOW_FE = True
     DEFAULT_HEAD_ORDER = "dh"
@@ -476,13 +499,7 @@ class ETable(MTable):
     ) -> pd.DataFrame:
         # builtin stats via extractor
         def label_of(k: str) -> str:
-            default = {
-                "N": "Observations",
-                "se_type": "S.E. type",
-                "r2": "R2",
-                "adj_r2": "Adj. R2",
-                "r2_within": "R2 Within",
-            }.get(k, k)
+            default = self.DEFAULT_STAT_LABELS.get(k, k)
             return stat_labels.get(k, default) if stat_labels else default
 
         rows = {label_of(k): [self._extract_stat(m, k, digits) for m in models] for k in stat_keys}

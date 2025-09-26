@@ -22,6 +22,7 @@ class ModelExtractor(Protocol):
     def stat(self, model: Any, key: str) -> Any: ...
     def vcov_info(self, model: Any) -> Dict[str, Any]: ...
     def var_labels(self, model: Any) -> Optional[Dict[str, str]]: ...
+    def supported_stats(self, model: Any) -> set[str]: ...
 
 
 _EXTRACTOR_REGISTRY: List[ModelExtractor] = []
@@ -45,6 +46,37 @@ def get_extractor(model: Any) -> ModelExtractor:
     raise TypeError(f"No extractor available for model type: {type(model).__name__}")
 
 
+# ---------- small helpers ----------
+
+def _follow(obj: Any, chain: List[str]) -> Any:
+    cur = obj
+    for a in chain:
+        if hasattr(cur, a):
+            cur = getattr(cur, a)
+        else:
+            return None
+    return cur
+
+
+def _get_attr(model: Any, spec: Any) -> Any:
+    """
+    Resolve a STAT_MAP spec against a model:
+    - "attr" -> model.attr or model.model.attr
+    - ("a","b","c") or ["a","b","c"] -> nested attributes
+    - callable(model) -> computed value
+    """
+    if isinstance(spec, str):
+        return getattr(model, spec, getattr(getattr(model, "model", None), spec, None))
+    if isinstance(spec, (list, tuple)):
+        return _follow(model, list(spec))
+    if callable(spec):
+        try:
+            return spec(model)
+        except Exception:
+            return None
+    return None
+
+
 # ---------- Built-in extractors ----------
 
 class PyFixestExtractor:
@@ -58,17 +90,13 @@ class PyFixestExtractor:
         df = model.tidy()
         if "Estimate" not in df.columns or "Std. Error" not in df.columns:
             raise ValueError("PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'.")
-
-        # Map z to t if needed (e.g., Poisson)
         if "t value" not in df.columns and "z value" in df.columns:
             df = df.rename(columns={"z value": "t value"})
-        # Map p-value column if needed
         if "Pr(>|t|)" not in df.columns:
             if "Pr(>|z|)" in df.columns:
                 df = df.rename(columns={"Pr(>|z|)": "Pr(>|t|)"})
             else:
                 raise ValueError("PyFixestExtractor: tidy() must contain 'Pr(>|t|)' (or 'Pr(>|z|)').")
-
         keep = ["Estimate", "Std. Error", "Pr(>|t|)"]
         if "t value" in df.columns:
             keep.insert(2, "t value")
@@ -80,20 +108,38 @@ class PyFixestExtractor:
     def fixef_string(self, model: Any) -> str | None:
         return getattr(model, "_fixef", None)
 
+    # Build a clean map of unified stat keys -> pyfixest attributes/callables
+    STAT_MAP: Dict[str, Any] = {
+        "N": "_N",
+        "se_type": lambda m: ("by: " + "+".join(getattr(m, "_clustervar", []))
+                              if getattr(m, "_vcov_type", None) == "CRV" and getattr(m, "_clustervar", None)
+                              else getattr(m, "_vcov_type", None)),
+        "r2": "_r2",
+        "adj_r2": "_r2_adj",
+        "r2_within": "_r2_within",
+        "adj_r2_within": "_adj_r2_within",
+        "rmse": "_rmse",
+        "fvalue": "_F_stat",
+        "fstat_1st": "_f_stat_1st_stage", 
+        # pyfixest may return a sequence; take the first element
+        "deviance": lambda m: (
+            (getattr(m, "deviance", None)[0])
+            if isinstance(getattr(m, "deviance", None), (list, tuple, np.ndarray, pd.Series))
+            else getattr(m, "deviance", None)
+        ),
+    }
+
     def stat(self, model: Any, key: str) -> Any:
-        if key == "se_type":
-            vcov_type = getattr(model, "_vcov_type", None)
-            cl = getattr(model, "_clustervar", None)
-            if vcov_type == "CRV" and cl:
-                return "by: " + "+".join(cl)
-            return vcov_type
-        mapping = {
-            "N": "_N",
-            "r2": "_r2",
-            "adj_r2": "_r2_adj",
-            "r2_within": "_r2_within",
-        }
-        return getattr(model, mapping.get(key, ""), None)
+        spec = self.STAT_MAP.get(key)
+        if spec is None:
+            return None
+        val = _get_attr(model, spec)
+        if key == "N" and val is not None:
+            try:
+                return int(val)
+            except Exception:
+                return val
+        return val
 
     def vcov_info(self, model: Any) -> Dict[str, Any]:
         return {
@@ -110,15 +156,8 @@ class PyFixestExtractor:
                 return None
         return None
 
-
-def _follow(obj: Any, chain: List[str]) -> Any:
-    cur = obj
-    for a in chain:
-        if hasattr(cur, a):
-            cur = getattr(cur, a)
-        else:
-            return None
-    return cur
+    def supported_stats(self, model: Any) -> set[str]:
+        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
 
 
 class StatsmodelsExtractor:
@@ -162,25 +201,36 @@ class StatsmodelsExtractor:
     def fixef_string(self, model: Any) -> str | None:
         return None
 
+    # Unified stat keys -> statsmodels attributes/callables
+    STAT_MAP: Dict[str, Any] = {
+        "N": "nobs",
+        "se_type": "cov_type",
+        "r2": "rsquared",
+        "adj_r2": "rsquared_adj",
+        "pseudo_r2": "prsquared",
+        "ll": "llf",
+        "llnull": "llnull",
+        "aic": "aic",
+        "bic": "bic",
+        "df_model": "df_model",
+        "df_resid": "df_resid",
+        "deviance": "deviance",
+        "null_deviance": "null_deviance",
+        "fvalue": "fvalue",
+        "f_pvalue": "f_pvalue",
+    }
+
     def stat(self, model: Any, key: str) -> Any:
-        if key == "se_type":
-            return getattr(model, "cov_type", None)
-        mapping = {"N": "nobs", 
-                   "r2": "rsquared", 
-                   "adj_r2": "rsquared_adj", 
-                   "aic": "aic", 
-                   "bic": "bic",
-                   "f_pvalue": "f_pvalue",
-                   "fvalue": "fvalue"}
-        attr = mapping.get(key)
-        value = getattr(model, attr, None) if attr else None
-        # For N, convert to int if possible
-        if key == "N" and value is not None:
+        spec = self.STAT_MAP.get(key)
+        if spec is None:
+            return None
+        val = _get_attr(model, spec)
+        if key == "N" and val is not None:
             try:
-                value = int(value)
+                return int(val)
             except Exception:
-                pass
-        return value
+                return val
+        return val
 
     def vcov_info(self, model: Any) -> Dict[str, Any]:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
@@ -200,7 +250,11 @@ class StatsmodelsExtractor:
                     return None
         return None
 
+    def supported_stats(self, model: Any) -> set[str]:
+        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
+
 
 # Register built-ins
+clear_extractors()
 register_extractor(PyFixestExtractor())
 register_extractor(StatsmodelsExtractor())
