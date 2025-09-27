@@ -165,9 +165,13 @@ class MTable:
               - first_col_width: Optional[str] (default MTable.DEFAULT_TEX_FIRST_COL_WIDTH)
                 LaTeX length for the first column (e.g., "3cm", "1.2in", r"0.25\\linewidth").
                 Use None to keep first column flexible (X when full_width=True, or 'l' otherwise).
+              - tab_width: Optional[str] (default None)
+                Target table width for tabularx, e.g., r"0.8\\linewidth", r"\\textwidth", "14cm".
+                If set, tabularx is used even when full_width=False.
               - texlocation: str (default "htbp")
                 Placement specifier for the table environment.
-              Note: When full_width=True, ensure your document loads tabularx and array packages.
+              Note: When full_width=True or tab_width is set, ensure your document loads
+              the tabularx and array packages.
             - For type="gt" (HTML via great-tables):
               - full_width: bool (default MTable.DEFAULT_GT_FULL_WIDTH)
                 If True, sets table_width to 100%.
@@ -253,7 +257,7 @@ class MTable:
         replace : bool, optional
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
-            - type="tex": full_width, first_col_width, texlocation (see make()).
+            - type="tex": full_width, first_col_width, tab_width, texlocation (see make()).
             - type="docx": docx_style (see make()).
             - type="html": gt options via _output_gt (e.g., full_width, gt_style).
 
@@ -639,12 +643,22 @@ class MTable:
 
 
         
-    def _output_tex(self, full_width: Optional[bool] = None, first_col_width: Optional[str] = None, **kwargs):
+    def _output_tex(
+        self,
+        full_width: Optional[bool] = None,
+        first_col_width: Optional[str] = None,
+        tab_width: Optional[str] = None,
+        **kwargs
+    ):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
         # Resolve TeX defaults (per-call -> class)
         _fw = self.DEFAULT_TEX_FULL_WIDTH if full_width is None else bool(full_width)
         _fcw = self.DEFAULT_TEX_FIRST_COL_WIDTH if first_col_width is None else first_col_width
+        # Desired table width expression for tabularx (default \linewidth)
+        _tw = tab_width or r"\linewidth"
+        # Use tabularx if full_width or a specific tab_width was requested
+        _use_tx = _fw or (tab_width is not None)
 
         dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
         dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
@@ -738,8 +752,8 @@ class MTable:
 
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
-        # Full width: switch to tabularx and use X for all flexible columns
-        if _fw:
+        # Switch to tabularx and use X for flexible columns when requested
+        if _use_tx:
             # Center flexible columns; keep stub left
             centered_X = r">{\centering\arraybackslash}X"
             n_flex = max(0, stub_cols - 1) + data_cols
@@ -752,7 +766,7 @@ class MTable:
 
             latex_res = re.sub(
                 r"\\begin\{tabular\}\{[^}]*\}",
-                lambda m: f"\\begin{{tabularx}}{{\\linewidth}}{{{colfmt_x}}}",
+                lambda m: f"\\begin{{tabularx}}{{{_tw}}}{{{colfmt_x}}}",
                 latex_res,
                 count=1,
             )
