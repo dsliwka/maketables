@@ -52,9 +52,10 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
-    # Global render defaults (user can override at class level)
-    DEFAULT_FULL_WIDTH: bool = False
-    DEFAULT_FIRST_COL_WIDTH: Optional[str] = None
+    # Backend-specific render defaults (override at class level)
+    DEFAULT_TEX_FULL_WIDTH: bool = True
+    DEFAULT_TEX_FIRST_COL_WIDTH: Optional[str] = None
+    DEFAULT_GT_FULL_WIDTH: bool = False
 
     # Shared defaults (override per subclass if needed)
     DEFAULT_LABELS: Dict[str, str] = {}
@@ -126,11 +127,7 @@ class MTable:
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
-        docx_style: Optional[Dict[str, object]] = None,
-        gt_style: Optional[Dict[str, object]] = None,
-        # Render defaults (use class defaults when None)
-        full_width: Optional[bool] = None,
-        first_col_width: Optional[str] = None,
+        # No style/render defaults here; handled in output methods
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -148,18 +145,6 @@ class MTable:
             self.default_paths = default_paths.copy()
         else:
             self.default_paths = {}
-        # Instance-level style (defaults merged with user overrides)
-        self.docx_style = dict(self.DEFAULT_DOCX_STYLE)
-        if docx_style:
-            self.docx_style.update(docx_style)
-        # Instance-level GT style
-        self.gt_style = dict(self.DEFAULT_GT_STYLE)
-        if gt_style:
-             self.gt_style.update(gt_style)
-        # Render defaults stored on the instance (fall back to class defaults)
-        self.full_width = bool(self.DEFAULT_FULL_WIDTH if full_width is None else full_width)
-        self.first_col_width = self.DEFAULT_FIRST_COL_WIDTH if first_col_width is None else first_col_width
-
     
     def make(self, 
              type: str = None,  
@@ -182,15 +167,8 @@ class MTable:
                 The output object of the table if type is specified.
         """
 
-        # Inject instance defaults if not explicitly provided
-        if "full_width" not in kwargs:
-            kwargs["full_width"] = getattr(self, "full_width", False)
-        if "first_col_width" not in kwargs and getattr(self, "first_col_width", None) is not None:
-            kwargs["first_col_width"] = self.first_col_width
-
         if type is None:
             # If no type is specified, directly display dual output
-            
             # Create dual output object for notebook/Quarto compatibility
             class DualOutput:
                 """Display different outputs in notebook vs Quarto rendering."""
@@ -205,8 +183,8 @@ class MTable:
                     }
             
             # Generate both HTML and LaTeX outputs
-            html_output = self._output_gt(**kwargs).as_raw_html()
-            tex_output = self._output_tex(**kwargs)
+            html_output = self._output_gt().as_raw_html()
+            tex_output = self._output_tex()
             
             # Add CSS to remove zebra striping if desired
             html_output = """
@@ -216,16 +194,13 @@ class MTable:
             }
             </style>
             """ + html_output
-            
             # Create and display the dual output object
             dual_output = DualOutput(html_output, tex_output)
             display(dual_output)
             return None
 
-
         # For explicitly specified types
         assert type in self.ADMISSIBLE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_TYPES) 
-        
         if type == "gt":
             return self._output_gt(**kwargs)
         elif type == "tex":
@@ -267,11 +242,7 @@ class MTable:
         output : GT object
             The table as GT object if show is True.
         """
-        # Inject instance defaults if not explicitly provided
-        if "full_width" not in kwargs:
-            kwargs["full_width"] = getattr(self, "full_width", False)
-        if "first_col_width" not in kwargs and getattr(self, "first_col_width", None) is not None:
-            kwargs["first_col_width"] = self.first_col_width
+        # No instance default injection; defaults resolved in output methods
 
         assert type in self.ADMISSIBLE_SAVE_TYPES, "types must be either " + ", ".join(self.ADMISSIBLE_SAVE_TYPES) 
         if file_name is None:
@@ -299,17 +270,16 @@ class MTable:
             document = self._output_docx(file_name=file_name, **kwargs)
             document.save(file_name)
         else:
-            # Save the html code of the table to a file
             with open(file_name, "w") as f:
                 f.write(self._output_gt(**kwargs).as_raw_html())
         if show:
-            # return gt table if show is True
             return self._output_gt(**kwargs)  
     
 
     def update_docx(self, file_name: str = None, 
                     tab_num: Optional[int] = None,
                     show: bool=False, 
+                    docx_style: Optional[Dict[str, object]] = None,
                     **kwargs):
         """
         Update an existing DOCX file with the output object of the table.
@@ -331,6 +301,10 @@ class MTable:
             The table as GT object if show is True.
         """
         assert file_name is not None, "file_name must be provided"
+        # Resolve DOCX style (per-call -> class default)
+        s = dict(self.DEFAULT_DOCX_STYLE)
+        if docx_style:
+            s.update(docx_style)
         # check if file_name is an absolute path, if not add default path
         if self.default_paths.get("docx") is not None and not os.path.isabs(file_name):
             file_name = os.path.join(self.default_paths.get("docx", ""), file_name)
@@ -367,16 +341,16 @@ class MTable:
             for row in table.rows:
                 table._element.remove(row._element)
             # Build the new table in the existing document
-            self._build_docx_table(table)
+            self._build_docx_table(table, s)
         else:
             # Add a caption if specified
             if self.caption is not None:
                 paragraph = document.add_paragraph('Table ', style='Caption')
-                self._build_docx_caption(self.caption, paragraph)
+                self._build_docx_caption(self.caption, paragraph, s)
             # Add a new table to the document
             table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-            table.style = self.docx_style.get("table_style_name") or 'Table Grid'
-            self._build_docx_table(table)
+            table.style = s.get("table_style_name") or 'Table Grid'
+            self._build_docx_table(table, s)
 
         # Save the document
         document.save(file_name)
@@ -387,25 +361,28 @@ class MTable:
     
 
 
-    def _output_docx(self, **kwargs):
+    def _output_docx(self, docx_style: Optional[Dict[str, object]] = None, **kwargs):
         # Create a new Document
         document = Document()
+        # Resolve DOCX style (per-call -> class default)
+        s = dict(self.DEFAULT_DOCX_STYLE)
+        if docx_style:
+            s.update(docx_style)
 
         # Add caption if specified
         if self.caption is not None:
             paragraph = document.add_paragraph('Table ', style='Caption')
-            self._build_docx_caption(self.caption, paragraph)
+            self._build_docx_caption(self.caption, paragraph, s)
 
         # Add table
         table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
-        table.style = self.docx_style.get("table_style_name") or 'Table Grid'
-        self._build_docx_table(table)
+        table.style = s.get("table_style_name") or 'Table Grid'
+        self._build_docx_table(table, s)
 
         return document
 
 
-    def _build_docx_caption(self, caption: str, paragraph):
-        s = self.docx_style
+    def _build_docx_caption(self, caption: str, paragraph, s: Dict[str, object]):
         run = paragraph.add_run()
         r = run._r
         fldChar = OxmlElement('w:fldChar')
@@ -436,8 +413,7 @@ class MTable:
             r_.font.size = cap_font_size
 
 
-    def _build_docx_table(self, table):
-        s = self.docx_style
+    def _build_docx_table(self, table, s: Dict[str, object]):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
@@ -641,9 +617,12 @@ class MTable:
 
 
         
-    def _output_tex(self, full_width: bool = False, first_col_width: Optional[str] = None, **kwargs):
+    def _output_tex(self, full_width: Optional[bool] = None, first_col_width: Optional[str] = None, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
+        # Resolve TeX defaults (per-call -> class)
+        _fw = self.DEFAULT_TEX_FULL_WIDTH if full_width is None else bool(full_width)
+        _fcw = self.DEFAULT_TEX_FIRST_COL_WIDTH if first_col_width is None else first_col_width
 
         dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
         dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
@@ -660,8 +639,8 @@ class MTable:
         data_cols = dfs.shape[1]
 
         # Build column_format for pandas styler (non-full-width)
-        if first_col_width and not full_width:
-            first_stub = f"p{{{first_col_width}}}"
+        if _fcw and not _fw:
+            first_stub = f"p{{{_fcw}}}"
         else:
             first_stub = "l"
         other_stubs = "l" * max(0, stub_cols - 1)
@@ -738,13 +717,13 @@ class MTable:
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
         # Full width: switch to tabularx and use X for all flexible columns
-        if full_width:
+        if _fw:
             # Center flexible columns; keep stub left
             centered_X = r">{\centering\arraybackslash}X"
             n_flex = max(0, stub_cols - 1) + data_cols
             rest_spec = centered_X * n_flex
-            if first_col_width:
-                first_spec = f"p{{{first_col_width}}}"
+            if _fcw:
+                first_spec = f"p{{{_fcw}}}"
             else:
                 first_spec = r">{\raggedright\arraybackslash}X"
             colfmt_x = first_spec + rest_spec
@@ -762,10 +741,15 @@ class MTable:
 
 
 
-    def _output_gt(self, full_width: bool = False, **kwargs):
+    def _output_gt(self, full_width: Optional[bool] = None, gt_style: Optional[Dict[str, object]] = None, **kwargs):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
-        
+        # Resolve GT defaults (per-call -> class)
+        _fw_gt = self.DEFAULT_GT_FULL_WIDTH if full_width is None else bool(full_width)
+        s = dict(self.DEFAULT_GT_STYLE)
+        if gt_style:
+            s.update(gt_style)
+         
         # In all cells replace line breaks with <br> 
         dfs = dfs.replace(r'\n', '<br>', regex=True)
 
@@ -823,7 +807,6 @@ class MTable:
                 gt = gt.cols_label(**col_dict)
 
         # Customize the table layout using GT style defaults
-        s = self.gt_style
         gt = gt.tab_source_note(self.notes).tab_stub(rowname_col=rowname_col, groupname_col=groupname_col)
         gt = gt.tab_options(
             table_border_bottom_style="hidden",
@@ -858,7 +841,7 @@ class MTable:
         ).cols_align(align=s.get("align", "center"))
 
         # Full page width
-        if full_width:
+        if _fw_gt:
             gt = gt.tab_options(table_width="100%")
         elif s.get("table_width"):
             gt = gt.tab_options(table_width=str(s["table_width"]))
