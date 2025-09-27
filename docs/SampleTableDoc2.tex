@@ -21,33 +21,37 @@
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
 \begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5}
  & High & Low & High & Low \\
 \midrule
-\addlinespace
+\addlinespace[0.5ex]
 \emph{Gr 1} \\
 \addlinespace
-Var 1 & 0.727 & 0.58 & -0.363 & 1.952 \\
-Var 2 & -0.712 & -1.186 & 1.756 & 0.915 \\
-Var 3 & -1.704 & -1.544 & 0.529 & -2.891 \\
+Var 1 & -0.385 & -0.663 & -0.574 & -0.262 \\
+Var 2 & 0.758 & -0.621 & -0.722 & -0.449 \\
+Var 3 & -0.769 & 0.559 & -0.416 & 1.419 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 2} \\
 \addlinespace
-Var 4 & -1.107 & 1.368 & -0.78 & -0.35 \\
-Var 5 & -0.557 & -0.504 & -0.366 & -0.2 \\
+Var 4 & 0.347 & 1.714 & -0.053 & -0.666 \\
+Var 5 & -1.464 & 0.916 & 0.385 & 0.457 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 3} \\
 \addlinespace
-Var 6 & -0.543 & 1.906 & 0.638 & -0.026 \\
+Var 6 & 0.091 & -1.349 & -0.002 & -0.326 \\
 \bottomrule
 \end{tabularx}
+\endgroup
 \footnotesize 
 \noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
 Test notes...\end{minipage}
@@ -61,113 +65,43 @@ Test notes...\end{minipage}
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begingroup
+\renewcommand\arraystretch{1}
+\setlength{\tabcolsep}{1pt}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5}
  & High & Low & High & Low \\
 \midrule
+\addlinespace[0ex]
+\bfseries Gr 1 \\
 \addlinespace
-\emph{Gr 1} \\
-\addlinespace
-Var 1 & 0.727 & 0.58 & -0.363 & 1.952 \\
-Var 2 & -0.712 & -1.186 & 1.756 & 0.915 \\
-Var 3 & -1.704 & -1.544 & 0.529 & -2.891 \\
-\addlinespace
-\midrule
-\addlinespace
-\emph{Gr 2} \\
-\addlinespace
-Var 4 & -1.107 & 1.368 & -0.78 & -0.35 \\
-Var 5 & -0.557 & -0.504 & -0.366 & -0.2 \\
+Var 1 & -0.385 & -0.663 & -0.574 & -0.262 \\
+\addlinespace[0ex]
+Var 2 & 0.758 & -0.621 & -0.722 & -0.449 \\
+\addlinespace[0ex]
+Var 3 & -0.769 & 0.559 & -0.416 & 1.419 \\
+\addlinespace[0ex]
 \addlinespace
 \midrule
 \addlinespace
-\emph{Gr 3} \\
+\bfseries Gr 2 \\
 \addlinespace
-Var 6 & -0.543 & 1.906 & 0.638 & -0.026 \\
+Var 4 & 0.347 & 1.714 & -0.053 & -0.666 \\
+\addlinespace[0ex]
+Var 5 & -1.464 & 0.916 & 0.385 & 0.457 \\
+\addlinespace[0ex]
+\addlinespace
+\midrule
+\addlinespace
+\bfseries Gr 3 \\
+\addlinespace
+Var 6 & 0.091 & -1.349 & -0.002 & -0.326 \\
+\addlinespace[0ex]
 \bottomrule
 \end{tabularx}
-\footnotesize 
-\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
-\end{minipage}
-
-\end{threeparttable}%
-\end{table}
-
-%
-
-
-\begin{table}[htbp]%
-\renewcommand\cellalign{t}
-\begin{threeparttable}
-\begin{tabularx}{10cm}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
-\toprule
- & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5}
- & High & Low & High & Low \\
-\midrule
-\addlinespace
-\emph{Gr 1} \\
-\addlinespace
-Var 1 & 0.727 & 0.58 & -0.363 & 1.952 \\
-Var 2 & -0.712 & -1.186 & 1.756 & 0.915 \\
-Var 3 & -1.704 & -1.544 & 0.529 & -2.891 \\
-\addlinespace
-\midrule
-\addlinespace
-\emph{Gr 2} \\
-\addlinespace
-Var 4 & -1.107 & 1.368 & -0.78 & -0.35 \\
-Var 5 & -0.557 & -0.504 & -0.366 & -0.2 \\
-\addlinespace
-\midrule
-\addlinespace
-\emph{Gr 3} \\
-\addlinespace
-Var 6 & -0.543 & 1.906 & 0.638 & -0.026 \\
-\bottomrule
-\end{tabularx}
-\footnotesize 
-\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
-\end{minipage}
-
-\end{threeparttable}%
-\end{table}
-
-%
-
-
-\begin{table}[htbp]%
-\renewcommand\cellalign{t}
-\begin{threeparttable}
-\begin{tabularx}{0.8\textwidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
-\toprule
- & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5}
- & High & Low & High & Low \\
-\midrule
-\addlinespace
-\emph{Gr 1} \\
-\addlinespace
-Var 1 & 0.727 & 0.58 & -0.363 & 1.952 \\
-Var 2 & -0.712 & -1.186 & 1.756 & 0.915 \\
-Var 3 & -1.704 & -1.544 & 0.529 & -2.891 \\
-\addlinespace
-\midrule
-\addlinespace
-\emph{Gr 2} \\
-\addlinespace
-Var 4 & -1.107 & 1.368 & -0.78 & -0.35 \\
-Var 5 & -0.557 & -0.504 & -0.366 & -0.2 \\
-\addlinespace
-\midrule
-\addlinespace
-\emph{Gr 3} \\
-\addlinespace
-Var 6 & -0.543 & 1.906 & 0.638 & -0.026 \\
-\bottomrule
-\end{tabularx}
+\endgroup
 \footnotesize 
 \noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
 \end{minipage}

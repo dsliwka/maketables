@@ -56,6 +56,25 @@ class MTable:
     DEFAULT_TEX_FIRST_COL_WIDTH: Optional[str] = None
     DEFAULT_GT_FULL_WIDTH: bool = False
 
+    # Default TeX style (override globally via MTable.DEFAULT_TEX_STYLE.update({...})
+    # or per-call via tex_style in make/save/_output_tex)
+    DEFAULT_TEX_STYLE: Dict[str, object] = {
+        # Row height and column separation (scoped to the table)
+        "arraystretch": 1.1,        # float or str
+        "tabcolsep": "6pt",         # TeX length
+        # Alignment
+        "data_align": "c",          # l|c|r for non-tabularx data columns
+        "x_col_align": "center",    # left|center|right for tabularx X columns
+        # Rules/spacing
+        "cmidrule_trim": "lr",      # "", "l", "r", "lr"
+        "header_addlinespace": "0.5ex",  # spacing after header midrule
+        "data_addlinespace": None,  # e.g., "0.25ex" between data rows; None disables
+        # Row-group header formatting
+        "group_header_format": r"\emph{%s}",
+        # Notes font size command used in notes minipage
+        "notes_fontsize_cmd": r"\footnotesize",
+    }
+
     # Shared defaults (override per subclass if needed)
     DEFAULT_LABELS: Dict[str, str] = {}
     # Simple default DOCX styling. Users can tweak this globally or per instance.
@@ -166,6 +185,12 @@ class MTable:
                 Target width for tabularx, e.g., "14cm", r"0.8\\textwidth",
                 or the keywords "linewidth" or "textwidth".
                 If set (or default is set), tabularx is used; None keeps normal tabular.
+              - tex_style: Dict[str, object] (default MTable.DEFAULT_TEX_STYLE)
+                Per-table overrides for TeX rendering, e.g.:
+                {arraystretch: 1.15, tabcolsep: "4pt", data_align: "c",
+                 x_col_align: "left", cmidrule_trim: "lr",
+                 header_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
+                 group_header_format: r"\\bfseries %s", notes_fontsize_cmd: r"\\footnotesize"}
               - texlocation: str (default "htbp")
                 Placement specifier for the table environment.
               Note: When tab_width is set, ensure your document loads
@@ -255,7 +280,7 @@ class MTable:
         replace : bool, optional
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
-            - type="tex": first_col_width, tab_width, texlocation (see make()).
+            - type="tex": first_col_width, tab_width, tex_style, texlocation (see make()).
             - type="docx": docx_style (see make()).
             - type="html": gt options via _output_gt (e.g., full_width, gt_style).
 
@@ -645,6 +670,7 @@ class MTable:
         self,
         first_col_width: Optional[str] = None,
         tab_width: Optional[str] = None,
+        tex_style: Optional[Dict[str, object]] = None,
         **kwargs
     ):
         # Make a copy of the DataFrame to avoid modifying the original
@@ -652,6 +678,10 @@ class MTable:
 
         # Resolve TeX defaults
         _fcw = self.DEFAULT_TEX_FIRST_COL_WIDTH if first_col_width is None else first_col_width
+        # Resolve TeX style (per-call -> class default)
+        s = dict(getattr(self, "DEFAULT_TEX_STYLE", {}))
+        if tex_style:
+            s.update(tex_style)
 
         # Normalize tab_width (only these two keywords are mapped)
         def _normalize_width(w: Optional[str]) -> Optional[str]:
@@ -679,7 +709,11 @@ class MTable:
                 return x
             return str(x)
 
-        dfs = dfs.map(_prep_cell)
+        # Element-wise conversion; prefer DataFrame.map (pandas >= 2.1), fallback to applymap
+        if hasattr(dfs, "map"):
+            dfs = dfs.map(_prep_cell)  # type: ignore[attr-defined]
+        else:
+            dfs = dfs.applymap(_prep_cell)
 
         # Determine row groups (if MultiIndex on rows)
         row_levels = dfs.index.nlevels
@@ -696,9 +730,14 @@ class MTable:
 
         # Column spec
         if use_tabularx:
-            centered_X = r">{\centering\arraybackslash}X"
+            align_map = {
+                "left":   r">{\raggedright\arraybackslash}X",
+                "center": r">{\centering\arraybackslash}X",
+                "right":  r">{\raggedleft\arraybackslash}X",
+            }
+            x_align = align_map.get(str(s.get("x_col_align", "center")).lower(), align_map["center"])
             n_flex = max(0, stub_cols - 1) + data_cols
-            rest_spec = centered_X * n_flex
+            rest_spec = x_align * n_flex
             if _fcw:
                 first_spec = f"p{{{_fcw}}}"
             else:
@@ -707,7 +746,10 @@ class MTable:
         else:
             first_stub = f"p{{{_fcw}}}" if _fcw else "l"
             other_stubs = "l" * max(0, stub_cols - 1)
-            data_spec = "c" * data_cols
+            data_align = str(s.get("data_align", "c")).lower()
+            if data_align not in {"l", "c", "r"}:
+                data_align = "c"
+            data_spec = data_align * data_cols
             colspec = first_stub + other_stubs + data_spec
 
         # Build header rows (MultiIndex columns -> spanners + cmidrules)
@@ -750,7 +792,9 @@ class MTable:
                 header_lines.append(" & ".join(parts) + r" \\")
                 # Place the cmidrule(s) directly under the spanner row
                 if cmid_ranges:
-                    cmids = " ".join([rf"\cmidrule(lr){{{L}-{R}}}" for (L, R) in cmid_ranges])
+                    trim = str(s.get("cmidrule_trim", "lr"))
+                    opt = f"({trim})" if trim else ""
+                    cmids = " ".join([rf"\cmidrule{opt}{{{L}-{R}}}" for (L, R) in cmid_ranges])
                     header_lines.append(cmids)
             # Last level: the actual column names
             last_labels = [dfs.columns[i][-1] for i in range(len(dfs.columns))]
@@ -763,11 +807,16 @@ class MTable:
 
         # Build body rows
         body_lines = []
+        def _maybe_add_data_space(target: list):
+            sp = s.get("data_addlinespace")
+            if isinstance(sp, str) and sp.strip():
+                target.append(rf"\addlinespace[{sp}]")
         if row_groups_present:
             start = 0
             for gi, (gname, glen) in enumerate(zip(row_groups, row_groups_len)):
                 if self.rgroup_display:
-                    body_lines.append(rf"\emph{{{gname}}} " + r"\\")
+                    fmt = str(s.get("group_header_format", r"\emph{%s}"))
+                    body_lines.append((fmt % str(gname)) + r" \\")
                     body_lines.append(r"\addlinespace")
                 # Rows for this group
                 end = start + glen
@@ -776,6 +825,7 @@ class MTable:
                     vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
                     row_parts = [row_label] + [str(v) for v in vals]
                     body_lines.append(" & ".join(row_parts) + r" \\")
+                    _maybe_add_data_space(body_lines)
                 # Group separator if requested and not last group
                 if (self.rgroup_sep != "") and (gi < len(row_groups) - 1):
                     body_lines.append(r"\addlinespace")
@@ -788,34 +838,44 @@ class MTable:
                 vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
                 row_parts = [row_label] + [str(v) for v in vals]
                 body_lines.append(" & ".join(row_parts) + r" \\")
-            body_lines.append(r"\addlinespace")
+                _maybe_add_data_space(body_lines)
+            if s.get("data_addlinespace") is None:
+                body_lines.append(r"\addlinespace")
 
         # Assemble tabular/tabularx content
         tab_env = "tabularx" if use_tabularx else "tabular"
         width_arg = f"{{{_tw}}}" if use_tabularx else ""
         lines = []
+        # Scope style changes to this table
+        lines.append(r"\begingroup")
+        if s.get("arraystretch") is not None:
+            lines.append(rf"\renewcommand\arraystretch{{{s['arraystretch']}}}")
+        if s.get("tabcolsep"):
+            lines.append(rf"\setlength{{\tabcolsep}}{{{s['tabcolsep']}}}")
         lines.append(rf"\begin{{{tab_env}}}{width_arg}{{{colspec}}}")
         lines.append(r"\toprule")
         lines.extend(header_lines)
         lines.append(r"\midrule")
-        lines.append(r"\addlinespace")
+        if s.get("header_addlinespace"):
+            lines.append(rf"\addlinespace[{s['header_addlinespace']}]")
         lines.extend(body_lines)
         lines.append(r"\bottomrule")
         lines.append(rf"\end{{{tab_env}}}")
+        lines.append(r"\endgroup")
 
         latex_res = "\n".join(lines)
 
         # Wrap threeparttable
         if self.notes is not None:
-            latex_res = (
-                "\\begin{threeparttable}\n"
-                + latex_res
-                + "\n\\footnotesize "
-                + "\n\\noindent\\begin{minipage}{\\linewidth}\\smallskip\\footnotesize\n"
-                + self.notes
-                + "\\end{minipage}\n"
-                + "\n\\end{threeparttable}"
-            )
+             latex_res = (
+                 "\\begin{threeparttable}\n"
+                 + latex_res
+                 + "\n\\footnotesize "
+                 + "\n\\noindent\\begin{minipage}{\\linewidth}\\smallskip\\footnotesize\n"
+                 + self.notes
+                 + "\\end{minipage}\n"
+                 + "\n\\end{threeparttable}"
+             )
         else:
             latex_res = "\\begin{threeparttable}\n" + latex_res + "\n\\end{threeparttable}"
 
