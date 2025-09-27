@@ -52,7 +52,7 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
-    # Backend-specific render defaults (override at class level)
+    # Output-specific render defaults
     DEFAULT_TEX_FULL_WIDTH: bool = True
     DEFAULT_TEX_FIRST_COL_WIDTH: Optional[str] = None
     DEFAULT_GT_FULL_WIDTH: bool = False
@@ -153,18 +153,39 @@ class MTable:
         Create the output object of the table (either gt, tex, docx, or html).
         If type is None, displays both HTML and LaTeX outputs for compatibility
         with both notebook viewing and Quarto rendering.
-        
+
         Parameters
         ----------
         type : str, optional
             The type of the output object ("gt", "tex", "docx", "html").
-        **kwargs : dict
-            Additional keyword arguments to pass to the output method.
-            
+        **kwargs : Further arguments forwarded to the respective output method when type is specified.
+            - For type="tex" (LaTeX):
+              - full_width: bool (default MTable.DEFAULT_TEX_FULL_WIDTH)
+                If True, use tabularx to fill \\linewidth with X columns.
+              - first_col_width: Optional[str] (default MTable.DEFAULT_TEX_FIRST_COL_WIDTH)
+                LaTeX length for the first column (e.g., "3cm", "1.2in", r"0.25\\linewidth").
+                Use None to keep first column flexible (X when full_width=True, or 'l' otherwise).
+              - texlocation: str (default "htbp")
+                Placement specifier for the table environment.
+              Note: When full_width=True, ensure your document loads tabularx and array packages.
+            - For type="gt" (HTML via great-tables):
+              - full_width: bool (default MTable.DEFAULT_GT_FULL_WIDTH)
+                If True, sets table_width to 100%.
+              - gt_style: Dict[str, object]
+                Overrides keys from MTable.DEFAULT_GT_STYLE (e.g., align, table_width,
+                data_row_padding, column_labels_padding, and border styles/colors/widths).
+            - For type="docx" (Word):
+              - docx_style: Dict[str, object]
+                Overrides keys from MTable.DEFAULT_DOCX_STYLE such as:
+                font_name, font_color_rgb, font_size_pt, notes_font_size_pt,
+                caption_font_name, caption_font_size_pt, caption_align, notes_align,
+                align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name.
+
         Returns
         -------
-            output : object
-                The output object of the table if type is specified.
+        output : object or None
+            - If type is specified: returns the backend output object.
+            - If type is None: displays dual output in notebooks (HTML + LaTeX) and returns None.
         """
 
         if type is None:
@@ -220,27 +241,26 @@ class MTable:
              **kwargs):
         """
         Save the output object of the table to a file.
-    
+
         Parameters
         ----------
         type : str, optional
-            The type of the output object. The default is 'html'.
-            Must be one of "tex", "docx", "html".
+            Output type to save ("tex", "docx", "html"). Default is 'html'.
         file_name : str, optional
-            The name of the file to save the output object to. If None, the file name
-            will be generated using the default path specified in DEFAULT_SAVE_PATH and tab_label.
+            Path to save the file. If None, uses DEFAULT_SAVE_PATH[type] + tab_label.
         show : bool, optional
-            If True, the output object will be returned and displayed. Default is True.
+            If True, also returns the table as a GT object for display. Default True.
         replace : bool, optional
-            If True, an existing file with the same name will be replaced. Default is False.
-            Default can be set using DEFAULT_REPLACE class attribute.
-        **kwargs : dict
-            Additional keyword arguments to pass to the output method.
-    
+            If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
+        **kwargs : Arguments forwarded to the respective output method:
+            - type="tex": full_width, first_col_width, texlocation (see make()).
+            - type="docx": docx_style (see make()).
+            - type="html": gt options via _output_gt (e.g., full_width, gt_style).
+
         Returns
         -------
-        output : GT object
-            The table as GT object if show is True.
+        output : GT
+            When show=True, returns a GT object for display (HTML).
         """
         # No instance default injection; defaults resolved in output methods
 
@@ -287,18 +307,20 @@ class MTable:
         Parameters
         ----------
         file_name : str
-            The name of the DOCX file to update. Must be provided.
+            Path to the DOCX file. If relative and DEFAULT_SAVE_PATH['docx'] is set,
+            that path is prepended. Must end with .docx (or no extension to auto-append).
         tab_num : int, optional
-            The position of the table to replace in the document. If None, a new table will be added.
+            1-based index of the table to replace. If None or out of range, appends a new table.
         show : bool, optional
-            If True, the output object will be returned and displayed. Default is True.
-        **kwargs : dict
-            Additional keyword arguments to pass to the output method.
+            If True, also returns a GT object for display (HTML). Default False.
+        docx_style : Dict[str, object], optional
+            Per-call overrides for MTable.DEFAULT_DOCX_STYLE (see make()).
+        **kwargs : dict.
 
         Returns
         -------
-        output : GT object
-            The table as GT object if show is True.
+        output : GT
+            When show=True, returns a GT object for display (HTML).
         """
         assert file_name is not None, "file_name must be provided"
         # Resolve DOCX style (per-call -> class default)
