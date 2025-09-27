@@ -8,6 +8,7 @@
 \usepackage{threeparttable}%
 \usepackage{makecell}%
 \usepackage{tabularx}%
+\usepackage{array}%
 %
 %
 %
@@ -20,17 +21,17 @@
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{p{3cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Hello & There \\
 \midrule
 \addlinespace
-Var 1 & 0.090000 & 1.090000 \\
-Var 2 & 1.080000 & -0.270000 \\
-Var 3 & 0.970000 & 0.310000 \\
-Var 4 & -0.110000 & -1.160000 \\
-Var 5 & -0.500000 & -1.390000 \\
-Var 6 & 0.740000 & 0.730000 \\
+Var 1 & 0.030000 & 0.890000 \\
+Var 2 & -1.610000 & 0.370000 \\
+Var 3 & 3.440000 & 0.380000 \\
+Var 4 & 1.190000 & -0.960000 \\
+Var 5 & 2.410000 & -0.150000 \\
+Var 6 & -1.620000 & -0.690000 \\
 \addlinespace
 \bottomrule
 \end{tabularx}
@@ -45,17 +46,17 @@ Var 6 & 0.740000 & 0.730000 \\
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{p{2cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Hello & There \\
 \midrule
 \addlinespace
-Var 1 & 0.090000 & 1.090000 \\
-Var 2 & 1.080000 & -0.270000 \\
-Var 3 & 0.970000 & 0.310000 \\
-Var 4 & -0.110000 & -1.160000 \\
-Var 5 & -0.500000 & -1.390000 \\
-Var 6 & 0.740000 & 0.730000 \\
+Var 1 & 0.030000 & 0.890000 \\
+Var 2 & -1.610000 & 0.370000 \\
+Var 3 & 3.440000 & 0.380000 \\
+Var 4 & 1.190000 & -0.960000 \\
+Var 5 & 2.410000 & -0.150000 \\
+Var 6 & -1.620000 & -0.690000 \\
 \addlinespace
 \bottomrule
 \end{tabularx}
@@ -70,20 +71,21 @@ Var 6 & 0.740000 & 0.730000 \\
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lcc}
+\begin{tabularx}{10cm}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Hello & There \\
 \midrule
 \addlinespace
-Var 1 & 0.090000 & 1.090000 \\
-Var 2 & 1.080000 & -0.270000 \\
-Var 3 & 0.970000 & 0.310000 \\
-Var 4 & -0.110000 & -1.160000 \\
-Var 5 & -0.500000 & -1.390000 \\
-Var 6 & 0.740000 & 0.730000 \\
+Var 1 & 0.030000 & 0.890000 \\
+Var 2 & -1.610000 & 0.370000 \\
+Var 3 & 3.440000 & 0.380000 \\
+Var 4 & 1.190000 & -0.960000 \\
+Var 5 & 2.410000 & -0.150000 \\
+Var 6 & -1.620000 & -0.690000 \\
 \addlinespace
 \bottomrule
-\end{tabular}
+\end{tabularx}
+ \vspace{3pt}
 \footnotesize 
 \end{threeparttable}%
 \end{table}
@@ -94,20 +96,21 @@ Var 6 & 0.740000 & 0.730000 \\
 \begin{table}[htbp]%
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabular}{lcc}
+\begin{tabularx}{0.8\textwidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Hello & There \\
 \midrule
 \addlinespace
-Var 1 & 0.090000 & 1.090000 \\
-Var 2 & 1.080000 & -0.270000 \\
-Var 3 & 0.970000 & 0.310000 \\
-Var 4 & -0.110000 & -1.160000 \\
-Var 5 & -0.500000 & -1.390000 \\
-Var 6 & 0.740000 & 0.730000 \\
+Var 1 & 0.030000 & 0.890000 \\
+Var 2 & -1.610000 & 0.370000 \\
+Var 3 & 3.440000 & 0.380000 \\
+Var 4 & 1.190000 & -0.960000 \\
+Var 5 & 2.410000 & -0.150000 \\
+Var 6 & -1.620000 & -0.690000 \\
 \addlinespace
 \bottomrule
-\end{tabular}
+\end{tabularx}
+ \vspace{3pt}
 \footnotesize 
 \end{threeparttable}%
 \end{table}

@@ -52,8 +52,7 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES= ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
-    # Output-specific render defaults
-    DEFAULT_TEX_FULL_WIDTH: bool = True
+    DEFAULT_TEX_TAB_WIDTH: Optional[str] = r"\linewidth"        
     DEFAULT_TEX_FIRST_COL_WIDTH: Optional[str] = None
     DEFAULT_GT_FULL_WIDTH: bool = False
 
@@ -160,17 +159,16 @@ class MTable:
             The type of the output object ("gt", "tex", "docx", "html").
         **kwargs : Further arguments forwarded to the respective output method when type is specified.
             - For type="tex" (LaTeX):
-              - full_width: bool (default MTable.DEFAULT_TEX_FULL_WIDTH)
-                If True, use tabularx to fill \\linewidth with X columns.
               - first_col_width: Optional[str] (default MTable.DEFAULT_TEX_FIRST_COL_WIDTH)
                 LaTeX length for the first column (e.g., "3cm", "1.2in", r"0.25\\linewidth").
-                Use None to keep first column flexible (X when full_width=True, or 'l' otherwise).
-              - tab_width: Optional[str] (default None)
-                Target table width for tabularx, e.g., r"0.8\\linewidth", r"\\textwidth", "14cm".
-                If set, tabularx is used even when full_width=False.
+                Use None to keep first column flexible (X when tabularx is used, or 'l' otherwise).
+              - tab_width: Optional[str] (default MTable.DEFAULT_TEX_TAB_WIDTH)
+                Target width for tabularx, e.g., "14cm", r"0.8\\textwidth",
+                or the keywords "linewidth" or "textwidth".
+                If set (or default is set), tabularx is used; None keeps normal tabular.
               - texlocation: str (default "htbp")
                 Placement specifier for the table environment.
-              Note: When full_width=True or tab_width is set, ensure your document loads
+              Note: When tab_width is set, ensure your document loads
               the tabularx and array packages.
             - For type="gt" (HTML via great-tables):
               - full_width: bool (default MTable.DEFAULT_GT_FULL_WIDTH)
@@ -257,7 +255,7 @@ class MTable:
         replace : bool, optional
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
-            - type="tex": full_width, first_col_width, tab_width, texlocation (see make()).
+            - type="tex": first_col_width, tab_width, texlocation (see make()).
             - type="docx": docx_style (see make()).
             - type="html": gt options via _output_gt (e.g., full_width, gt_style).
 
@@ -645,24 +643,36 @@ class MTable:
         
     def _output_tex(
         self,
-        full_width: Optional[bool] = None,
         first_col_width: Optional[str] = None,
         tab_width: Optional[str] = None,
         **kwargs
     ):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
-        # Resolve TeX defaults (per-call -> class)
-        _fw = self.DEFAULT_TEX_FULL_WIDTH if full_width is None else bool(full_width)
-        _fcw = self.DEFAULT_TEX_FIRST_COL_WIDTH if first_col_width is None else first_col_width
-        # Desired table width expression for tabularx (default \linewidth)
-        _tw = tab_width or r"\linewidth"
-        # Use tabularx if full_width or a specific tab_width was requested
-        _use_tx = _fw or (tab_width is not None)
 
+        # Resolve TeX defaults
+        _fcw = self.DEFAULT_TEX_FIRST_COL_WIDTH if first_col_width is None else first_col_width
+
+        # Normalize tab_width (only these two keywords are mapped)
+        def _normalize_width(w: Optional[str]) -> Optional[str]:
+            if w is None:
+                return None
+            v = str(w).strip()
+            low = v.lower()
+            if low == "linewidth":
+                return r"\linewidth"
+            if low == "textwidth":
+                return r"\textwidth"
+            return v  # e.g., "4cm", r"0.5\textwidth"
+
+        _tw = _normalize_width(tab_width if tab_width is not None else self.DEFAULT_TEX_TAB_WIDTH)
+        use_tabularx = _tw is not None
+
+        # Replace newlines and wrap cells with makecell if needed
         dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
         dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
 
+        # Handle row groups
         row_levels = dfs.index.nlevels
         if row_levels > 1:
             top_row_id = dfs.index.get_level_values(0).to_list()
@@ -670,12 +680,11 @@ class MTable:
             row_groups_len = [top_row_id.count(group) for group in row_groups]
             dfs.index = dfs.index.droplevel(0)
 
-        # Stub (index) and data columns after droplevel
         stub_cols = dfs.index.nlevels
         data_cols = dfs.shape[1]
 
-        # Build column_format for pandas styler (non-full-width)
-        if _fcw and not _fw:
+        # Column format for non-tabularx
+        if _fcw and not use_tabularx:
             first_stub = f"p{{{_fcw}}}"
         else:
             first_stub = "l"
@@ -691,6 +700,7 @@ class MTable:
             column_format=colfmt,
         )
 
+        # Add spacing, group separators
         lines = latex_res.splitlines()
         line_at = next(i for i, line in enumerate(lines) if "\\midrule" in line)
         lines.insert(line_at + 1, "\\addlinespace")
@@ -729,6 +739,7 @@ class MTable:
 
         latex_res = "\n".join(lines)
 
+        # Wrap threeparttable
         if self.notes is not None:
             latex_res = (
                 "\\begin{threeparttable}\n"
@@ -740,6 +751,7 @@ class MTable:
         else:
             latex_res = "\\begin{threeparttable}\n" + latex_res + "\n\\end{threeparttable}"
 
+        # Optional table float wrapper
         if (self.caption is not None) or (self.tab_label is not None):
             latex_res = (
                 "\\begin{table}[" + kwargs.get("texlocation", "htbp") + "]\n"
@@ -752,9 +764,8 @@ class MTable:
 
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
-        # Switch to tabularx and use X for flexible columns when requested
-        if _use_tx:
-            # Center flexible columns; keep stub left
+        # Switch to tabularx when requested
+        if use_tabularx:
             centered_X = r">{\centering\arraybackslash}X"
             n_flex = max(0, stub_cols - 1) + data_cols
             rest_spec = centered_X * n_flex
@@ -764,6 +775,7 @@ class MTable:
                 first_spec = r">{\raggedright\arraybackslash}X"
             colfmt_x = first_spec + rest_spec
 
+            # IMPORTANT: correct pattern so replacement actually happens
             latex_res = re.sub(
                 r"\\begin\{tabular\}\{[^}]*\}",
                 lambda m: f"\\begin{{tabularx}}{{{_tw}}}{{{colfmt_x}}}",
