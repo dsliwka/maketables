@@ -104,6 +104,7 @@
 \usepackage{threeparttable}
 \usepackage{tabularx}
 \usepackage{multirow}
+\usepackage{array}
 \KOMAoption{captions}{tableheading}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
@@ -192,35 +193,33 @@ mollit anim id est laborum.
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{France} & \multicolumn{2}{c}{US} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} 
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
  & High & Low & High & Low \\
 \midrule
 \addlinespace
 \emph{Gr 1} \\
 \addlinespace
-Var 1 & -0.047000 & -0.845000 & 0.009000 & 0.140000 \\
-Var 2 & -1.662000 & -0.049000 & 1.605000 & -0.807000 \\
-Var 3 & -0.486000 & -1.213000 & 1.435000 & -0.505000 \\
+Var 1 & 0.853 & 0.495 & -0.374 & 1.017 \\
+Var 2 & 0.581 & 0.117 & 1.179 & 0.375 \\
+Var 3 & 1.189 & 0.386 & -0.914 & 0.144 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 2} \\
 \addlinespace
-Var 4 & 0.163000 & 0.020000 & 1.347000 & -1.367000 \\
-Var 5 & -1.254000 & 0.171000 & -1.493000 & 0.318000 \\
+Var 4 & 1.21 & 0.149 & -0.604 & 0.309 \\
+Var 5 & -0.377 & -1.048 & 0.599 & 0.882 \\
 \addlinespace
 \midrule
 \addlinespace
 \emph{Gr 3} \\
 \addlinespace
-Var 6 & -0.759000 & -1.624000 & 1.143000 & 2.105000 \\
-\addlinespace
+Var 6 & -0.366 & 0.602 & -0.725 & -0.709 \\
 \bottomrule
 \end{tabularx}
- \vspace{3pt}
 \footnotesize Sample notes!
 \end{threeparttable}
 
@@ -239,19 +238,19 @@ Var 6 & -0.759000 & -1.624000 & 1.143000 & 2.105000 \\
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & Control & Treatment 1 & Treatment 2 \\
 \midrule
 \addlinespace
-Ability (test score) & \makecell{99.29\\(16.79)} & \makecell{98.61\\(15.53)} & \makecell{98.80\\(14.56)} \\
-Age (years) & \makecell{40.39\\(12.02)} & \makecell{40.15\\(12.39)} & \makecell{38.44\\(11.39)} \\
+Ability (test score) & \makecell{99.08\\(16.47)} & \makecell{100.20\\(14.28)} & \makecell{100.18\\(16.03)} \\
+Age (years) & \makecell{39.69\\(12.12)} & \makecell{40.28\\(11.65)} & \makecell{39.83\\(12.62)} \\
+\addlinespace
 \midrule
 \addlinespace
-N & 350 & 300 & 350 \\
+N & 316 & 358 & 326 \\
 \bottomrule
 \end{tabularx}
- \vspace{3pt}
 \footnotesize Note: Displayed statistics are Mean (Std. Dev.).
 \end{threeparttable}
 
@@ -270,24 +269,24 @@ N & 350 & 300 & 350 \\
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
-\begin{tabularx}{\linewidth}{p{0.25\linewidth}>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{Sales (Euro)} \\
-\cmidrule(lr){2-3} 
+\cmidrule(lr){2-3}
  & (1) & (2) \\
 \midrule
 \addlinespace
-Ability (test score) & \makecell{88.238*** \\ (13.330)} & \makecell{90.443*** \\ (10.774)} \\
-Age (years) & \makecell{20.084 \\ (17.469)} & \makecell{18.278 \\ (14.119)} \\
-training &  & \makecell{8283.795*** \\ (359.742)} \\
-Intercept & \makecell{2.175E+04*** \\ (1502.583)} & \makecell{1.891E+04*** \\ (1220.675)} \\
+Ability (test score) & \makecell{102.863*** \\ (12.658)} & \makecell{98.773*** \\ (10.200)} \\
+Age (years) & \makecell{28.943 \\ (16.264)} & \makecell{17.613 \\ (13.113)} \\
+training &  & \makecell{7775.113*** \\ (334.645)} \\
+Intercept & \makecell{1.956E+04*** \\ (1448.958)} & \makecell{1.776E+04*** \\ (1170.001)} \\
+\addlinespace
 \midrule
 \addlinespace
 Observations & 1000 & 1000 \\
-R² & 0.043 & 0.376 \\
+R² & 0.064 & 0.393 \\
 \bottomrule
 \end{tabularx}
- \vspace{3pt}
 \footnotesize Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)
 \end{threeparttable}
 

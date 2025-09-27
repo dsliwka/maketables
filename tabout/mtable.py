@@ -669,73 +669,139 @@ class MTable:
         use_tabularx = _tw is not None
 
         # Replace newlines and wrap cells with makecell if needed
-        dfs = dfs.map(lambda x: x.replace('\n', r'\\') if isinstance(x, str) else x)
-        dfs = dfs.map(lambda x: f"\\makecell{{{x}}}" if isinstance(x, str) and r'\\' in x else x)
+        def _prep_cell(x):
+            if isinstance(x, float) and np.isnan(x):
+                return ""
+            if isinstance(x, str):
+                x = x.replace('\n', r'\\')
+                if r'\\' in x:
+                    return f"\\makecell{{{x}}}"
+                return x
+            return str(x)
 
-        # Handle row groups
+        dfs = dfs.map(_prep_cell)
+
+        # Determine row groups (if MultiIndex on rows)
         row_levels = dfs.index.nlevels
-        if row_levels > 1:
+        row_groups_present = row_levels > 1
+        if row_groups_present:
             top_row_id = dfs.index.get_level_values(0).to_list()
             row_groups = list(dict.fromkeys(top_row_id))
             row_groups_len = [top_row_id.count(group) for group in row_groups]
+            # Show only the inner row labels in the stub
             dfs.index = dfs.index.droplevel(0)
 
         stub_cols = dfs.index.nlevels
         data_cols = dfs.shape[1]
 
-        # Column format for non-tabularx
-        if _fcw and not use_tabularx:
-            first_stub = f"p{{{_fcw}}}"
+        # Column spec
+        if use_tabularx:
+            centered_X = r">{\centering\arraybackslash}X"
+            n_flex = max(0, stub_cols - 1) + data_cols
+            rest_spec = centered_X * n_flex
+            if _fcw:
+                first_spec = f"p{{{_fcw}}}"
+            else:
+                first_spec = r">{\raggedright\arraybackslash}X"
+            colspec = first_spec + rest_spec
         else:
-            first_stub = "l"
-        other_stubs = "l" * max(0, stub_cols - 1)
-        data_spec = "c" * data_cols
-        colfmt = first_stub + other_stubs + data_spec
+            first_stub = f"p{{{_fcw}}}" if _fcw else "l"
+            other_stubs = "l" * max(0, stub_cols - 1)
+            data_spec = "c" * data_cols
+            colspec = first_stub + other_stubs + data_spec
 
-        styler = dfs.style
-        latex_res = styler.to_latex(
-            hrules=True,
-            multicol_align="c",
-            multirow_align="t",
-            column_format=colfmt,
-        )
+        # Build header rows (MultiIndex columns -> spanners + cmidrules)
+        header_lines = []
 
-        # Add spacing, group separators
-        lines = latex_res.splitlines()
-        line_at = next(i for i, line in enumerate(lines) if "\\midrule" in line)
-        lines.insert(line_at + 1, "\\addlinespace")
-        line_at += 1
+        def _make_spanner_row(level_labels):
+            # level_labels is a list (len = n data columns) of labels at a given level
+            cells = []
+            spans = []
+            i = 0
+            n = len(level_labels)
+            while i < n:
+                label = level_labels[i]
+                span = 1
+                j = i + 1
+                while j < n and level_labels[j] == label:
+                    span += 1
+                    j += 1
+                cells.append(str(label))
+                spans.append(span)
+                i = j
+            return cells, spans
 
-        if row_levels > 1 and len(row_groups) > 1:
-            for i in range(len(row_groups)):
+        # Prepare column labels by levels
+        if isinstance(dfs.columns, pd.MultiIndex):
+            col_levels = dfs.columns.nlevels
+            # For each level except the last, create a spanner row
+            for lvl in range(col_levels - 1):
+                labels_lvl = [dfs.columns[i][lvl] for i in range(len(dfs.columns))]
+                row_cells, row_spans = _make_spanner_row(labels_lvl)
+                # Build the LaTeX row: prepend stub blanks, then multicolumns
+                parts = [""] * stub_cols
+                cmid_ranges = []
+                left = stub_cols + 1
+                for cell, span in zip(row_cells, row_spans):
+                    parts.append(f"\\multicolumn{{{span}}}{{c}}{{{cell}}}")
+                    cmid_ranges.append((left, left + span - 1))
+                    left += span
+                # Add the spanner row
+                header_lines.append(" & ".join(parts) + r" \\")
+                # Place the cmidrule(s) directly under the spanner row
+                if cmid_ranges:
+                    cmids = " ".join([rf"\cmidrule(lr){{{L}-{R}}}" for (L, R) in cmid_ranges])
+                    header_lines.append(cmids)
+            # Last level: the actual column names
+            last_labels = [dfs.columns[i][-1] for i in range(len(dfs.columns))]
+            last_parts = [""] * stub_cols + [str(x) for x in last_labels]
+            header_lines.append(" & ".join(last_parts) + r" \\")
+        else:
+            # Single-level columns: one header row with the column names
+            last_parts = [""] * stub_cols + [str(c) for c in dfs.columns]
+            header_lines.append(" & ".join(last_parts) + r" \\")
+
+        # Build body rows
+        body_lines = []
+        if row_groups_present:
+            start = 0
+            for gi, (gname, glen) in enumerate(zip(row_groups, row_groups_len)):
                 if self.rgroup_display:
-                    lines.insert(line_at + 1, "\\emph{" + row_groups[i] + "} \\\\")
-                    lines.insert(line_at + 2, "\\addlinespace")
-                    lines.insert(line_at + 3 + row_groups_len[i], "\\addlinespace")
-                    line_at += 3
-                if (self.rgroup_sep != "") and (i < len(row_groups) - 1):
-                    line_at += row_groups_len[i] + 1
-                    lines.insert(line_at, "\\midrule")
-                    lines.insert(line_at + 1, "\\addlinespace")
-                    line_at += 1
+                    body_lines.append(rf"\emph{{{gname}}} " + r"\\")
+                    body_lines.append(r"\addlinespace")
+                # Rows for this group
+                end = start + glen
+                for ridx in range(start, end):
+                    row_label = str(dfs.index[ridx])
+                    vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
+                    row_parts = [row_label] + [str(v) for v in vals]
+                    body_lines.append(" & ".join(row_parts) + r" \\")
+                # Group separator if requested and not last group
+                if (self.rgroup_sep != "") and (gi < len(row_groups) - 1):
+                    body_lines.append(r"\addlinespace")
+                    body_lines.append(r"\midrule")
+                    body_lines.append(r"\addlinespace")
+                start = end
         else:
-            lines.insert(line_at + dfs.shape[0] + 1, "\\addlinespace")
+            for ridx in range(dfs.shape[0]):
+                row_label = str(dfs.index[ridx])
+                vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
+                row_parts = [row_label] + [str(v) for v in vals]
+                body_lines.append(" & ".join(row_parts) + r" \\")
+            body_lines.append(r"\addlinespace")
 
-        # cmidrules under multicolumn header
-        for i, line in enumerate(lines):
-            if "multicolumn" in line:
-                cmidrule_line_number = i + 1
-                pattern = r"\\multicolumn\{(\d+)\}"
-                ncols = [int(match) for match in re.findall(pattern, line)]
-                cmidrule_string = ""
-                leftcol = stub_cols + 1
-                for n in ncols:
-                    cmidrule_string += (
-                        r"\cmidrule(lr){" + str(leftcol) + "-" + str(leftcol + n - 1) + "} "
-                    )
-                    leftcol += n
-                lines.insert(cmidrule_line_number, cmidrule_string)
-                break
+        # Assemble tabular/tabularx content
+        tab_env = "tabularx" if use_tabularx else "tabular"
+        width_arg = f"{{{_tw}}}" if use_tabularx else ""
+        lines = []
+        lines.append(rf"\begin{{{tab_env}}}{width_arg}{{{colspec}}}")
+        lines.append(r"\toprule")
+        lines.extend(header_lines)
+        lines.append(r"\midrule")
+        lines.append(r"\addlinespace")
+        lines.extend(body_lines)
+        lines.append(r"\bottomrule")
+        lines.append(rf"\end{{{tab_env}}}")
 
         latex_res = "\n".join(lines)
 
@@ -745,7 +811,9 @@ class MTable:
                 "\\begin{threeparttable}\n"
                 + latex_res
                 + "\n\\footnotesize "
+                + "\n\\noindent\\begin{minipage}{\\linewidth}\\smallskip\\footnotesize\n"
                 + self.notes
+                + "\\end{minipage}\n"
                 + "\n\\end{threeparttable}"
             )
         else:
@@ -762,27 +830,8 @@ class MTable:
                 + "\n\\end{table}"
             )
 
+        # Top-align makecell content
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
-
-        # Switch to tabularx when requested
-        if use_tabularx:
-            centered_X = r">{\centering\arraybackslash}X"
-            n_flex = max(0, stub_cols - 1) + data_cols
-            rest_spec = centered_X * n_flex
-            if _fcw:
-                first_spec = f"p{{{_fcw}}}"
-            else:
-                first_spec = r">{\raggedright\arraybackslash}X"
-            colfmt_x = first_spec + rest_spec
-
-            # IMPORTANT: correct pattern so replacement actually happens
-            latex_res = re.sub(
-                r"\\begin\{tabular\}\{[^}]*\}",
-                lambda m: f"\\begin{{tabularx}}{{{_tw}}}{{{colfmt_x}}}",
-                latex_res,
-                count=1,
-            )
-            latex_res = latex_res.replace("\\end{tabular}", "\\end{tabularx}\n \\vspace{3pt}")
 
         return latex_res
 
