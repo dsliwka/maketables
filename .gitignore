@@ -166,8 +166,17 @@ Desktop.ini
 # Jupyter notebook outputs (optional - uncomment if you want to ignore outputs)
 # *.ipynb
 
+# But keep documentation notebooks
+!getting-started.ipynb
+!examples*.ipynb
+!*-docs.ipynb
+
 # PowerShell profile backups
 *_profile.ps1
 
 # Custom folder
 mystuff/
+
+# Quarto
+_site/
+.quarto/

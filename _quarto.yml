@@ -1,0 +1,27 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "MakeTables"
+  description: "A Python package for creating publication-ready tables"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: getting-started.ipynb
+        text: Getting Started
+    right:
+      - icon: github
+        href: https://github.com/dsliwka/maketables
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    code-copy: true
+    code-fold: false
+
+execute:
+  freeze: auto

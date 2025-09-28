@@ -1,0 +1,61 @@
+---
+title: "MakeTables"
+---
+
+A Python package for creating publication-ready tables from statistical models and descriptive statistics.
+
+## Overview
+
+MakeTables provides a unified interface for generating professional tables from:
+
+- Statistical regression models (via pyfixest integration)
+- Descriptive statistics 
+- Custom data tables
+
+The package supports multiple output formats including:
+
+- Great Tables (HTML/interactive)
+- LaTeX
+- Microsoft Word documents
+- Plain DataFrames
+
+## Installation
+
+### From PyPI
+```bash
+pip install maketables
+```
+
+### Development Installation
+```bash
+git clone https://github.com/dsliwka/maketables.git
+cd maketables
+pip install -e .
+```
+
+## Quick Example
+
+```{python}
+#| eval: false
+import maketables as mt
+import pandas as pd
+
+# Load data (with variable labels from Stata file)
+df = mt.import_dta("https://www.stata-press.com/data/r18/auto.dta")
+
+# Create descriptive statistics table
+table = mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
+table.make()
+```
+
+## Key Features
+
+- **Multiple Output Formats**: Great Tables, LaTeX, Word, DataFrame
+- **Statistical Integration**: Native support for pyfixest, statsmodels, linearmodels
+- **Flexible Formatting**: Customizable labels, notes, significance levels
+- **Data Import**: Stata file support with variable label preservation
+- **Extensible**: Plugin system for custom model extractors
+
+## Get Started
+
+- [Getting Started Guide](getting-started.ipynb) - Interactive examples from the README
