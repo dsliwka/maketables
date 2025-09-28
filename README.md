@@ -14,6 +14,11 @@ The package supports multiple output formats including:
 - LaTeX
 - Microsoft Word (docx) documents
 
+## Origin
+
+MakeTables originated as the table output functionality within the [pyfixest](https://github.com/py-econometrics/pyfixest) package and has been moved to this standalone package to provide broader table creation capabilities also supporting other statistical packages.
+
+
 
 ## Installation
 
