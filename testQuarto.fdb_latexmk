@@ -1,6 +1,6 @@
 # Fdb version 3
-["pdflatex"] 1758986876 "c:/PythonProjects/tabout/testQuarto.tex" "testQuarto.pdf" "testQuarto" 1758986879
-  "c:/PythonProjects/tabout/testQuarto.tex" 1758986869 8955 164731c020ebd7fa416d352a1120274f ""
+["pdflatex"] 1758988294 "c:/PythonProjects/tabout/testQuarto.tex" "testQuarto.pdf" "testQuarto" 1758988297
+  "c:/PythonProjects/tabout/testQuarto.tex" 1758988290 8955 164731c020ebd7fa416d352a1120274f ""
   "c:/texlive/2021/texmf-dist/fonts/enc/dvips/newpx/zpl_TOsF.enc" 1647608059 2697 c0e4acf9af2683eef1d80f88a94044c0 ""
   "c:/texlive/2021/texmf-dist/fonts/enc/dvips/newtx/ntx-ec-tlf.enc" 1647608064 2914 8283dfc24eaf1964346f843d7605c2b0 ""
   "c:/texlive/2021/texmf-dist/fonts/enc/dvips/tex-gyre/q-ec.enc" 1647609233 2457 aaabbccba4df2a7f7371410ee4e075a3 ""
@@ -153,8 +153,8 @@
   "c:/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1647609999 4448422 1ce8db434ffa4259b75148f2b12051ea ""
   "c:/texlive/2021/texmf-var/web2c/pdftex/pdflatex.fmt" 1647610097 2826124 203992d6c3e618f4cb7ac80be8667715 ""
   "c:/texlive/2021/texmf.cnf" 1647609974 713 e69b156964470283e0530f5060668171 ""
-  "testQuarto.aux" 1758986879 2529 f30146bbe8cda542bda938d91a8e537b "pdflatex"
-  "testQuarto.tex" 1758986869 8955 164731c020ebd7fa416d352a1120274f ""
+  "testQuarto.aux" 1758988297 2529 f30146bbe8cda542bda938d91a8e537b "pdflatex"
+  "testQuarto.tex" 1758988290 8955 164731c020ebd7fa416d352a1120274f ""
   (generated)
   "testQuarto.aux"
   "testQuarto.log"
