@@ -6,22 +6,19 @@ A Python package for creating publication-ready tables from statistical models a
 
 ## Overview
 
-MakeTables provides a unified interface for generating professional tables from:
-
-- Statistical regression models (via pyfixest integration)
+MakeTables provides a unified interface for generating tables from:
+- Regression results (from [statsmodels](https://www.statsmodels.org/stable/index.html), [pyfixest](https://py-econometrics.github.io/pyfixest/pyfixest.html), or (still more experimental) [linearmodels](https://bashtage.github.io/linearmodels/))
 - Descriptive statistics 
 - Custom data tables
 
 The package supports multiple output formats including:
-
-- Great Tables (HTML/interactive)
+- Great Tables (HTML)
 - LaTeX
-- Microsoft Word documents
-- Plain DataFrames
+- Microsoft Word (docx) documents
 
 ## Installation
 
-### From PyPI
+### From PyPI (once published)
 ```bash
 pip install maketables
 ```
@@ -37,24 +34,24 @@ pip install -e .
 
 ```{python}
 #| eval: false
-import maketables as mt
 import pandas as pd
+import maketables as mt
+import pyfixest as pf
 
-# Load data (with variable labels from Stata file)
+# Load your data (here using a sample Stata dataset with the import_dta function that also stores variable labels)
 df = mt.import_dta("https://www.stata-press.com/data/r18/auto.dta")
 
 # Create descriptive statistics table
-table = mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
-table.make()
+mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
+
+# Fit your models (here using pyfixest)
+est1 = pf.feols("mpg ~ weight", data=df)
+est2 = pf.feols("mpg ~ weight + length", data=df)
+
+# Make a regression table
+mt.ETable([est1, est2])
 ```
 
-## Key Features
-
-- **Multiple Output Formats**: Great Tables, LaTeX, Word, DataFrame
-- **Statistical Integration**: Native support for pyfixest, statsmodels, linearmodels
-- **Flexible Formatting**: Customizable labels, notes, significance levels
-- **Data Import**: Stata file support with variable label preservation
-- **Extensible**: Plugin system for custom model extractors
 
 ## Get Started
 
