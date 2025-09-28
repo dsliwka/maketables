@@ -161,7 +161,6 @@ Desktop.ini
 # Output files
 *.pdf
 *.docx
-*.html
 *.tex
 
 # Jupyter notebook outputs (optional - uncomment if you want to ignore outputs)
