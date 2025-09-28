@@ -1,0 +1,30 @@
+# Include important files in the package distribution
+include README.md
+include LICENSE
+include requirements.txt
+include requirements-dev.txt
+
+# Include documentation
+recursive-include docs *
+prune docs/_build
+
+# Include data files if any
+recursive-include maketables *.txt
+recursive-include maketables *.md
+recursive-include data *.dta
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude .pytest_cache
+global-exclude .DS_Store
+global-exclude *.so
+global-exclude .coverage
+exclude .gitignore
+
+# Exclude notebooks and test files from distribution
+exclude *.ipynb
+exclude test_*.ipynb
+prune test*
+prune *test*
