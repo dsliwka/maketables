@@ -1,5 +1,6 @@
 ---
 title: "MakeTables"
+
 ---
 
 A Python package for creating publication-ready tables from statistical models and descriptive statistics.
