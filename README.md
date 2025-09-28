@@ -63,7 +63,7 @@ est2 = pf.feols("mpg ~ weight + length", data=df)
 # Make the table
 mt.ETable([est1, est2])
 ```
-**Sample Output:** [View HTML table](docs/tab2.html)
+**Sample Output:** [View HTML table](https://dsliwka.github.io/maketables/docs/tab2.html)
 
 ## With statsmodels
 ```python
@@ -80,7 +80,7 @@ est2 = smf.probit("foreign_i ~ weight + length + price", data=df).fit(disp=0)
 # Make the table
 mt.ETable([est1, est2], model_stats=["N","r2","pseudo_r2",""], model_heads=["OLS","Probit"])
 ```
-**Sample Output:** [View HTML table](docs/tab3.html)
+**Sample Output:** [View HTML table](https://dsliwka.github.io/maketables/docs/tab3.html)
 
 
 ## Main Classes
