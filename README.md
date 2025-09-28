@@ -1,6 +1,6 @@
 # MakeTables
 
-A Python package for creating publication-ready tables from statistical models and descriptive statistics.
+A Python package for creating publication-ready tables from statistical models and descriptive statistics. To get started, check out the [Getting Started Notebook](getting-started.ipynb).
 
 ## Overview
 
