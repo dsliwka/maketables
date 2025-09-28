@@ -50,7 +50,7 @@ mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
 
 ### Regression Tables
 
-#### With pyfixest
+#### with pyfixest
 ```python
 import pyfixest as pf
 
@@ -62,7 +62,7 @@ est2 = pf.feols("mpg ~ weight + length", data=df)
 mt.ETable([est1, est2])
 ```
 
-#### With statsmodels
+#### with statsmodels
 ```python
 import statsmodels.formula.api as smf
 
@@ -103,24 +103,6 @@ Extends MTable for econometric model results:
 
 ### `BTable`
 Extends MTable for simple balance tables.
-
-## Key Features
-
-- **Multiple Output Formats**: Generate tables as Great Tables (HTML), LaTeX, or Word documents 
-- **Statistical Integration**: Native support for statsmodels, pyfixest, linearmodels
-- **Flexible Formatting**: Customizable labels, notes, significance levels, and styling
-- **Data Import**: Built-in Stata file (.dta) import/export with variable label preservation
-- **Extensible**: Plugin system for custom model extractors
-
-## Dependencies
-
-- pandas (>=1.3.0)
-- numpy (>=1.20.0) 
-- great-tables (>=0.2.0)
-- tabulate (>=0.9.0)
-- pyfixest (>=0.13.0)
-- python-docx (>=0.8.11)
-- ipython (>=7.0.0)
 
 
 ## License
