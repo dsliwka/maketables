@@ -15,7 +15,7 @@ website:
         text: Regression Tables
       - href: DTable.ipynb
         text: Descriptive Statistics
-      - href: quartoExample.ipynb
+      - href: https://github.com/dsliwka/maketables/blob/main/docs/quartoExample.ipynb
         text: Using Quarto
     right:
       - icon: github
@@ -37,3 +37,4 @@ exclude:
   - ".venv/"
   - "__pycache__/"
   - "mystuff/"
+  - "docs/"
