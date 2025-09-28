@@ -168,3 +168,6 @@ Desktop.ini
 
 # PowerShell profile backups
 *_profile.ps1
+
+# Custom folder
+mystuff/

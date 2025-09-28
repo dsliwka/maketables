@@ -48,7 +48,14 @@ df = mt.import_dta("https://www.stata-press.com/data/r18/auto.dta")
 mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
 ```
 
-**Sample Output:** [View HTML table](docs/tab1.html)
+**Sample Output:**
+
+|                | Domestic | | | Foreign | | |
+|----------------|----------|-------|-------|---------|-------|-------|
+|                | N | Mean | Std. Dev. | N | Mean | Std. Dev. |
+| Mileage (mpg)  | 52 | 19.83 | 4.74 | 22 | 24.77 | 6.61 |
+| Weight (lbs.)  | 52 | 3,317.12 | 695.36 | 22 | 2,315.91 | 433.00 |
+| Length (in.)   | 52 | 196.13 | 20.05 | 22 | 168.55 | 13.68 |
 
 ### Regression Tables
 
