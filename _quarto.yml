@@ -25,3 +25,9 @@ format:
 
 execute:
   freeze: auto
+
+exclude:
+  - "introductions.ipynb"
+  - ".venv/"
+  - "__pycache__/"
+  - "mystuff/"
