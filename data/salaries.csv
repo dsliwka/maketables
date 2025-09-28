@@ -1,0 +1,1801 @@
+age,female,tenure,education,worker_type,occupation,wage,logwage
+46,0,19,High School,White Collar,Teacher,52164,10.862147880776792
+38,1,16,Some College,Blue Collar,Manufacturing Worker,29141,10.279901396250288
+48,1,25,Bachelor's,Blue Collar,Manufacturing Worker,51967,10.85836418072537
+58,0,36,Bachelor's,Blue Collar,Plumber,50973,10.839051359753869
+37,0,15,PhD,Blue Collar,Construction Worker,91376,11.422738140904643
+37,0,13,Some College,Blue Collar,Welder,34342,10.444124373873748
+59,0,37,Bachelor's,White Collar,Programmer,106043,11.571599951213637
+49,0,21,Some College,Blue Collar,Welder,58631,10.979018845927424
+34,1,12,Some College,White Collar,Teacher,51241,10.84429527182336
+47,1,25,Master's,Blue Collar,Manufacturing Worker,66289,11.101779249890095
+34,1,12,Bachelor's,Blue Collar,Manufacturing Worker,68314,11.131870002591821
+34,0,12,Master's,White Collar,Analyst,84968,11.350029994001375
+43,1,21,High School,White Collar,Engineer,66742,11.108589718892622
+22,1,0,Master's,Blue Collar,Mechanic,84989,11.350277115333324
+22,1,0,High School,White Collar,Teacher,25000,10.126631103850338
+33,0,9,Master's,Blue Collar,Welder,45786,10.731733646517688
+28,1,6,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+44,0,22,Some College,Blue Collar,Plumber,78378,11.269298554714618
+29,0,6,Bachelor's,Blue Collar,Plumber,25000,10.126631103850338
+23,0,1,Master's,Blue Collar,Plumber,75614,11.233396730208149
+58,1,33,High School,Blue Collar,Plumber,44985,10.714084379851219
+37,1,15,Some College,White Collar,Sales Rep,87004,11.373709373591305
+41,0,19,Master's,Blue Collar,Welder,81449,11.307732336483982
+23,0,1,Some College,White Collar,Analyst,25000,10.126631103850338
+33,0,8,High School,Blue Collar,Electrician,25000,10.126631103850338
+41,0,18,Some College,White Collar,Manager,27740,10.230630693868823
+26,0,4,Some College,White Collar,Manager,40217,10.602045070788348
+45,0,23,Master's,Blue Collar,Construction Worker,67872,11.125378857364408
+33,1,10,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+36,0,11,Bachelor's,White Collar,Engineer,112093,11.62708416286432
+33,0,11,PhD,White Collar,Engineer,82450,11.319947327987745
+62,0,40,Bachelor's,Blue Collar,Manufacturing Worker,106052,11.571684818843758
+40,1,15,High School,Blue Collar,Welder,67262,11.116350720207512
+27,1,5,Some College,White Collar,Manager,74053,11.212536332042088
+50,1,28,Some College,Blue Collar,Electrician,35488,10.476949890150093
+25,0,3,High School,White Collar,Engineer,59386,10.991813787335737
+43,1,21,Master's,Blue Collar,Welder,45763,10.731231183345313
+22,0,0,Bachelor's,Blue Collar,Welder,73773,11.20874808998925
+24,1,0,Some College,White Collar,Accountant,44650,10.706609586304646
+42,1,20,Bachelor's,White Collar,Accountant,65566,11.090812547889174
+49,1,21,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+42,1,20,Master's,White Collar,Programmer,34245,10.441295847632006
+39,1,12,Master's,White Collar,Consultant,48669,10.792797556078508
+36,0,14,Bachelor's,White Collar,Programmer,109298,11.60183337573555
+22,1,0,Bachelor's,Blue Collar,Mechanic,38929,10.569494753143834
+31,0,8,Bachelor's,White Collar,Analyst,67457,11.119245636829277
+34,1,10,Bachelor's,White Collar,Consultant,84714,11.34703615623758
+53,0,30,High School,White Collar,Engineer,110277,11.610750661285666
+44,0,22,High School,White Collar,Sales Rep,98089,11.493630508787259
+22,0,0,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+44,0,22,Some College,White Collar,Programmer,25000,10.126631103850338
+35,0,13,High School,White Collar,Engineer,113596,11.64040357338165
+32,1,6,Bachelor's,Blue Collar,Manufacturing Worker,108958,11.598717765855113
+47,0,22,High School,White Collar,Accountant,38503,10.558491439318031
+52,0,30,Bachelor's,Blue Collar,Plumber,27392,10.218006278941468
+51,1,26,Bachelor's,White Collar,Accountant,114843,11.651321257195779
+30,0,5,PhD,Blue Collar,Construction Worker,78238,11.267510742009788
+36,1,14,Bachelor's,White Collar,Manager,71860,11.18247506066751
+44,1,22,High School,White Collar,Sales Rep,54497,10.905900933264697
+52,1,27,Bachelor's,White Collar,Programmer,88486,11.390599626391937
+34,1,12,Master's,White Collar,Sales Rep,50015,10.820078239419281
+38,0,13,PhD,White Collar,Teacher,87733,11.382053390365874
+27,1,5,Some College,Blue Collar,Welder,52405,10.866757285604278
+26,0,4,Some College,White Collar,Teacher,51305,10.84554349229631
+50,0,28,Master's,White Collar,Accountant,68842,11.139569302779684
+56,1,34,High School,White Collar,Teacher,91006,11.418680717391366
+39,0,17,Bachelor's,Blue Collar,Mechanic,44859,10.711279516251953
+52,1,30,Some College,White Collar,Sales Rep,64224,11.070132251596064
+44,1,18,High School,White Collar,Teacher,25000,10.126631103850338
+32,1,10,Some College,White Collar,Analyst,35622,10.48071870349873
+44,1,22,Some College,Blue Collar,Manufacturing Worker,47048,10.758923636139793
+58,0,33,Bachelor's,Blue Collar,Manufacturing Worker,34352,10.444415520118563
+40,0,17,Master's,White Collar,Sales Rep,67997,11.127218865537973
+59,1,37,Some College,Blue Collar,Manufacturing Worker,28546,10.259272100189714
+22,0,0,Master's,White Collar,Engineer,112084,11.627003869167778
+50,1,25,High School,Blue Collar,Mechanic,76543,11.245607953403638
+41,1,19,Bachelor's,White Collar,Accountant,100993,11.522806486490866
+36,1,14,High School,Blue Collar,Electrician,25000,10.126631103850338
+41,0,19,Master's,White Collar,Accountant,82452,11.319971584819076
+22,0,0,Bachelor's,White Collar,Programmer,65497,11.089759619047705
+37,0,10,Bachelor's,Blue Collar,Welder,46896,10.755687662950674
+44,0,22,Master's,Blue Collar,Plumber,58555,10.977721762476238
+58,1,36,Bachelor's,Blue Collar,Mechanic,57807,10.964865154594012
+34,0,12,PhD,White Collar,Analyst,128752,11.765643352385913
+30,0,8,Bachelor's,White Collar,Programmer,30426,10.323052785023075
+34,0,10,Master's,White Collar,Engineer,133057,11.798532886821958
+51,1,26,Bachelor's,White Collar,Analyst,80267,11.293113856563991
+44,1,22,High School,White Collar,Teacher,48081,10.780642367661684
+34,0,12,Bachelor's,Blue Collar,Manufacturing Worker,79262,11.280514099835102
+46,0,19,High School,Blue Collar,Welder,25000,10.126631103850338
+41,0,19,Bachelor's,Blue Collar,Electrician,28404,10.254285259301984
+52,0,30,Bachelor's,White Collar,Accountant,69363,11.147108863114212
+32,1,10,Bachelor's,White Collar,Accountant,104257,11.55461428368981
+36,1,10,High School,Blue Collar,Construction Worker,41365,10.630190391624284
+35,0,9,High School,White Collar,Manager,55961,10.932410298526829
+22,0,0,Bachelor's,White Collar,Sales Rep,47761,10.773964685870737
+44,1,22,PhD,White Collar,Sales Rep,111588,11.622568796266197
+43,0,21,Some College,Blue Collar,Mechanic,101567,11.528473958216944
+40,1,18,Some College,Blue Collar,Electrician,68774,11.138581045519855
+37,0,14,Bachelor's,White Collar,Engineer,67712,11.123018695777917
+23,0,0,Bachelor's,White Collar,Engineer,87387,11.37810180916176
+35,0,13,Some College,White Collar,Engineer,71008,11.17054782573232
+36,1,11,Some College,Blue Collar,Manufacturing Worker,43331,10.676623593166008
+30,1,8,High School,Blue Collar,Plumber,59628,10.99588054139032
+38,0,15,PhD,White Collar,Programmer,152117,11.932405240575049
+45,0,23,High School,White Collar,Analyst,53939,10.895609057404332
+63,0,41,Some College,White Collar,Sales Rep,80656,11.297948476322413
+42,0,20,High School,White Collar,Consultant,41424,10.631615701991318
+43,0,19,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+39,0,16,Bachelor's,White Collar,Engineer,72405,11.190030636762703
+22,1,0,High School,White Collar,Programmer,46093,10.738416373637513
+40,0,18,High School,Blue Collar,Electrician,25000,10.126631103850338
+41,0,17,Bachelor's,White Collar,Programmer,108193,11.591671948292463
+65,1,43,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+38,0,16,High School,Blue Collar,Plumber,100447,11.517385504192315
+44,1,16,Master's,Blue Collar,Manufacturing Worker,99048,11.503359860100527
+40,0,18,Bachelor's,Blue Collar,Construction Worker,32364,10.38480197292773
+26,1,1,Master's,Blue Collar,Construction Worker,62649,11.045302998504885
+54,1,29,Master's,White Collar,Analyst,112884,11.634116021759953
+49,1,22,Bachelor's,White Collar,Engineer,53940,10.895627596693721
+49,1,22,High School,White Collar,Analyst,53215,10.882095590475144
+29,0,3,Bachelor's,Blue Collar,Manufacturing Worker,44145,10.695234949335683
+57,1,33,Master's,Blue Collar,Electrician,100295,11.515871122258797
+23,0,1,Bachelor's,White Collar,Accountant,67727,11.123240197709581
+47,0,23,Bachelor's,Blue Collar,Manufacturing Worker,25178,10.133725876326205
+65,0,43,High School,Blue Collar,Construction Worker,47356,10.765448806531527
+28,1,6,Master's,White Collar,Manager,91967,11.429185096032331
+33,0,11,Bachelor's,White Collar,Sales Rep,69549,11.149786819103003
+41,1,19,PhD,White Collar,Manager,85001,11.350418300109132
+34,1,8,High School,White Collar,Sales Rep,70542,11.163963556095796
+22,1,0,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+41,1,19,High School,White Collar,Analyst,56739,10.946217083956563
+27,0,0,Bachelor's,Blue Collar,Welder,83432,11.33178720780105
+46,0,21,High School,White Collar,Consultant,33652,10.423827768670705
+29,0,6,High School,Blue Collar,Manufacturing Worker,34861,10.459124004835836
+59,0,34,PhD,White Collar,Programmer,107295,11.583337329210593
+31,0,9,High School,Blue Collar,Electrician,67317,11.117168084031912
+36,0,12,Master's,White Collar,Programmer,91798,11.427345789878878
+50,0,28,Some College,White Collar,Sales Rep,86854,11.3719838270278
+25,1,3,Master's,White Collar,Accountant,78734,11.273830361441949
+43,1,21,Bachelor's,White Collar,Programmer,50343,10.826614861669272
+56,0,34,Master's,White Collar,Engineer,121493,11.707611926934314
+22,1,0,Master's,White Collar,Accountant,71883,11.182795076253608
+42,0,18,High School,White Collar,Teacher,49622,10.812189562761608
+43,0,19,High School,White Collar,Manager,25000,10.126631103850338
+49,1,27,Some College,White Collar,Manager,61637,11.02901761855464
+25,0,3,Bachelor's,White Collar,Manager,59778,10.99839297927291
+24,0,2,Master's,White Collar,Sales Rep,53017,10.878367895820443
+46,1,19,Bachelor's,White Collar,Accountant,60391,11.0085953661978
+44,1,20,Bachelor's,White Collar,Accountant,56251,10.937579097686422
+43,1,21,High School,White Collar,Manager,50690,10.833483931466395
+44,1,22,Master's,White Collar,Teacher,49265,10.804969168756575
+32,1,10,PhD,Blue Collar,Welder,90991,11.41851587950905
+43,0,17,Some College,White Collar,Analyst,79334,11.281422067311539
+44,0,22,Bachelor's,White Collar,Sales Rep,94093,11.452038933858548
+31,0,9,High School,White Collar,Consultant,60956,11.01790757140975
+62,0,40,Bachelor's,White Collar,Consultant,97168,11.484196718137357
+46,1,23,Bachelor's,Blue Collar,Construction Worker,86528,11.368223339962581
+26,0,4,High School,White Collar,Programmer,99678,11.509700269614534
+48,1,26,Some College,White Collar,Teacher,57210,10.954483987262574
+28,1,6,Some College,White Collar,Consultant,28663,10.263362371409995
+49,1,27,Bachelor's,Blue Collar,Manufacturing Worker,70033,11.156721838515388
+54,1,32,Bachelor's,White Collar,Analyst,61177,11.021526580870049
+30,1,0,High School,White Collar,Manager,63892,11.064949436909847
+52,0,30,Bachelor's,Blue Collar,Plumber,115307,11.655353415602505
+45,1,23,Bachelor's,Blue Collar,Manufacturing Worker,74278,11.215570089956065
+50,0,27,Some College,Blue Collar,Construction Worker,59082,10.986681588475857
+63,1,41,High School,White Collar,Analyst,55993,10.932981961904135
+37,0,13,Bachelor's,Blue Collar,Welder,113378,11.638482647927333
+31,1,8,PhD,Blue Collar,Electrician,70545,11.164006083047258
+29,1,7,High School,White Collar,Accountant,31163,10.346986772628886
+30,0,6,Some College,Blue Collar,Electrician,33556,10.420970963966186
+39,0,15,High School,Blue Collar,Electrician,25000,10.126631103850338
+44,1,22,Bachelor's,White Collar,Teacher,60111,11.003948132061856
+43,0,21,High School,White Collar,Programmer,44106,10.694351106602143
+50,1,28,Some College,White Collar,Engineer,46288,10.742638027215916
+40,1,14,Bachelor's,White Collar,Teacher,37906,10.542864689886246
+57,0,33,Bachelor's,White Collar,Analyst,131860,11.78949603266729
+37,0,13,Some College,White Collar,Accountant,71952,11.18375450901049
+65,0,43,Some College,Blue Collar,Mechanic,76379,11.243463068261226
+48,1,26,Bachelor's,Blue Collar,Construction Worker,81706,11.310882717564038
+30,0,8,High School,White Collar,Engineer,99123,11.504116782188833
+27,1,0,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+46,0,24,Master's,White Collar,Engineer,51340,10.84622545442513
+37,1,15,High School,White Collar,Engineer,42228,10.650838787109585
+49,1,27,Bachelor's,Blue Collar,Manufacturing Worker,55374,10.921865448493632
+46,1,24,Master's,Blue Collar,Electrician,66876,11.110595437357537
+39,0,17,Some College,Blue Collar,Mechanic,46779,10.753189663252995
+30,1,8,Some College,White Collar,Accountant,54112,10.898811251698307
+22,1,0,Bachelor's,White Collar,Sales Rep,62782,11.0474236871679
+35,1,13,Master's,White Collar,Accountant,67770,11.12387489813016
+50,1,28,Master's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+43,0,21,Bachelor's,White Collar,Analyst,68483,11.134340818267278
+25,0,3,High School,White Collar,Analyst,32455,10.387609793467568
+42,1,20,Bachelor's,Blue Collar,Mechanic,49613,10.812008175145854
+45,0,19,Some College,White Collar,Accountant,33266,10.41229113335048
+29,1,3,Bachelor's,White Collar,Consultant,54624,10.908228625594168
+42,1,20,High School,Blue Collar,Plumber,25000,10.126631103850338
+41,0,19,High School,White Collar,Engineer,30239,10.316887760963617
+26,1,2,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+44,0,22,Bachelor's,White Collar,Sales Rep,60849,11.016150664426897
+47,1,25,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+53,1,31,Some College,White Collar,Manager,61779,11.031318779873457
+53,1,28,Master's,White Collar,Consultant,53484,10.887137822734557
+23,0,1,Bachelor's,White Collar,Engineer,94494,11.456291619402636
+29,0,5,Some College,White Collar,Programmer,71123,11.172166051525362
+46,1,23,High School,White Collar,Sales Rep,45046,10.715439468861323
+46,1,23,Some College,White Collar,Sales Rep,30009,10.30925261565329
+46,1,23,Master's,White Collar,Analyst,111753,11.62404635775306
+65,0,39,Bachelor's,White Collar,Engineer,142026,11.863765418414445
+47,0,25,Bachelor's,White Collar,Accountant,88989,11.396268045570105
+54,0,30,Bachelor's,White Collar,Engineer,155170,11.95227656907753
+51,1,20,Some College,White Collar,Analyst,58467,10.976217771490134
+48,0,26,Master's,White Collar,Analyst,104588,11.557784101278456
+36,0,14,Bachelor's,White Collar,Engineer,71117,11.17208168707087
+49,1,26,High School,Blue Collar,Manufacturing Worker,61534,11.027345146560275
+31,0,9,High School,Blue Collar,Plumber,25000,10.126631103850338
+37,1,11,Bachelor's,Blue Collar,Manufacturing Worker,38604,10.561111177027026
+34,1,12,Master's,White Collar,Manager,101390,11.526729745946625
+41,1,19,Some College,Blue Collar,Mechanic,63360,11.056588026488308
+65,0,43,Master's,White Collar,Programmer,86089,11.36313692383358
+22,0,0,Bachelor's,White Collar,Analyst,93010,11.440462293236513
+48,1,26,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+22,1,0,High School,White Collar,Accountant,25000,10.126631103850338
+34,1,11,High School,Blue Collar,Welder,37149,10.522692131883208
+53,0,31,Bachelor's,Blue Collar,Plumber,62078,11.036146937843293
+41,1,18,High School,White Collar,Accountant,121039,11.70386808669645
+27,1,4,Some College,White Collar,Analyst,62090,11.036340224358938
+31,1,9,Bachelor's,White Collar,Accountant,66121,11.099241675837533
+48,1,26,Bachelor's,Blue Collar,Manufacturing Worker,36554,10.506545898314387
+31,1,9,High School,White Collar,Accountant,36120,10.494602007530922
+43,1,18,Some College,Blue Collar,Electrician,39834,10.592476097947214
+41,0,17,Bachelor's,Blue Collar,Welder,72573,11.192348230814178
+32,0,6,Bachelor's,Blue Collar,Construction Worker,40105,10.599256293801025
+65,0,43,Master's,Blue Collar,Manufacturing Worker,85804,11.359820904435994
+48,0,20,High School,Blue Collar,Electrician,83567,11.333403984301592
+22,0,0,Master's,Blue Collar,Plumber,100113,11.514054827000788
+42,0,20,Bachelor's,White Collar,Consultant,61266,11.022980318783594
+32,0,9,Bachelor's,Blue Collar,Construction Worker,25000,10.126631103850338
+50,0,20,Bachelor's,Blue Collar,Construction Worker,71685,11.180036799680368
+30,1,7,Some College,Blue Collar,Construction Worker,77602,11.259348479035063
+39,1,17,High School,White Collar,Analyst,81819,11.312264769458078
+46,0,21,Bachelor's,Blue Collar,Welder,73241,11.20151065243636
+50,1,26,Bachelor's,White Collar,Teacher,127371,11.754859366695326
+26,1,4,Bachelor's,White Collar,Sales Rep,61890,11.033113894733408
+36,0,14,Some College,Blue Collar,Electrician,65440,11.088888971276628
+34,0,9,Master's,White Collar,Consultant,67995,11.127189452043059
+32,1,5,Bachelor's,Blue Collar,Manufacturing Worker,54967,10.914488284142575
+61,1,38,High School,White Collar,Sales Rep,82313,11.31828433287873
+45,1,22,Some College,White Collar,Analyst,33427,10.41711923563258
+25,0,3,Bachelor's,Blue Collar,Electrician,33021,10.4048990016915
+51,0,27,Bachelor's,Blue Collar,Construction Worker,81511,11.308493259446568
+65,0,43,Bachelor's,White Collar,Accountant,85139,11.352040493952584
+52,0,30,Master's,White Collar,Analyst,111779,11.62427898663946
+22,0,0,Some College,Blue Collar,Construction Worker,25000,10.126631103850338
+34,0,12,Some College,White Collar,Programmer,106862,11.57929356141373
+55,1,32,Master's,White Collar,Engineer,100560,11.518509843264129
+32,1,9,Master's,White Collar,Sales Rep,111630,11.622945110008779
+45,0,23,Bachelor's,Blue Collar,Welder,36755,10.512029549808188
+49,1,25,Master's,White Collar,Manager,41087,10.623447048747229
+29,0,7,High School,White Collar,Consultant,52534,10.869215858012614
+39,0,17,Master's,Blue Collar,Construction Worker,40100,10.599131613294661
+22,0,0,Some College,White Collar,Manager,25000,10.126631103850338
+28,1,2,High School,White Collar,Teacher,25000,10.126631103850338
+37,1,15,High School,White Collar,Consultant,38014,10.545709791910783
+25,1,3,Some College,Blue Collar,Manufacturing Worker,59726,10.997522715461125
+60,0,38,Some College,White Collar,Sales Rep,55265,10.919895075745055
+23,1,0,Some College,Blue Collar,Construction Worker,35418,10.474975444468745
+35,0,13,High School,White Collar,Programmer,77203,11.25419359536146
+42,1,17,Some College,Blue Collar,Manufacturing Worker,27141,10.20880077869385
+57,1,35,Bachelor's,White Collar,Accountant,25000,10.126631103850338
+23,0,0,Some College,White Collar,Consultant,25000,10.126631103850338
+54,1,32,Some College,Blue Collar,Electrician,63113,11.052682049496653
+40,1,18,Bachelor's,White Collar,Consultant,55315,10.920799398469011
+28,0,4,Master's,White Collar,Programmer,112690,11.632395964946395
+46,1,24,Bachelor's,Blue Collar,Manufacturing Worker,82005,11.31453549999721
+42,0,20,Some College,White Collar,Accountant,49537,10.810475144084139
+33,1,4,Bachelor's,White Collar,Teacher,51490,10.849142893040186
+41,1,19,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+35,1,6,High School,Blue Collar,Manufacturing Worker,40266,10.603262719386294
+41,1,16,Some College,Blue Collar,Manufacturing Worker,62548,11.0436895409634
+48,1,26,Master's,Blue Collar,Manufacturing Worker,25461,10.144903148637786
+59,0,35,High School,White Collar,Programmer,45446,10.724280086931744
+25,1,0,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+65,0,42,High School,White Collar,Programmer,49829,10.816352422842092
+22,0,0,Master's,White Collar,Accountant,59916,11.00069886028861
+38,0,11,Bachelor's,Blue Collar,Electrician,59080,10.986647736645317
+47,0,22,Some College,White Collar,Programmer,55971,10.932588978440108
+43,1,21,Bachelor's,White Collar,Teacher,36648,10.509114135566579
+33,0,11,Bachelor's,White Collar,Teacher,48968,10.798922302530906
+38,1,16,Bachelor's,Blue Collar,Manufacturing Worker,38447,10.557035948482783
+34,0,8,High School,Blue Collar,Mechanic,25000,10.126631103850338
+33,0,11,Master's,White Collar,Programmer,107616,11.586324614539997
+50,1,28,Some College,White Collar,Sales Rep,92223,11.431964836135938
+44,0,22,Bachelor's,White Collar,Manager,27214,10.211486825750804
+32,0,8,High School,White Collar,Manager,89453,11.401468626664016
+51,1,29,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+44,0,22,Some College,White Collar,Manager,104545,11.557372879705524
+50,1,28,Bachelor's,Blue Collar,Mechanic,45938,10.7350479402497
+48,0,26,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+30,0,8,Bachelor's,White Collar,Accountant,74758,11.222011508937708
+33,1,8,High School,Blue Collar,Manufacturing Worker,30421,10.32288843838277
+49,0,27,Bachelor's,White Collar,Analyst,71080,11.171561282268588
+47,0,25,Master's,White Collar,Consultant,83030,11.326957267256077
+40,0,18,Bachelor's,Blue Collar,Electrician,67974,11.126880558101544
+41,0,19,Bachelor's,White Collar,Programmer,56186,10.936422894528368
+55,1,30,Bachelor's,White Collar,Consultant,86147,11.363810418366572
+33,0,11,Some College,White Collar,Analyst,70878,11.168715368176574
+47,1,23,Master's,Blue Collar,Manufacturing Worker,77974,11.264130716770492
+38,1,11,Some College,Blue Collar,Plumber,53544,10.888259024780478
+37,0,15,Bachelor's,White Collar,Programmer,74070,11.212765871007335
+53,1,31,Bachelor's,Blue Collar,Electrician,68174,11.129818539472732
+50,0,22,Some College,Blue Collar,Construction Worker,25000,10.126631103850338
+50,1,28,Some College,White Collar,Programmer,45930,10.734873777319839
+56,0,34,Bachelor's,Blue Collar,Construction Worker,25000,10.126631103850338
+40,1,18,Master's,White Collar,Sales Rep,92459,11.434520581995951
+48,0,26,Master's,Blue Collar,Welder,61632,11.028936495157797
+36,0,10,Bachelor's,White Collar,Engineer,98793,11.500782031023537
+44,1,22,Bachelor's,White Collar,Consultant,90432,11.4123534660442
+38,1,14,Master's,Blue Collar,Manufacturing Worker,73611,11.206549750071193
+41,0,12,High School,Blue Collar,Welder,25000,10.126631103850338
+47,0,25,High School,White Collar,Engineer,48428,10.787833437827631
+30,1,8,Bachelor's,White Collar,Programmer,30940,10.339805124127057
+65,1,43,Master's,White Collar,Manager,39748,10.590314804351253
+28,1,6,Master's,Blue Collar,Electrician,61492,11.02666236403249
+25,1,3,Some College,Blue Collar,Construction Worker,69352,11.146950264548476
+54,1,32,High School,White Collar,Teacher,45603,10.727728782812129
+49,1,27,Some College,White Collar,Analyst,56206,10.936778791749008
+47,0,24,High School,White Collar,Consultant,34198,10.439922441808537
+48,0,26,Some College,White Collar,Engineer,51422,10.847821375434926
+40,1,18,Bachelor's,White Collar,Accountant,58981,10.984970637125501
+29,1,7,High School,White Collar,Analyst,56407,10.940348543259887
+41,0,15,Master's,Blue Collar,Welder,34240,10.441149830255679
+32,0,10,Some College,White Collar,Manager,69363,11.147108863114212
+52,1,28,Bachelor's,White Collar,Analyst,73214,11.201141938492748
+38,1,14,High School,Blue Collar,Manufacturing Worker,54537,10.906634649386172
+30,0,6,Some College,White Collar,Teacher,66372,11.103030559782677
+36,0,11,High School,White Collar,Engineer,25000,10.126631103850338
+45,0,23,PhD,White Collar,Accountant,104080,11.552915113186387
+33,0,11,Master's,White Collar,Programmer,75735,11.234995683961126
+30,0,8,Bachelor's,White Collar,Consultant,26153,10.171719185666264
+43,0,17,High School,Blue Collar,Electrician,28393,10.253897914895148
+43,1,21,Master's,White Collar,Manager,156844,11.96300695977909
+34,0,8,Some College,White Collar,Consultant,74658,11.220672964003686
+34,1,10,High School,White Collar,Engineer,101967,11.532404510507712
+43,1,18,Bachelor's,Blue Collar,Electrician,61850,11.032467377820634
+23,0,1,Master's,Blue Collar,Construction Worker,45506,10.725599464377073
+23,1,0,High School,White Collar,Teacher,25000,10.126631103850338
+31,0,9,High School,White Collar,Analyst,61577,11.028043703175827
+37,1,15,Master's,White Collar,Consultant,101848,11.53123678474148
+44,0,22,High School,White Collar,Manager,37072,10.520617246672158
+58,1,32,High School,White Collar,Accountant,25000,10.126631103850338
+50,1,28,Bachelor's,White Collar,Engineer,154108,11.94540893430204
+38,0,16,Master's,White Collar,Consultant,97065,11.483136136159477
+40,0,15,Bachelor's,Blue Collar,Welder,48005,10.779060451131723
+28,1,6,PhD,White Collar,Teacher,92386,11.43373073099868
+40,1,18,Bachelor's,White Collar,Teacher,48107,10.781182975650898
+37,0,14,High School,Blue Collar,Welder,43550,10.68166498228065
+44,1,20,PhD,Blue Collar,Construction Worker,116545,11.66603274350077
+30,0,6,Some College,Blue Collar,Electrician,39452,10.582840022073885
+46,1,24,Some College,White Collar,Accountant,25000,10.126631103850338
+58,0,36,Bachelor's,Blue Collar,Plumber,33538,10.420434403307056
+39,1,17,Some College,White Collar,Manager,50507,10.829867219518825
+45,0,21,High School,White Collar,Programmer,110086,11.609017157495737
+48,0,24,High School,White Collar,Teacher,60062,11.003132641016187
+35,0,13,Some College,White Collar,Manager,70219,11.159374208664028
+43,0,17,Master's,Blue Collar,Plumber,42745,10.663007508460334
+40,1,17,Bachelor's,White Collar,Teacher,31393,10.354340217107467
+41,0,19,PhD,White Collar,Manager,105701,11.568369632551514
+31,1,9,Some College,White Collar,Accountant,52278,10.864330911459342
+40,0,17,Some College,Blue Collar,Welder,43330,10.676600514733956
+46,0,24,High School,White Collar,Programmer,38788,10.565866199424438
+57,0,35,High School,White Collar,Programmer,36033,10.4921904642226
+52,0,30,Some College,White Collar,Programmer,82294,11.318053479997815
+65,0,40,Bachelor's,White Collar,Manager,25000,10.126631103850338
+31,0,8,Master's,White Collar,Analyst,51572,10.850734168530728
+50,0,28,PhD,White Collar,Programmer,100770,11.520595971274448
+42,0,20,High School,White Collar,Analyst,84620,11.34592592427406
+65,1,39,Master's,White Collar,Accountant,84207,11.341033332166788
+30,1,8,Some College,Blue Collar,Mechanic,42005,10.645543937798948
+30,0,2,High School,Blue Collar,Mechanic,41494,10.633304117453084
+33,0,11,Master's,Blue Collar,Welder,100095,11.513875014005817
+22,1,0,Bachelor's,Blue Collar,Construction Worker,79064,11.27801293005602
+34,1,9,High School,Blue Collar,Manufacturing Worker,27076,10.206403005628498
+31,1,6,Some College,White Collar,Programmer,44385,10.70065685350242
+42,0,20,Some College,Blue Collar,Electrician,36554,10.506545898314387
+44,1,17,Bachelor's,White Collar,Engineer,80004,11.28983191240606
+63,1,39,Bachelor's,Blue Collar,Construction Worker,25000,10.126631103850338
+51,1,29,PhD,Blue Collar,Electrician,99374,11.50664578901292
+33,1,9,High School,Blue Collar,Electrician,48618,10.79174911168878
+29,0,6,Some College,Blue Collar,Plumber,57456,10.958774716465864
+46,0,24,Bachelor's,White Collar,Consultant,108661,11.595988223081756
+24,1,2,Bachelor's,White Collar,Analyst,112614,11.631721320884305
+62,1,40,Some College,Blue Collar,Plumber,39637,10.587518304449791
+54,0,31,Bachelor's,White Collar,Programmer,136534,11.824328946839904
+34,0,12,Master's,White Collar,Engineer,88964,11.395987072502335
+22,0,0,Master's,White Collar,Engineer,116625,11.666718938149645
+56,0,34,Master's,White Collar,Programmer,110861,11.616032443319185
+39,1,16,Master's,White Collar,Consultant,106035,11.571524507273164
+55,1,32,Bachelor's,White Collar,Consultant,92299,11.432788586196066
+22,0,0,Master's,White Collar,Programmer,72291,11.188454919070612
+33,0,11,Some College,Blue Collar,Electrician,25000,10.126631103850338
+40,0,16,Some College,White Collar,Sales Rep,55037,10.915760965307776
+41,0,16,Some College,White Collar,Accountant,91196,11.420766315451438
+35,1,13,Bachelor's,White Collar,Manager,65637,11.091894840320453
+47,1,25,Some College,White Collar,Sales Rep,61706,11.030136449898094
+27,1,5,PhD,White Collar,Teacher,112886,11.634133738905721
+38,0,15,Some College,Blue Collar,Plumber,32809,10.398458146978019
+41,1,19,High School,White Collar,Teacher,70725,11.166554396169769
+46,1,24,Bachelor's,White Collar,Teacher,25000,10.126631103850338
+49,1,27,High School,White Collar,Engineer,28623,10.261965869419956
+27,0,3,High School,White Collar,Engineer,26845,10.19783486285667
+22,0,0,High School,White Collar,Engineer,28007,10.240209757912549
+55,0,33,Bachelor's,Blue Collar,Construction Worker,66164,11.099891787362111
+44,0,22,Some College,White Collar,Programmer,72075,11.185462522506603
+31,0,3,Bachelor's,White Collar,Engineer,79487,11.283348765258662
+59,0,37,Bachelor's,White Collar,Engineer,91645,11.425677696405948
+41,0,19,Some College,Blue Collar,Electrician,26530,10.186031447131786
+54,1,31,Some College,White Collar,Accountant,25000,10.126631103850338
+41,0,17,Some College,White Collar,Engineer,80539,11.296496818137651
+65,0,43,Bachelor's,White Collar,Consultant,96241,11.47461074128452
+61,1,39,High School,White Collar,Sales Rep,25000,10.126631103850338
+37,1,15,High School,White Collar,Analyst,83166,11.328593889441407
+52,1,26,Bachelor's,Blue Collar,Manufacturing Worker,89911,11.406575571150311
+48,1,26,Bachelor's,Blue Collar,Welder,104170,11.553779458978495
+56,1,34,High School,White Collar,Sales Rep,49732,10.814403868072828
+28,1,6,High School,White Collar,Accountant,61817,11.031933686524116
+48,0,26,Master's,Blue Collar,Manufacturing Worker,110926,11.616618591306768
+53,0,31,Master's,Blue Collar,Mechanic,47745,10.773629628384302
+22,0,0,Bachelor's,Blue Collar,Electrician,80267,11.293113856563991
+26,0,1,Bachelor's,White Collar,Engineer,77055,11.252274731569479
+22,0,0,Bachelor's,Blue Collar,Mechanic,73343,11.202902346160954
+37,1,15,PhD,White Collar,Accountant,110946,11.616798875435041
+49,1,27,PhD,White Collar,Analyst,149694,11.916348489444168
+58,1,36,High School,Blue Collar,Electrician,50364,10.82703191312159
+41,0,19,Master's,White Collar,Programmer,48509,10.789504626720456
+60,1,38,High School,Blue Collar,Manufacturing Worker,67039,11.113029818576933
+23,1,1,High School,White Collar,Consultant,25000,10.126631103850338
+22,0,0,Bachelor's,Blue Collar,Manufacturing Worker,78826,11.27499817066327
+39,1,16,Some College,White Collar,Sales Rep,50691,10.833503659028759
+45,0,23,Master's,White Collar,Engineer,113230,11.637176427308086
+40,0,18,High School,Blue Collar,Manufacturing Worker,68098,11.128703123130714
+22,1,0,Bachelor's,Blue Collar,Mechanic,59754,10.997991413159694
+39,0,14,Master's,White Collar,Accountant,105640,11.56779236641107
+24,0,2,Master's,Blue Collar,Welder,76639,11.246861364542914
+48,1,26,High School,White Collar,Teacher,25000,10.126631103850338
+44,1,22,Some College,White Collar,Analyst,58565,10.977892527503975
+29,0,7,Bachelor's,White Collar,Accountant,36469,10.504217863629703
+34,0,12,High School,White Collar,Teacher,34063,10.435967030196949
+27,0,5,PhD,White Collar,Analyst,69783,11.153145706078018
+39,1,17,Master's,White Collar,Accountant,58361,10.974403137513908
+51,0,29,High School,White Collar,Consultant,101940,11.532139683894032
+28,0,6,High School,Blue Collar,Welder,62582,11.044232975804555
+46,1,23,High School,Blue Collar,Welder,37027,10.51940265523281
+34,1,10,Master's,White Collar,Analyst,94485,11.45619637072414
+30,0,8,High School,White Collar,Consultant,42756,10.663264815393836
+39,1,17,Some College,White Collar,Teacher,65825,11.09475498436451
+28,1,5,Some College,Blue Collar,Electrician,25000,10.126631103850338
+33,0,11,Bachelor's,White Collar,Accountant,71170,11.172826660293318
+26,0,4,High School,Blue Collar,Welder,28840,10.269518591398885
+64,1,39,High School,Blue Collar,Electrician,25000,10.126631103850338
+40,0,15,Master's,White Collar,Programmer,93949,11.45050736082541
+32,1,10,Master's,Blue Collar,Electrician,51711,10.853425803822502
+43,0,21,Bachelor's,White Collar,Programmer,105785,11.569164011417417
+39,0,15,High School,Blue Collar,Plumber,29566,10.294380331461035
+37,0,15,Some College,White Collar,Teacher,57957,10.967456635260664
+47,0,25,Bachelor's,White Collar,Engineer,121363,11.706541333558677
+49,0,27,Some College,Blue Collar,Mechanic,34792,10.457142754277474
+34,0,8,Master's,Blue Collar,Manufacturing Worker,59105,10.987070802184478
+33,1,7,Bachelor's,White Collar,Teacher,73383,11.20344758014799
+37,1,15,High School,White Collar,Teacher,25000,10.126631103850338
+22,1,0,Master's,White Collar,Teacher,83408,11.331499507007887
+22,1,0,PhD,Blue Collar,Welder,90285,11.410726612649981
+56,0,34,High School,White Collar,Programmer,94649,11.457930591341297
+60,1,38,Bachelor's,White Collar,Engineer,72717,11.194330473874974
+37,0,15,Some College,White Collar,Analyst,44004,10.692035817859326
+47,1,24,Some College,White Collar,Teacher,25000,10.126631103850338
+44,1,22,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+65,1,43,Bachelor's,Blue Collar,Electrician,99500,11.507912923146684
+53,1,31,PhD,White Collar,Teacher,76854,11.249662797059191
+38,1,11,Bachelor's,White Collar,Accountant,126717,11.74971153252559
+29,0,2,High School,Blue Collar,Welder,65242,11.085858712304303
+22,0,0,Bachelor's,White Collar,Consultant,67814,11.124523942287944
+42,1,20,Some College,Blue Collar,Manufacturing Worker,75135,11.227041774459828
+31,0,9,Master's,Blue Collar,Plumber,27948,10.238100919672341
+23,1,1,Some College,Blue Collar,Manufacturing Worker,96672,11.479079084186399
+32,1,6,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+27,0,0,High School,White Collar,Manager,43488,10.68024031695087
+60,1,38,Bachelor's,White Collar,Teacher,41844,10.64170369646365
+51,1,27,Some College,Blue Collar,Manufacturing Worker,62751,11.046929793122029
+40,1,12,Bachelor's,Blue Collar,Manufacturing Worker,37475,10.531429322970798
+58,1,36,High School,White Collar,Accountant,39661,10.588123616077645
+41,1,19,Some College,Blue Collar,Electrician,38808,10.566381689925052
+30,1,8,Bachelor's,White Collar,Analyst,35710,10.483186040588494
+58,1,35,Master's,Blue Collar,Manufacturing Worker,56645,10.944559001307589
+46,0,24,Master's,White Collar,Programmer,115963,11.66102645369094
+28,0,5,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+38,1,12,Some College,Blue Collar,Welder,25000,10.126631103850338
+29,0,5,High School,Blue Collar,Electrician,51674,10.852710032645257
+23,1,1,Bachelor's,Blue Collar,Manufacturing Worker,111611,11.622774890380253
+51,1,29,Bachelor's,White Collar,Analyst,93825,11.449186624003222
+63,0,41,Master's,White Collar,Manager,101443,11.52725234336624
+23,1,0,Master's,Blue Collar,Manufacturing Worker,50822,10.836084610684592
+47,1,24,Some College,Blue Collar,Manufacturing Worker,45856,10.733261330627899
+32,0,3,Bachelor's,White Collar,Sales Rep,55136,10.917558139327657
+34,0,12,Master's,White Collar,Engineer,114387,11.647342715107097
+33,0,11,Master's,White Collar,Accountant,83845,11.33672513518121
+30,0,4,High School,White Collar,Sales Rep,67013,11.112641909402493
+41,1,17,Some College,White Collar,Analyst,49648,10.812713386688161
+30,0,8,Some College,White Collar,Manager,89917,11.406642301581638
+43,1,21,High School,White Collar,Manager,40270,10.6033620538455
+39,0,16,High School,White Collar,Manager,25000,10.126631103850338
+37,0,13,High School,Blue Collar,Plumber,92488,11.434834185355157
+29,1,1,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+33,1,11,Some College,Blue Collar,Electrician,25000,10.126631103850338
+49,0,27,High School,White Collar,Teacher,25000,10.126631103850338
+46,0,24,High School,White Collar,Teacher,112078,11.626950336454817
+28,0,6,Master's,White Collar,Accountant,125612,11.74095306985372
+41,0,19,Master's,Blue Collar,Plumber,100770,11.520595971274448
+49,1,27,Bachelor's,White Collar,Analyst,56235,10.937294617838122
+22,0,0,Some College,White Collar,Manager,112654,11.632076453441263
+47,0,25,PhD,Blue Collar,Electrician,94286,11.454087995245734
+32,0,10,High School,White Collar,Analyst,82759,11.32368804865453
+47,1,25,High School,White Collar,Teacher,60975,11.01821922308412
+31,1,6,Some College,White Collar,Accountant,50738,10.834430415742597
+22,0,0,High School,White Collar,Accountant,35206,10.468971801605917
+22,1,0,Some College,White Collar,Accountant,41259,10.627624549782817
+41,0,17,Master's,White Collar,Accountant,91622,11.425426696497391
+43,0,21,Bachelor's,White Collar,Consultant,73458,11.20446909330197
+29,1,6,Some College,White Collar,Sales Rep,51017,10.839914189496584
+48,1,24,Master's,Blue Collar,Construction Worker,101772,11.5304902961497
+22,1,0,High School,White Collar,Accountant,25000,10.126631103850338
+39,1,12,High School,Blue Collar,Plumber,47161,10.761322558837014
+25,0,3,Bachelor's,Blue Collar,Mechanic,69286,11.145998144567145
+32,1,5,Bachelor's,White Collar,Teacher,86645,11.369574590074345
+41,0,15,High School,White Collar,Consultant,51760,10.854372929174783
+30,1,2,Some College,White Collar,Accountant,51670,10.85263262128123
+35,0,13,Bachelor's,Blue Collar,Manufacturing Worker,81805,11.312093645417177
+52,1,30,Bachelor's,Blue Collar,Plumber,89891,11.406353104213542
+33,0,10,Bachelor's,Blue Collar,Manufacturing Worker,43205,10.673711508275499
+50,0,25,Some College,Blue Collar,Plumber,63759,11.0628656295268
+26,1,0,High School,White Collar,Sales Rep,81864,11.31281461276659
+46,0,24,Some College,Blue Collar,Welder,25000,10.126631103850338
+57,1,33,High School,White Collar,Manager,50212,10.8240093209381
+22,0,0,Master's,Blue Collar,Electrician,102646,11.539041454323
+30,0,5,Bachelor's,White Collar,Teacher,83851,11.336796693238679
+47,0,25,Some College,Blue Collar,Mechanic,67008,11.112567294230209
+38,0,16,Bachelor's,Blue Collar,Manufacturing Worker,59118,10.98729072555053
+44,1,22,Bachelor's,Blue Collar,Mechanic,42414,10.65523377539901
+33,0,10,Some College,White Collar,Accountant,38583,10.560567043934196
+41,1,19,Master's,White Collar,Manager,134343,11.80815150996946
+38,1,15,Master's,White Collar,Accountant,61740,11.03068729805615
+54,0,32,Bachelor's,White Collar,Consultant,84685,11.346693769325222
+43,1,20,High School,Blue Collar,Electrician,25000,10.126631103850338
+44,1,22,Bachelor's,White Collar,Consultant,99707,11.509991164117174
+35,1,13,Bachelor's,White Collar,Teacher,47789,10.774550766473594
+34,0,9,High School,Blue Collar,Welder,35869,10.487628691687759
+35,0,10,High School,Blue Collar,Welder,25000,10.126631103850338
+45,1,19,Master's,Blue Collar,Manufacturing Worker,27823,10.233618295752684
+35,1,8,High School,Blue Collar,Manufacturing Worker,26981,10.202888193567093
+43,1,17,Bachelor's,White Collar,Teacher,26252,10.175497455593613
+65,0,43,Bachelor's,Blue Collar,Mechanic,150230,11.91992273205647
+50,1,25,Some College,Blue Collar,Mechanic,25000,10.126631103850338
+36,0,14,High School,Blue Collar,Electrician,25000,10.126631103850338
+54,0,32,Master's,White Collar,Consultant,127555,11.756302923115248
+35,0,7,Some College,White Collar,Accountant,35909,10.488743239436115
+22,1,0,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+28,0,6,Bachelor's,Blue Collar,Welder,34590,10.451319901931214
+22,0,0,Bachelor's,Blue Collar,Mechanic,25734,10.155568353744936
+36,1,14,PhD,White Collar,Programmer,99734,11.510261920883988
+40,0,15,Bachelor's,Blue Collar,Construction Worker,95304,11.464827061479197
+60,0,38,Some College,White Collar,Programmer,81655,11.310258333510843
+44,0,18,PhD,White Collar,Manager,143173,11.871808968245336
+37,1,10,Bachelor's,White Collar,Analyst,75902,11.237198313497688
+50,1,27,Some College,Blue Collar,Manufacturing Worker,69753,11.152715709511364
+22,0,0,High School,White Collar,Consultant,25000,10.126631103850338
+43,1,20,Master's,White Collar,Consultant,85748,11.359168041141027
+49,1,23,Some College,Blue Collar,Manufacturing Worker,62007,11.035002560879946
+22,0,0,Bachelor's,Blue Collar,Welder,36707,10.510722751549745
+54,1,32,Bachelor's,Blue Collar,Mechanic,120515,11.69952950549349
+44,1,22,High School,Blue Collar,Mechanic,72902,11.19687135246267
+35,1,13,Bachelor's,Blue Collar,Plumber,42265,10.651714599363029
+48,0,24,High School,White Collar,Engineer,43884,10.689305067937381
+65,1,43,Some College,White Collar,Teacher,25000,10.126631103850338
+42,1,16,Bachelor's,White Collar,Consultant,53413,10.885809441013075
+43,0,21,Some College,Blue Collar,Welder,25000,10.126631103850338
+34,0,12,Bachelor's,White Collar,Programmer,97697,11.489626131315825
+30,0,8,Master's,Blue Collar,Welder,35085,10.465528967686389
+50,0,27,Bachelor's,White Collar,Manager,107011,11.580686911898418
+30,1,6,High School,Blue Collar,Electrician,51712,10.853445141880767
+41,0,19,High School,Blue Collar,Mechanic,25000,10.126631103850338
+34,0,8,Bachelor's,White Collar,Programmer,114280,11.64640685634471
+46,1,21,Master's,Blue Collar,Manufacturing Worker,91430,11.423328931158473
+44,0,21,Master's,White Collar,Accountant,93931,11.450315749157804
+52,1,30,Master's,White Collar,Teacher,74382,11.216969256066202
+34,0,12,Some College,White Collar,Analyst,83295,11.330143802343818
+37,0,12,Some College,White Collar,Manager,91331,11.422245548930501
+28,0,5,Bachelor's,White Collar,Programmer,75570,11.232814658014766
+35,0,11,High School,Blue Collar,Plumber,89649,11.403657324481385
+45,0,21,High School,White Collar,Engineer,68165,11.12968651562023
+49,1,27,Master's,White Collar,Sales Rep,108029,11.59015498858023
+29,1,3,High School,Blue Collar,Mechanic,40719,10.614450092966075
+50,0,28,High School,Blue Collar,Mechanic,67499,11.119868061936065
+56,1,34,High School,White Collar,Analyst,25000,10.126631103850338
+45,1,23,Master's,White Collar,Consultant,116410,11.664873721242287
+63,1,40,Bachelor's,White Collar,Accountant,49850,10.816773775389985
+31,0,9,Bachelor's,Blue Collar,Electrician,34098,10.436994010525176
+25,0,0,Master's,White Collar,Sales Rep,122603,11.716706772005422
+22,0,0,Some College,Blue Collar,Manufacturing Worker,28656,10.263118124300494
+58,1,36,Bachelor's,White Collar,Teacher,48702,10.79347537598923
+48,1,26,High School,White Collar,Analyst,25000,10.126631103850338
+39,0,14,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+43,0,20,Master's,White Collar,Sales Rep,123313,11.722481117495727
+26,1,4,Bachelor's,White Collar,Consultant,49466,10.809040843867542
+65,1,39,Some College,White Collar,Teacher,51362,10.846653878415639
+42,1,20,Some College,White Collar,Analyst,87757,11.382326910226261
+41,1,17,Bachelor's,White Collar,Accountant,63146,11.053204784521506
+49,0,26,High School,White Collar,Programmer,81321,11.30615956476456
+46,1,23,High School,Blue Collar,Electrician,25000,10.126631103850338
+43,1,19,High School,Blue Collar,Plumber,92907,11.43935427180181
+31,0,9,Some College,Blue Collar,Electrician,68966,11.141368908513245
+46,1,23,Master's,White Collar,Sales Rep,74478,11.218259058744003
+63,1,40,Some College,White Collar,Engineer,50377,10.827290000694122
+56,0,32,High School,Blue Collar,Mechanic,44430,10.701670195929955
+59,1,37,Bachelor's,White Collar,Teacher,67374,11.118014465800593
+34,1,12,Master's,White Collar,Teacher,130573,11.779687736319495
+28,1,6,High School,White Collar,Consultant,25000,10.126631103850338
+38,0,16,High School,Blue Collar,Welder,27481,10.221250135776074
+41,0,15,Some College,White Collar,Engineer,55286,10.920274990901907
+53,1,31,Bachelor's,Blue Collar,Manufacturing Worker,83888,11.337237854812313
+22,0,0,Bachelor's,Blue Collar,Mechanic,47785,10.77446706170028
+58,1,32,Master's,White Collar,Analyst,120397,11.698549894602904
+38,1,14,PhD,Blue Collar,Mechanic,102076,11.533472912857889
+35,0,13,Bachelor's,Blue Collar,Welder,59841,10.999446323738674
+28,1,6,Bachelor's,White Collar,Programmer,75844,11.236433878154095
+22,1,0,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+50,0,23,High School,White Collar,Programmer,64917,11.080864809839891
+41,1,18,PhD,Blue Collar,Construction Worker,52015,10.859287417504996
+25,1,3,Some College,Blue Collar,Manufacturing Worker,51660,10.852439066649831
+24,1,2,High School,Blue Collar,Construction Worker,67390,11.118251917940263
+36,1,8,Bachelor's,Blue Collar,Mechanic,25485,10.145845322774143
+60,0,35,Some College,White Collar,Consultant,41642,10.63686455231514
+37,1,15,Bachelor's,White Collar,Analyst,57622,10.961659718206215
+22,1,0,Bachelor's,White Collar,Teacher,86186,11.364263030468326
+37,1,8,Some College,White Collar,Teacher,45943,10.735156776679537
+37,1,15,Master's,Blue Collar,Welder,104349,11.555496329325743
+22,0,0,Some College,White Collar,Teacher,49344,10.806571456923
+39,1,17,Some College,White Collar,Sales Rep,61881,11.032968464866704
+37,0,15,Bachelor's,White Collar,Consultant,67175,11.115056433483693
+48,0,26,Bachelor's,Blue Collar,Construction Worker,70154,11.158448104574983
+62,0,38,Bachelor's,White Collar,Sales Rep,47339,10.765089759059482
+54,1,26,Some College,White Collar,Consultant,59285,10.99011160189217
+37,1,14,Bachelor's,Blue Collar,Manufacturing Worker,61473,11.026353333004943
+27,1,5,High School,White Collar,Consultant,65688,11.092671539388625
+65,1,43,Master's,Blue Collar,Manufacturing Worker,62045,11.03561520720872
+41,1,19,Some College,White Collar,Manager,31535,10.35885331909775
+40,1,18,Bachelor's,White Collar,Consultant,74254,11.21524692726777
+40,0,18,High School,White Collar,Programmer,25000,10.126631103850338
+42,0,18,High School,White Collar,Programmer,25000,10.126631103850338
+38,0,16,Bachelor's,Blue Collar,Plumber,82189,11.316776752138244
+33,1,11,Master's,White Collar,Consultant,106326,11.5742651252034
+33,1,8,Bachelor's,White Collar,Sales Rep,79192,11.279630562599642
+40,0,18,Master's,Blue Collar,Welder,117911,11.67768538157962
+33,0,10,Bachelor's,White Collar,Sales Rep,47165,10.761407371083953
+31,1,9,Bachelor's,White Collar,Teacher,30656,10.330583680770587
+41,0,15,High School,Blue Collar,Welder,30492,10.325219633108164
+37,1,15,Master's,Blue Collar,Manufacturing Worker,49717,10.814102205912047
+58,1,34,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+22,0,0,Master's,White Collar,Teacher,70004,11.156307662256047
+53,0,31,Master's,White Collar,Sales Rep,68302,11.131694327707022
+55,1,33,Master's,White Collar,Teacher,47778,10.7743205614855
+22,1,0,Bachelor's,White Collar,Manager,55471,10.923615640649537
+36,1,10,Bachelor's,White Collar,Consultant,35926,10.48921654632878
+36,1,14,Bachelor's,White Collar,Teacher,63942,11.06573170144901
+23,0,1,High School,Blue Collar,Electrician,25000,10.126631103850338
+31,1,9,Bachelor's,White Collar,Engineer,92399,11.43387143506039
+27,1,5,High School,White Collar,Manager,84144,11.340284895829125
+61,1,39,Bachelor's,White Collar,Analyst,82254,11.317567299663954
+51,0,29,High School,White Collar,Consultant,39112,10.574184604258482
+55,1,33,High School,Blue Collar,Manufacturing Worker,82489,11.32042023009976
+49,1,26,Some College,White Collar,Consultant,108201,11.591745887495987
+26,0,0,Some College,Blue Collar,Construction Worker,36470,10.504245283802726
+34,0,11,Bachelor's,White Collar,Engineer,114541,11.648688116484209
+46,1,23,High School,Blue Collar,Manufacturing Worker,38871,10.56800375029692
+25,0,3,Bachelor's,White Collar,Manager,25000,10.126631103850338
+49,0,27,High School,Blue Collar,Plumber,25000,10.126631103850338
+37,0,11,Bachelor's,Blue Collar,Welder,101359,11.52642394912157
+36,1,14,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+49,1,27,Bachelor's,Blue Collar,Manufacturing Worker,48128,10.781619407309512
+45,1,23,Bachelor's,Blue Collar,Manufacturing Worker,53040,10.878801624859744
+36,0,14,Some College,White Collar,Accountant,35594,10.479932363309931
+54,1,32,Bachelor's,White Collar,Programmer,73479,11.204754930091111
+27,1,5,Some College,Blue Collar,Manufacturing Worker,39799,10.591597065328735
+47,1,25,Bachelor's,Blue Collar,Electrician,36808,10.513470491835305
+47,1,25,Bachelor's,White Collar,Teacher,42259,10.65157262785174
+36,0,10,High School,White Collar,Engineer,53967,10.896128027630796
+44,1,21,Bachelor's,White Collar,Teacher,81634,11.310001120837414
+25,0,1,Bachelor's,White Collar,Manager,91049,11.419153102119054
+51,1,29,Some College,Blue Collar,Electrician,41725,10.638855748530036
+38,0,16,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+34,0,10,High School,Blue Collar,Plumber,25000,10.126631103850338
+53,0,24,Master's,White Collar,Manager,128203,11.761370224130946
+32,1,9,Bachelor's,White Collar,Programmer,93443,11.445106903711046
+23,0,1,High School,White Collar,Engineer,66520,11.105257933306865
+22,1,0,Some College,Blue Collar,Plumber,58946,10.984377049549666
+47,0,25,Bachelor's,Blue Collar,Plumber,78248,11.267638548970329
+25,0,2,Master's,Blue Collar,Welder,67600,11.121363262031055
+61,1,35,High School,White Collar,Teacher,95262,11.464386269305567
+22,0,0,High School,Blue Collar,Plumber,25000,10.126631103850338
+60,0,35,Master's,White Collar,Analyst,71210,11.173388536976171
+43,1,21,High School,Blue Collar,Manufacturing Worker,69265,11.14569500709198
+39,0,17,High School,White Collar,Teacher,71794,11.181556186084919
+33,0,9,PhD,White Collar,Engineer,82589,11.32163177872807
+45,0,21,Bachelor's,White Collar,Programmer,116964,11.66962147412521
+40,1,18,Some College,White Collar,Manager,101429,11.527114325305371
+53,1,30,High School,White Collar,Accountant,49116,10.801940126280403
+41,1,19,High School,White Collar,Accountant,25000,10.126631103850338
+42,1,20,High School,White Collar,Teacher,43544,10.681527200114036
+36,0,12,Master's,White Collar,Sales Rep,74977,11.224936678819944
+39,0,17,Some College,White Collar,Manager,51420,10.84778248081988
+44,1,22,Bachelor's,White Collar,Accountant,88178,11.387112777774695
+22,0,0,Master's,White Collar,Engineer,46907,10.755922197028484
+24,0,0,Some College,White Collar,Programmer,25000,10.126631103850338
+49,0,27,High School,Blue Collar,Plumber,38597,10.560929832225296
+42,0,20,Bachelor's,Blue Collar,Welder,55399,10.922316822030947
+38,1,10,Master's,White Collar,Manager,94024,11.45130534781269
+40,0,18,Master's,White Collar,Engineer,146648,11.895790436399201
+44,1,22,High School,White Collar,Analyst,75955,11.237896338641763
+34,0,11,Bachelor's,White Collar,Manager,88534,11.391141938008436
+31,1,6,Bachelor's,White Collar,Analyst,42061,10.646876224532782
+42,0,20,Master's,White Collar,Consultant,108606,11.595481933574607
+28,0,6,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+45,1,23,Bachelor's,White Collar,Teacher,56760,10.94658713127398
+22,1,0,Master's,White Collar,Consultant,80079,11.290768926398645
+52,0,30,Some College,Blue Collar,Plumber,83087,11.327643530579362
+46,0,24,Bachelor's,White Collar,Analyst,44867,10.711457836917562
+43,0,21,High School,White Collar,Analyst,25000,10.126631103850338
+52,0,27,Some College,Blue Collar,Mechanic,48320,10.785600832608697
+60,0,38,Some College,Blue Collar,Construction Worker,29247,10.283532283297381
+52,0,30,Master's,White Collar,Sales Rep,104360,11.555601739250665
+22,0,0,Some College,Blue Collar,Mechanic,67805,11.124391217522046
+25,0,0,Bachelor's,Blue Collar,Welder,61934,11.033824580898479
+33,1,11,Bachelor's,Blue Collar,Electrician,34729,10.455330351773332
+40,1,12,High School,White Collar,Accountant,25000,10.126631103850338
+46,1,24,Bachelor's,White Collar,Teacher,56296,10.938378763646385
+31,0,7,Bachelor's,White Collar,Engineer,93112,11.441558348621813
+42,0,20,Master's,Blue Collar,Plumber,68479,11.134282407905264
+31,1,7,Bachelor's,White Collar,Teacher,53769,10.892452371899706
+33,0,6,Bachelor's,Blue Collar,Construction Worker,62853,11.048553945576122
+23,0,0,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+29,1,1,Master's,White Collar,Engineer,101924,11.531982716503686
+24,1,2,High School,Blue Collar,Electrician,76010,11.238620189560086
+28,1,0,Bachelor's,White Collar,Analyst,60380,11.00841320326083
+53,0,31,Some College,White Collar,Accountant,30360,10.320881231509567
+29,0,1,Master's,Blue Collar,Mechanic,62597,11.044472632617147
+65,1,42,Bachelor's,White Collar,Accountant,33299,10.413282645487595
+46,0,24,Bachelor's,White Collar,Programmer,93111,11.441547608809866
+42,1,20,High School,White Collar,Consultant,60081,11.003448930773533
+30,1,5,Some College,Blue Collar,Manufacturing Worker,75789,11.235708442366212
+48,1,26,Bachelor's,White Collar,Manager,57536,10.960166117831292
+33,0,11,Bachelor's,Blue Collar,Mechanic,70545,11.164006083047258
+41,0,19,High School,White Collar,Sales Rep,30930,10.339481865679115
+65,1,39,PhD,Blue Collar,Mechanic,100586,11.518768361953487
+39,1,17,Master's,White Collar,Accountant,45532,10.726170654445108
+54,1,24,Some College,Blue Collar,Manufacturing Worker,29848,10.303873114900993
+32,0,8,Master's,Blue Collar,Plumber,56754,10.946481417441225
+40,0,17,Bachelor's,White Collar,Engineer,87831,11.38316979247768
+61,1,39,Bachelor's,White Collar,Sales Rep,41634,10.636672420127605
+32,1,10,Some College,White Collar,Teacher,54127,10.899088416123256
+62,1,36,Bachelor's,White Collar,Sales Rep,44428,10.70162518028701
+48,0,23,Bachelor's,Blue Collar,Manufacturing Worker,51560,10.850501457053124
+33,1,11,Some College,White Collar,Teacher,53827,10.893530478996958
+48,1,26,Bachelor's,White Collar,Sales Rep,81101,11.303450570483712
+52,1,28,Bachelor's,Blue Collar,Manufacturing Worker,79189,11.279592679267674
+47,0,24,Bachelor's,White Collar,Consultant,62462,11.04231365081754
+22,0,0,High School,White Collar,Sales Rep,31753,10.365742488046086
+31,1,7,Master's,White Collar,Accountant,80475,11.295701856167009
+37,0,15,Bachelor's,White Collar,Analyst,64930,11.081065045502532
+39,0,17,Some College,White Collar,Accountant,41072,10.623081903110922
+47,1,21,High School,Blue Collar,Mechanic,78219,11.267267863773679
+42,0,14,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+24,1,2,Master's,White Collar,Accountant,72353,11.189312196300184
+45,0,21,Some College,Blue Collar,Mechanic,34519,10.449265176063975
+47,1,24,Bachelor's,Blue Collar,Manufacturing Worker,69110,11.14345471708544
+47,1,23,High School,White Collar,Analyst,51360,10.846614938363842
+53,0,30,Bachelor's,White Collar,Manager,92057,11.430163229397278
+50,0,28,PhD,Blue Collar,Mechanic,40344,10.605197963756561
+46,0,24,Bachelor's,White Collar,Consultant,96031,11.472426334990274
+39,0,17,High School,White Collar,Consultant,80063,11.290569103740589
+22,1,0,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+45,1,20,High School,White Collar,Programmer,25000,10.126631103850338
+42,0,11,Some College,White Collar,Accountant,25000,10.126631103850338
+43,0,19,Bachelor's,White Collar,Programmer,65880,11.095590184291577
+25,0,3,Bachelor's,White Collar,Consultant,132388,11.793492283936407
+27,1,5,High School,Blue Collar,Electrician,49489,10.809505701639543
+53,0,30,Master's,White Collar,Manager,50199,10.823750385162683
+40,1,18,Bachelor's,Blue Collar,Manufacturing Worker,35767,10.484780959571744
+48,1,24,Some College,White Collar,Manager,74031,11.212239203383193
+40,1,18,Bachelor's,White Collar,Sales Rep,69174,11.14438034846101
+40,0,18,Bachelor's,White Collar,Analyst,56609,10.943923262151136
+51,1,24,Bachelor's,Blue Collar,Electrician,48670,10.7928181028275
+34,0,12,Bachelor's,Blue Collar,Mechanic,37894,10.542548067192307
+41,0,19,Bachelor's,Blue Collar,Plumber,29335,10.28653662135996
+34,1,11,High School,White Collar,Engineer,58569,10.977960825350912
+35,1,13,Master's,Blue Collar,Manufacturing Worker,87437,11.378673813021223
+36,0,14,Bachelor's,White Collar,Analyst,95163,11.463346489771162
+43,0,21,High School,Blue Collar,Mechanic,47352,10.765364336370562
+34,0,12,Bachelor's,White Collar,Analyst,51128,10.842087571330119
+55,0,31,Master's,Blue Collar,Plumber,134563,11.809787769845286
+29,0,7,Master's,White Collar,Manager,93832,11.44926122820134
+38,0,16,Some College,White Collar,Analyst,64342,11.071967885171565
+35,0,13,High School,White Collar,Programmer,29958,10.307551679728665
+57,1,32,Bachelor's,White Collar,Manager,62404,11.04138465486714
+42,1,20,High School,White Collar,Consultant,52875,10.87568591634858
+52,1,30,Master's,White Collar,Programmer,166589,12.023284980124476
+22,0,0,High School,Blue Collar,Manufacturing Worker,37031,10.519510678674001
+43,1,21,Some College,Blue Collar,Manufacturing Worker,27865,10.235126700003637
+51,1,28,Some College,White Collar,Teacher,25000,10.126631103850338
+41,1,19,Some College,White Collar,Sales Rep,43787,10.687092248656647
+53,1,31,Bachelor's,White Collar,Accountant,113769,11.641925355831777
+34,1,9,Bachelor's,Blue Collar,Mechanic,38769,10.5653762371933
+57,1,35,High School,Blue Collar,Electrician,64383,11.07260490208959
+65,0,40,Some College,Blue Collar,Construction Worker,25000,10.126631103850338
+36,1,12,Bachelor's,Blue Collar,Electrician,58976,10.98488586046955
+35,1,13,High School,Blue Collar,Electrician,49737,10.814504401907575
+57,1,35,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+59,1,33,Bachelor's,Blue Collar,Plumber,64169,11.069275507017089
+34,0,12,Bachelor's,White Collar,Consultant,105995,11.571147202170353
+35,0,13,Master's,Blue Collar,Construction Worker,91653,11.425764985956354
+37,1,13,Master's,White Collar,Teacher,101661,11.529399027663118
+24,1,0,Master's,Blue Collar,Construction Worker,80682,11.298270781051926
+29,1,7,High School,White Collar,Manager,55901,10.93133754807084
+28,0,5,High School,White Collar,Programmer,103510,11.547423505377797
+31,0,9,Some College,Blue Collar,Construction Worker,45728,10.730466080729594
+40,1,17,Master's,White Collar,Accountant,90792,11.416326454980975
+43,1,15,PhD,Blue Collar,Construction Worker,43101,10.67130147767883
+59,1,36,Master's,White Collar,Manager,45591,10.727465607601715
+28,0,5,High School,Blue Collar,Welder,25000,10.126631103850338
+52,1,30,Master's,White Collar,Consultant,127165,11.753240734792758
+37,0,13,Some College,White Collar,Accountant,25000,10.126631103850338
+39,1,17,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+48,0,20,Some College,White Collar,Manager,25000,10.126631103850338
+27,0,5,High School,Blue Collar,Mechanic,25000,10.126631103850338
+45,1,22,Bachelor's,White Collar,Analyst,72839,11.19600680502682
+42,1,20,Some College,White Collar,Teacher,70450,11.162658517326827
+46,0,24,Bachelor's,White Collar,Programmer,84544,11.345027387881997
+43,1,21,Bachelor's,Blue Collar,Mechanic,41848,10.641799285050446
+65,0,42,Master's,White Collar,Programmer,157903,11.969736199429935
+32,0,7,Bachelor's,White Collar,Sales Rep,60520,11.010729167902293
+34,0,12,Some College,Blue Collar,Electrician,43726,10.685698169836833
+33,0,11,Master's,Blue Collar,Welder,40390,10.60633750855746
+33,1,11,Master's,Blue Collar,Manufacturing Worker,39088,10.573570793497522
+32,0,10,High School,White Collar,Programmer,25000,10.126631103850338
+54,0,29,Bachelor's,Blue Collar,Construction Worker,69527,11.149470445319123
+57,1,35,Some College,White Collar,Engineer,95036,11.462011046168678
+33,0,9,High School,Blue Collar,Welder,75727,11.234890046903548
+30,1,8,Bachelor's,Blue Collar,Mechanic,57702,10.963047113940537
+46,0,24,Master's,White Collar,Programmer,25000,10.126631103850338
+33,1,6,High School,White Collar,Consultant,58576,10.978080335360017
+48,0,24,Master's,White Collar,Manager,69269,11.145752754648552
+42,0,20,Master's,White Collar,Accountant,70251,11.159829821970122
+22,0,0,Master's,White Collar,Analyst,61696,11.029974377970218
+59,0,37,Some College,Blue Collar,Electrician,25000,10.126631103850338
+62,0,40,Master's,Blue Collar,Plumber,43110,10.67151026774118
+33,1,10,Some College,White Collar,Analyst,56897,10.94899789464713
+35,1,13,Bachelor's,White Collar,Accountant,36502,10.505122332589966
+43,1,20,High School,White Collar,Sales Rep,71906,11.183114989462492
+44,1,22,High School,Blue Collar,Manufacturing Worker,105526,11.566712647033185
+48,0,26,Bachelor's,Blue Collar,Plumber,25000,10.126631103850338
+64,0,40,Some College,Blue Collar,Electrician,52367,10.866031900927718
+38,0,16,Some College,White Collar,Programmer,25000,10.126631103850338
+30,0,3,High School,White Collar,Analyst,38105,10.548100786100218
+23,1,1,Bachelor's,White Collar,Manager,82653,11.32240640023108
+31,1,8,High School,Blue Collar,Construction Worker,62372,11.040871735704776
+40,0,17,Master's,White Collar,Manager,82879,11.325136991783454
+62,0,34,High School,White Collar,Programmer,67917,11.126041650398415
+34,1,11,High School,Blue Collar,Manufacturing Worker,97836,11.491047886450911
+43,1,18,Some College,White Collar,Sales Rep,114459,11.64797195924836
+40,0,16,Bachelor's,Blue Collar,Electrician,39147,10.575079070130357
+54,1,32,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+65,1,43,Some College,White Collar,Manager,80208,11.292378539503284
+34,0,12,PhD,White Collar,Sales Rep,76518,11.245281286254954
+34,0,12,Bachelor's,White Collar,Sales Rep,76576,11.246038990708099
+53,1,28,High School,White Collar,Analyst,32289,10.382481893932408
+48,1,23,Some College,Blue Collar,Welder,46413,10.745334871387179
+62,1,40,Master's,White Collar,Analyst,138759,11.840493894369912
+47,0,23,Some College,White Collar,Teacher,60534,11.010960469636434
+36,0,14,High School,White Collar,Accountant,25591,10.149996006155071
+47,1,24,Bachelor's,White Collar,Manager,108971,11.598837070766487
+53,1,31,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+50,0,28,Bachelor's,Blue Collar,Mechanic,60353,11.00796593531503
+46,1,24,High School,White Collar,Manager,53721,10.891559265504869
+53,1,31,High School,Blue Collar,Manufacturing Worker,41288,10.628327179828563
+54,1,31,Bachelor's,White Collar,Accountant,98460,11.497405653312192
+57,1,35,High School,Blue Collar,Construction Worker,85293,11.353847666806415
+48,1,26,Bachelor's,Blue Collar,Electrician,40417,10.60700576752029
+38,0,16,Bachelor's,Blue Collar,Manufacturing Worker,44779,10.709494558505451
+42,1,20,Some College,White Collar,Analyst,39123,10.574465808325012
+54,0,32,Master's,Blue Collar,Plumber,58037,10.968836017171531
+30,1,8,Master's,White Collar,Manager,107499,11.585236824181006
+44,0,22,Bachelor's,White Collar,Programmer,72501,11.19135563385109
+35,1,13,High School,Blue Collar,Manufacturing Worker,54140,10.899328563168293
+40,0,13,High School,White Collar,Programmer,43738,10.685972568448268
+55,0,25,Bachelor's,White Collar,Analyst,50406,10.827865494592903
+42,0,20,High School,White Collar,Sales Rep,72925,11.197186794735922
+41,0,19,PhD,White Collar,Engineer,66880,11.110655247758583
+24,1,0,High School,Blue Collar,Manufacturing Worker,44455,10.702232720555239
+49,1,27,Bachelor's,Blue Collar,Manufacturing Worker,69655,11.151309764140326
+48,1,26,Some College,White Collar,Engineer,65102,11.083710549690956
+65,0,43,Bachelor's,Blue Collar,Mechanic,76647,11.246965744590764
+36,0,14,High School,White Collar,Accountant,46335,10.743652894020792
+43,0,19,Some College,White Collar,Sales Rep,86626,11.369355280437118
+43,0,21,Some College,Blue Collar,Plumber,84438,11.343772816224623
+59,1,36,Master's,White Collar,Accountant,122827,11.718532140234219
+39,0,17,High School,Blue Collar,Electrician,25000,10.126631103850338
+43,0,20,Master's,Blue Collar,Mechanic,134082,11.80620683207244
+47,0,23,Master's,Blue Collar,Mechanic,31982,10.372928523519388
+42,0,20,Some College,White Collar,Teacher,62539,11.043545641117445
+35,1,13,Bachelor's,Blue Collar,Electrician,72692,11.193986616201151
+42,1,20,High School,White Collar,Analyst,25000,10.126631103850338
+53,0,30,PhD,White Collar,Manager,96985,11.482311606352392
+28,0,0,Bachelor's,White Collar,Sales Rep,60531,11.010910909482787
+42,0,19,Some College,White Collar,Engineer,80082,11.290806388702206
+32,0,10,Some College,White Collar,Programmer,42899,10.666603794621116
+54,0,31,High School,Blue Collar,Welder,56855,10.948259446058824
+22,1,0,PhD,White Collar,Manager,41098,10.623714737499816
+33,1,11,High School,White Collar,Manager,83987,11.33841730394383
+45,1,21,Bachelor's,White Collar,Teacher,45758,10.731121918804826
+59,0,32,Some College,White Collar,Sales Rep,93944,11.450454139044917
+39,0,17,Master's,White Collar,Engineer,85772,11.359447891889122
+33,1,10,High School,White Collar,Sales Rep,39057,10.572777396565506
+63,1,38,Bachelor's,White Collar,Accountant,108244,11.592143217076858
+23,1,0,Bachelor's,White Collar,Analyst,106482,11.57573123576262
+22,0,0,Bachelor's,White Collar,Manager,74787,11.222399352066713
+45,1,23,High School,Blue Collar,Electrician,42754,10.663218037239226
+34,0,12,High School,White Collar,Engineer,65311,11.086915754370356
+28,1,6,High School,White Collar,Sales Rep,70135,11.158177235153772
+49,1,26,Bachelor's,White Collar,Teacher,54207,10.90056533037994
+43,1,21,High School,White Collar,Accountant,70424,11.162289393140743
+33,0,9,Bachelor's,White Collar,Programmer,108337,11.593002018224842
+25,1,0,High School,Blue Collar,Plumber,59263,10.989740444213382
+50,0,26,Master's,White Collar,Analyst,65907,11.09599993639729
+48,0,25,Master's,White Collar,Engineer,93405,11.444700155974662
+39,0,17,Bachelor's,Blue Collar,Plumber,53297,10.88363532339163
+62,1,40,Some College,White Collar,Teacher,34247,10.441354248613159
+27,0,3,High School,White Collar,Engineer,89180,11.398412078181467
+22,0,0,High School,White Collar,Programmer,50193,10.823630853725772
+32,1,10,Some College,Blue Collar,Manufacturing Worker,43934,10.69044378677413
+39,0,17,Bachelor's,White Collar,Manager,61218,11.02219654290336
+43,1,21,Bachelor's,White Collar,Manager,51125,10.842028893345104
+37,0,15,Master's,White Collar,Sales Rep,74332,11.216296824393542
+44,0,15,Some College,Blue Collar,Plumber,48807,10.79562902417728
+25,1,0,Bachelor's,White Collar,Analyst,81536,11.308799919491781
+57,0,34,Bachelor's,White Collar,Analyst,89957,11.407087057362455
+39,0,17,Bachelor's,White Collar,Analyst,77342,11.255992424666598
+53,1,26,Some College,White Collar,Accountant,46853,10.754770319768017
+44,1,13,Bachelor's,Blue Collar,Manufacturing Worker,63143,11.053157274445402
+45,1,23,Bachelor's,White Collar,Consultant,118381,11.681663515581905
+47,0,25,Bachelor's,White Collar,Engineer,93532,11.446058902713284
+45,0,20,Master's,White Collar,Programmer,113334,11.638094490259874
+48,1,23,Some College,White Collar,Engineer,91691,11.42617950729923
+56,1,31,High School,White Collar,Sales Rep,29287,10.284899010540572
+42,1,20,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+49,1,25,Bachelor's,White Collar,Manager,95009,11.461726902937531
+39,1,17,High School,Blue Collar,Plumber,39732,10.589912187335246
+57,0,26,Bachelor's,Blue Collar,Welder,77486,11.257852553861845
+32,0,7,PhD,White Collar,Analyst,143691,11.875420439625579
+62,1,37,Master's,White Collar,Accountant,134459,11.80901459883934
+40,0,17,High School,White Collar,Accountant,82710,11.323095792685953
+23,0,0,Master's,White Collar,Programmer,91367,11.422639641919652
+42,1,20,Bachelor's,White Collar,Analyst,62942,11.049968946408427
+32,1,4,Bachelor's,White Collar,Teacher,55920,10.931677376907691
+50,0,28,Bachelor's,White Collar,Accountant,56282,10.938130047199616
+32,0,10,Master's,Blue Collar,Mechanic,108527,11.594754268931409
+35,0,13,Bachelor's,White Collar,Programmer,96851,11.480928994027062
+22,1,0,Some College,White Collar,Engineer,65513,11.09000387521257
+35,1,13,Bachelor's,White Collar,Engineer,101285,11.525693604247907
+22,0,0,Bachelor's,Blue Collar,Electrician,25000,10.126631103850338
+22,0,0,High School,Blue Collar,Plumber,48703,10.79349590881609
+49,1,27,Master's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+49,0,27,Bachelor's,Blue Collar,Mechanic,49242,10.804502196857767
+45,1,23,Bachelor's,White Collar,Programmer,69403,11.147685373226313
+28,1,2,High School,Blue Collar,Manufacturing Worker,45947,10.735243837295545
+39,0,17,Bachelor's,Blue Collar,Plumber,62199,11.038094201427613
+40,1,18,High School,Blue Collar,Electrician,52127,10.861438327669577
+26,0,4,High School,Blue Collar,Mechanic,25000,10.126631103850338
+58,0,36,Bachelor's,Blue Collar,Welder,102685,11.539421328774193
+51,1,29,Some College,White Collar,Sales Rep,67519,11.120164318733623
+37,0,10,Bachelor's,White Collar,Teacher,28155,10.245480237688719
+40,1,18,High School,Blue Collar,Mechanic,25000,10.126631103850338
+43,1,19,Some College,White Collar,Accountant,68285,11.131445402112526
+22,0,0,High School,White Collar,Sales Rep,68307,11.131767529326275
+37,0,10,PhD,Blue Collar,Welder,94787,11.459387548038137
+32,0,6,Bachelor's,White Collar,Analyst,34891,10.459984195277682
+28,0,6,Bachelor's,White Collar,Engineer,69436,11.14816074398844
+37,0,14,Some College,White Collar,Engineer,112748,11.632910518848396
+62,0,40,High School,White Collar,Manager,62187,11.037901253667622
+48,0,26,PhD,Blue Collar,Manufacturing Worker,85997,11.362067690906263
+33,1,5,Some College,White Collar,Consultant,64341,11.07195234310307
+47,1,25,Some College,White Collar,Accountant,69055,11.14265856751203
+57,1,33,Bachelor's,White Collar,Accountant,55443,10.923110744953865
+51,0,29,High School,Blue Collar,Electrician,70423,11.16227519333528
+41,0,19,Master's,White Collar,Programmer,82167,11.316509040583675
+32,1,5,Bachelor's,White Collar,Teacher,77572,11.258961816316132
+48,0,26,Some College,White Collar,Programmer,86538,11.368338902811566
+45,0,23,High School,Blue Collar,Mechanic,34559,10.450423287314177
+51,1,29,High School,White Collar,Consultant,53348,10.884591767742284
+48,1,26,Master's,White Collar,Accountant,96153,11.473695951778227
+53,1,31,Bachelor's,White Collar,Analyst,104643,11.558309836004828
+34,0,12,High School,White Collar,Sales Rep,46910,10.755986151322503
+56,1,34,High School,White Collar,Teacher,71655,11.179618214492171
+42,1,17,Bachelor's,White Collar,Engineer,65799,11.094359919629536
+65,1,43,Bachelor's,White Collar,Accountant,106587,11.576716832057715
+32,1,10,Some College,White Collar,Analyst,30434,10.32331568348006
+61,1,36,Some College,White Collar,Manager,63505,11.05887392193842
+42,1,20,High School,Blue Collar,Welder,64031,11.067122620070107
+32,0,10,Bachelor's,White Collar,Sales Rep,98405,11.496846894757537
+34,1,9,PhD,White Collar,Consultant,94600,11.45741275503997
+36,1,14,High School,White Collar,Accountant,90168,11.409429875921914
+45,1,22,Bachelor's,White Collar,Teacher,66072,11.098500335490552
+46,0,24,Some College,White Collar,Accountant,53273,10.8831849152016
+33,0,10,Some College,White Collar,Consultant,63475,11.058401406572878
+40,1,18,Some College,Blue Collar,Welder,35325,10.472346207552729
+65,1,43,Master's,White Collar,Analyst,107811,11.58813497306755
+61,1,39,Bachelor's,Blue Collar,Plumber,48706,10.7935575047672
+45,1,17,Bachelor's,Blue Collar,Welder,71857,11.182433311953016
+40,1,15,Some College,White Collar,Accountant,25752,10.156267572978644
+41,1,19,High School,White Collar,Consultant,65942,11.096530846769337
+47,1,25,High School,White Collar,Teacher,25000,10.126631103850338
+28,1,4,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+37,1,11,High School,Blue Collar,Electrician,42502,10.657306412628806
+22,0,0,Bachelor's,White Collar,Manager,108571,11.595159615830989
+45,0,17,Some College,White Collar,Programmer,59233,10.989234097996784
+48,1,26,Some College,Blue Collar,Construction Worker,53170,10.881249606498384
+34,0,10,Bachelor's,White Collar,Teacher,90773,11.416117163541884
+59,0,34,Some College,White Collar,Sales Rep,103741,11.549652687342256
+25,0,3,High School,White Collar,Engineer,43092,10.671092644014083
+22,0,0,Some College,White Collar,Accountant,25000,10.126631103850338
+43,0,21,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+53,0,26,Bachelor's,White Collar,Manager,52504,10.868644636153558
+60,1,38,Some College,White Collar,Analyst,90310,11.411003475244845
+34,1,12,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+53,0,29,High School,White Collar,Teacher,72673,11.193725205268558
+40,0,18,High School,White Collar,Consultant,52101,10.860939421415225
+38,1,15,High School,White Collar,Sales Rep,52300,10.864751650053014
+51,0,29,Master's,Blue Collar,Welder,64923,11.080957231281733
+48,1,26,High School,Blue Collar,Mechanic,25000,10.126631103850338
+22,1,0,High School,Blue Collar,Manufacturing Worker,32762,10.397024586164576
+58,1,36,Some College,White Collar,Consultant,55395,10.922244615954773
+57,0,34,High School,White Collar,Consultant,64305,11.071392667700188
+32,1,6,Bachelor's,Blue Collar,Mechanic,58019,10.968525822090808
+45,0,22,High School,White Collar,Consultant,42045,10.646495752266999
+46,1,24,High School,White Collar,Consultant,81520,11.308603667896607
+43,1,16,Bachelor's,White Collar,Sales Rep,90024,11.407831580429834
+33,0,8,Some College,White Collar,Analyst,30879,10.337831620194669
+32,0,10,Bachelor's,White Collar,Consultant,72044,11.185032322456948
+40,0,15,Bachelor's,White Collar,Manager,62332,11.040230216565504
+54,1,30,Some College,White Collar,Teacher,79280,11.28074116900387
+47,0,24,Bachelor's,Blue Collar,Mechanic,113921,11.643260504697164
+36,1,10,High School,Blue Collar,Manufacturing Worker,40653,10.612827912990824
+49,0,24,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+22,1,0,Some College,White Collar,Engineer,38930,10.569520440604501
+54,1,28,Some College,Blue Collar,Mechanic,25000,10.126631103850338
+22,1,0,Bachelor's,Blue Collar,Electrician,42255,10.651477968978583
+36,1,12,Master's,White Collar,Programmer,47381,10.765976583441928
+27,0,5,PhD,Blue Collar,Mechanic,59689,10.996903027797362
+24,0,1,Bachelor's,Blue Collar,Electrician,25000,10.126631103850338
+54,1,31,Some College,Blue Collar,Welder,55631,10.926495878820052
+34,0,12,High School,White Collar,Engineer,67408,11.118518984218797
+44,0,17,Some College,Blue Collar,Plumber,60948,11.017776320589245
+39,0,17,Bachelor's,White Collar,Consultant,63851,11.064307523045168
+46,0,24,Some College,White Collar,Manager,27942,10.237886212210432
+41,0,18,Master's,White Collar,Programmer,106022,11.571401898729082
+25,1,3,Some College,White Collar,Sales Rep,94453,11.455857635262708
+52,0,27,Some College,White Collar,Manager,56432,10.940791652475832
+34,1,12,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+22,0,0,Master's,Blue Collar,Manufacturing Worker,25298,10.138480620207487
+35,1,12,Bachelor's,Blue Collar,Manufacturing Worker,32073,10.375769833681609
+58,0,36,Bachelor's,Blue Collar,Electrician,33385,10.41586197629197
+50,1,28,Some College,Blue Collar,Construction Worker,89062,11.39708803539426
+36,1,14,Master's,Blue Collar,Manufacturing Worker,79749,11.286639481383522
+36,0,11,High School,White Collar,Programmer,72921,11.197131942357371
+36,1,12,Master's,White Collar,Teacher,98596,11.498785971816506
+65,1,43,Bachelor's,Blue Collar,Manufacturing Worker,57886,10.966230838123327
+45,1,21,Some College,White Collar,Analyst,35200,10.468801361586188
+45,1,23,Bachelor's,Blue Collar,Construction Worker,78281,11.268060196083502
+52,0,30,Bachelor's,Blue Collar,Mechanic,37215,10.52446718479401
+43,1,20,High School,White Collar,Analyst,32438,10.387085854047635
+37,0,15,Master's,Blue Collar,Construction Worker,76797,11.248920855872804
+38,0,13,Some College,Blue Collar,Plumber,85159,11.35227537633631
+39,1,17,Some College,White Collar,Programmer,37743,10.53855530701924
+40,0,18,High School,White Collar,Analyst,62867,11.048776662726263
+49,1,27,Some College,White Collar,Teacher,80940,11.301463418429856
+41,1,17,Bachelor's,Blue Collar,Mechanic,83654,11.334444523562208
+49,1,22,Some College,White Collar,Sales Rep,76352,11.243109505457587
+39,1,17,Bachelor's,White Collar,Teacher,70417,11.162189990267917
+41,0,13,Some College,White Collar,Programmer,101166,11.524518011006036
+22,0,0,PhD,White Collar,Sales Rep,68313,11.131855364196774
+51,0,29,Bachelor's,White Collar,Teacher,32494,10.388810735889695
+44,0,22,Master's,Blue Collar,Plumber,76099,11.23979040315897
+52,0,30,High School,White Collar,Programmer,25000,10.126631103850338
+22,0,0,Some College,White Collar,Consultant,81766,11.311616788263537
+65,1,41,Some College,White Collar,Manager,96991,11.482373469675709
+38,1,16,Bachelor's,White Collar,Analyst,58709,10.980348316039725
+53,0,31,Master's,White Collar,Accountant,102853,11.541056063347975
+28,1,1,High School,White Collar,Analyst,41400,10.631036159813405
+47,0,22,High School,White Collar,Consultant,65004,11.082204085445898
+27,0,3,Master's,White Collar,Programmer,93393,11.444571674941498
+33,1,5,High School,White Collar,Sales Rep,58497,10.976730749853697
+63,1,41,Bachelor's,Blue Collar,Welder,69634,11.151008232789549
+38,1,15,Bachelor's,Blue Collar,Manufacturing Worker,76180,11.240854240032595
+43,0,16,Master's,White Collar,Programmer,106442,11.575355514843695
+50,1,28,High School,White Collar,Sales Rep,25000,10.126631103850338
+46,1,24,High School,White Collar,Teacher,82361,11.31886730288443
+42,1,20,Bachelor's,White Collar,Sales Rep,35542,10.47847037474543
+44,1,21,Master's,Blue Collar,Manufacturing Worker,60825,11.015756167651723
+65,1,43,Some College,Blue Collar,Electrician,102162,11.534315067648699
+39,1,17,Some College,White Collar,Teacher,25000,10.126631103850338
+42,1,20,Bachelor's,Blue Collar,Manufacturing Worker,58014,10.968439639711603
+53,1,29,Master's,Blue Collar,Mechanic,102585,11.538447002200305
+53,1,31,Master's,Blue Collar,Mechanic,58278,10.972979942630385
+54,0,32,PhD,Blue Collar,Construction Worker,86722,11.37046287913816
+48,1,24,High School,White Collar,Manager,53199,10.881794878160589
+26,0,4,High School,Blue Collar,Mechanic,25000,10.126631103850338
+60,0,36,Bachelor's,White Collar,Sales Rep,107142,11.58191033642518
+26,1,4,Master's,Blue Collar,Plumber,45524,10.725994938401781
+44,1,20,Some College,White Collar,Consultant,99088,11.503763623177843
+31,1,9,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+39,0,12,Bachelor's,White Collar,Consultant,43224,10.674151175523901
+44,1,20,High School,White Collar,Teacher,38454,10.557218000732282
+44,0,19,Some College,Blue Collar,Plumber,61501,11.026808713825016
+45,1,23,Bachelor's,White Collar,Analyst,90207,11.409862308361086
+59,1,37,Bachelor's,White Collar,Teacher,118161,11.67980338027033
+45,1,23,Bachelor's,White Collar,Accountant,148100,11.90564300025589
+37,1,8,Some College,Blue Collar,Manufacturing Worker,45557,10.726719568158678
+52,1,30,Bachelor's,White Collar,Sales Rep,41559,10.634869383325988
+54,1,32,Bachelor's,White Collar,Sales Rep,80576,11.296956117404019
+25,0,1,Bachelor's,Blue Collar,Mechanic,44132,10.694940421880197
+47,0,25,Bachelor's,Blue Collar,Mechanic,89345,11.40026055931276
+48,1,26,Some College,White Collar,Consultant,25000,10.126631103850338
+36,1,12,High School,White Collar,Sales Rep,109402,11.60278445033856
+57,0,35,High School,White Collar,Engineer,104663,11.558500943761517
+38,1,14,High School,White Collar,Analyst,25000,10.126631103850338
+42,0,19,Bachelor's,White Collar,Consultant,52711,10.872579441401411
+38,1,14,Master's,Blue Collar,Mechanic,84779,11.347803149602338
+40,1,14,Bachelor's,Blue Collar,Manufacturing Worker,99935,11.512275253628642
+27,1,5,Bachelor's,White Collar,Analyst,33819,10.42877805371264
+23,1,1,Some College,White Collar,Consultant,68864,11.139888824081401
+59,0,37,Some College,Blue Collar,Plumber,25000,10.126631103850338
+30,0,8,Some College,White Collar,Programmer,53008,10.878198124539677
+28,1,6,High School,White Collar,Sales Rep,68041,11.127865743638715
+22,1,0,High School,White Collar,Consultant,30512,10.325875327840201
+32,0,10,Bachelor's,White Collar,Engineer,35487,10.476921711213846
+24,1,0,PhD,White Collar,Sales Rep,98555,11.49837004696103
+60,0,35,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+52,1,27,High School,White Collar,Accountant,83178,11.328738168766431
+32,1,10,Bachelor's,White Collar,Teacher,43286,10.675584536074474
+65,0,43,Some College,White Collar,Analyst,67294,11.116826358612387
+52,0,30,Master's,White Collar,Programmer,58335,10.973957535257957
+36,1,14,Bachelor's,White Collar,Consultant,76798,11.248933877130007
+22,1,0,Master's,Blue Collar,Manufacturing Worker,55977,10.93269617106536
+65,1,43,Some College,Blue Collar,Mechanic,25000,10.126631103850338
+23,1,1,Bachelor's,White Collar,Teacher,60726,11.014127221416956
+22,1,0,Bachelor's,Blue Collar,Manufacturing Worker,72177,11.186876714573257
+52,1,30,Bachelor's,Blue Collar,Electrician,42202,10.650222892266003
+65,1,42,Some College,White Collar,Analyst,95915,11.471217661570439
+57,0,35,High School,White Collar,Programmer,104594,11.557841467591059
+47,0,25,Bachelor's,Blue Collar,Construction Worker,34308,10.443133842110312
+47,0,23,Bachelor's,White Collar,Sales Rep,135839,11.819225639916192
+50,1,28,Master's,White Collar,Accountant,75487,11.231715734981039
+49,0,24,Bachelor's,White Collar,Engineer,80451,11.295403582424072
+43,1,14,Bachelor's,White Collar,Analyst,93816,11.4490906961409
+41,1,19,High School,White Collar,Sales Rep,49418,10.808070009278122
+39,1,17,Bachelor's,Blue Collar,Electrician,73079,11.199296326763948
+31,0,9,Bachelor's,Blue Collar,Mechanic,59155,10.987916396687764
+37,0,9,Master's,White Collar,Accountant,52489,10.868358902817011
+22,0,0,Master's,White Collar,Manager,76693,11.247565718522939
+39,0,10,High School,White Collar,Engineer,33317,10.413823056212888
+28,0,6,Master's,White Collar,Accountant,67832,11.124789338983838
+27,1,2,High School,White Collar,Manager,25000,10.126631103850338
+42,1,20,Some College,White Collar,Consultant,75082,11.226336128598184
+57,1,35,Bachelor's,Blue Collar,Electrician,92576,11.435785207775861
+51,1,26,High School,Blue Collar,Welder,57075,10.952121471397996
+22,0,0,Bachelor's,White Collar,Consultant,99263,11.505528172339753
+28,1,6,High School,Blue Collar,Welder,25000,10.126631103850338
+51,1,26,High School,Blue Collar,Mechanic,26627,10.18968101756145
+28,0,6,Bachelor's,White Collar,Sales Rep,49177,10.803181313502913
+37,1,14,Bachelor's,White Collar,Programmer,92650,11.436584231713505
+47,0,20,Master's,White Collar,Sales Rep,108090,11.59071949241025
+28,1,0,Bachelor's,Blue Collar,Manufacturing Worker,44569,10.704793829072338
+41,1,19,Bachelor's,Blue Collar,Electrician,97867,11.491364693043138
+24,0,0,Some College,Blue Collar,Welder,47624,10.771092114833227
+33,1,9,High School,White Collar,Sales Rep,25000,10.126631103850338
+44,1,22,High School,Blue Collar,Mechanic,31179,10.347500070256531
+22,1,0,Bachelor's,White Collar,Accountant,80050,11.29040671842486
+45,0,22,Bachelor's,White Collar,Programmer,86636,11.369470712557387
+40,1,17,Some College,White Collar,Manager,74774,11.22222550995503
+47,0,25,Bachelor's,Blue Collar,Plumber,95284,11.46461718467611
+43,0,17,Bachelor's,White Collar,Engineer,109997,11.608208371675373
+56,0,34,High School,White Collar,Sales Rep,65130,11.084140551540447
+42,1,20,High School,White Collar,Accountant,27084,10.206698426605536
+35,1,13,Master's,White Collar,Engineer,48772,10.794911656680155
+41,1,13,Bachelor's,Blue Collar,Manufacturing Worker,43091,10.67106943758126
+47,1,23,Master's,White Collar,Accountant,118641,11.68385740563671
+41,0,16,High School,Blue Collar,Construction Worker,74539,11.219077757327483
+40,0,18,PhD,Blue Collar,Construction Worker,105589,11.567309478161908
+32,0,10,High School,Blue Collar,Welder,58417,10.975362222346542
+32,0,10,High School,White Collar,Analyst,51954,10.858113990675855
+23,0,0,PhD,White Collar,Accountant,112069,11.626870032011707
+61,0,38,Some College,Blue Collar,Welder,76051,11.239159446844907
+25,0,3,Bachelor's,White Collar,Engineer,25000,10.126631103850338
+32,0,10,High School,Blue Collar,Mechanic,25853,10.16018192736142
+31,0,9,Bachelor's,White Collar,Sales Rep,90871,11.417196197360877
+51,0,29,Master's,Blue Collar,Plumber,82712,11.323119973266529
+36,1,11,Some College,Blue Collar,Plumber,25000,10.126631103850338
+55,1,29,Bachelor's,White Collar,Consultant,25000,10.126631103850338
+32,1,5,High School,Blue Collar,Electrician,28182,10.24643875525505
+43,0,21,Bachelor's,White Collar,Engineer,77434,11.257181239609936
+30,0,8,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+65,1,43,High School,White Collar,Teacher,42758,10.663311591360353
+26,0,4,Some College,Blue Collar,Construction Worker,49390,10.807503253534671
+44,0,22,High School,White Collar,Consultant,80039,11.2902692948665
+48,0,24,Master's,White Collar,Sales Rep,25000,10.126631103850338
+45,0,20,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+38,0,16,High School,White Collar,Programmer,58064,10.969301129452852
+38,0,16,Some College,Blue Collar,Construction Worker,47329,10.76487849442862
+41,1,19,Some College,White Collar,Teacher,41350,10.629827700451838
+38,0,16,Bachelor's,Blue Collar,Plumber,85145,11.352110964460705
+52,0,30,PhD,White Collar,Teacher,70007,11.156350516031829
+65,1,43,Some College,White Collar,Teacher,51768,10.854527476737102
+33,0,11,Master's,White Collar,Manager,71572,11.178459215011753
+24,0,2,Bachelor's,White Collar,Analyst,82694,11.322902326989235
+39,1,17,High School,White Collar,Sales Rep,25000,10.126631103850338
+65,0,43,Bachelor's,White Collar,Programmer,120592,11.700168226083251
+30,0,7,Bachelor's,White Collar,Teacher,64736,11.078072739967473
+60,0,38,Bachelor's,White Collar,Teacher,86741,11.370681946029382
+60,0,34,Master's,Blue Collar,Plumber,56095,10.934801960979065
+33,1,11,Some College,White Collar,Consultant,25000,10.126631103850338
+47,1,21,Master's,White Collar,Analyst,66171,11.099997579480698
+60,0,38,Bachelor's,White Collar,Teacher,35651,10.481532475939918
+35,1,10,Bachelor's,White Collar,Sales Rep,25000,10.126631103850338
+38,1,16,Bachelor's,Blue Collar,Mechanic,38769,10.5653762371933
+33,0,11,Some College,White Collar,Manager,85062,11.351135681345687
+28,1,1,PhD,Blue Collar,Mechanic,89823,11.405596346217557
+32,0,10,Bachelor's,Blue Collar,Construction Worker,42465,10.656435486214109
+25,0,1,High School,Blue Collar,Electrician,35940,10.48960616033755
+40,0,18,Some College,White Collar,Accountant,39372,10.580810182749103
+31,0,9,Bachelor's,Blue Collar,Welder,64455,11.073722584877205
+43,0,21,High School,Blue Collar,Mechanic,74799,11.222559794889246
+22,1,0,High School,White Collar,Analyst,66912,11.11113360222836
+44,0,20,Bachelor's,Blue Collar,Construction Worker,70895,11.168955188171658
+50,0,27,Some College,Blue Collar,Welder,33926,10.431936961055667
+22,0,0,Some College,Blue Collar,Construction Worker,54748,10.910496117331157
+44,1,22,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+55,1,31,High School,White Collar,Engineer,73073,11.199214220463611
+25,1,3,Bachelor's,Blue Collar,Electrician,67277,11.116573703878597
+60,1,31,Bachelor's,White Collar,Teacher,78778,11.274389049048537
+45,1,19,High School,White Collar,Teacher,73126,11.199939259654329
+32,0,7,Some College,Blue Collar,Mechanic,40702,10.614032510272494
+39,1,13,Bachelor's,Blue Collar,Plumber,47115,10.760346700640856
+47,1,20,High School,White Collar,Accountant,50365,10.827051768376782
+41,1,19,High School,White Collar,Sales Rep,27593,10.225317396349036
+46,1,23,High School,Blue Collar,Plumber,25000,10.126631103850338
+29,0,7,Master's,Blue Collar,Welder,70359,11.161365986129686
+42,0,20,Bachelor's,White Collar,Analyst,75966,11.238041150748309
+23,0,1,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+39,1,17,Bachelor's,Blue Collar,Manufacturing Worker,67982,11.126998243235105
+29,0,7,Bachelor's,White Collar,Analyst,86678,11.369955382010774
+31,0,5,Bachelor's,White Collar,Programmer,69846,11.154048097476297
+55,1,33,Bachelor's,Blue Collar,Manufacturing Worker,165284,12.015420485415893
+53,0,29,High School,White Collar,Engineer,35963,10.49024591113472
+47,1,22,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+27,0,4,Bachelor's,White Collar,Sales Rep,52539,10.869311029940775
+36,0,11,Bachelor's,White Collar,Teacher,51025,10.840070987678045
+55,0,32,Some College,White Collar,Consultant,68800,11.138959023921435
+42,1,20,Some College,White Collar,Consultant,25846,10.159911129085136
+65,0,43,Bachelor's,White Collar,Sales Rep,74609,11.220016422346655
+45,0,20,Bachelor's,White Collar,Engineer,72359,11.189395119623798
+42,1,19,Master's,White Collar,Consultant,118460,11.682330629830956
+36,0,14,Some College,Blue Collar,Construction Worker,94060,11.451688155499038
+42,1,20,Bachelor's,White Collar,Engineer,109575,11.60436452528701
+38,1,16,Bachelor's,White Collar,Manager,60198,11.005394408153668
+48,0,26,Master's,White Collar,Sales Rep,76374,11.24339760309849
+51,1,29,Bachelor's,Blue Collar,Manufacturing Worker,61368,11.024643805639132
+31,0,5,Bachelor's,White Collar,Engineer,118363,11.681511452593742
+24,1,2,Bachelor's,White Collar,Analyst,62249,11.038897749940894
+22,0,0,Bachelor's,White Collar,Engineer,37312,10.527070269710164
+46,1,22,PhD,White Collar,Accountant,96218,11.47437172933798
+27,0,5,High School,Blue Collar,Plumber,57898,10.966438120650151
+22,1,0,High School,Blue Collar,Electrician,49749,10.814745641882208
+45,0,23,Master's,Blue Collar,Construction Worker,57354,10.956997867291818
+65,0,40,Bachelor's,Blue Collar,Construction Worker,58867,10.983035940982012
+40,0,18,Bachelor's,White Collar,Programmer,25000,10.126631103850338
+50,0,26,Bachelor's,White Collar,Manager,57397,10.957747316133442
+41,1,19,High School,White Collar,Consultant,77808,11.261999532643568
+39,0,16,Bachelor's,White Collar,Engineer,55205,10.918808807873237
+51,1,28,Bachelor's,Blue Collar,Welder,55576,10.925506732372718
+37,1,15,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+43,1,18,Some College,Blue Collar,Manufacturing Worker,78118,11.265975783024382
+44,0,22,Master's,Blue Collar,Plumber,68640,11.136630734161844
+32,0,5,High School,White Collar,Sales Rep,51984,10.858691257908882
+52,1,28,Master's,Blue Collar,Manufacturing Worker,76776,11.248647370297464
+38,0,16,Some College,Blue Collar,Electrician,84656,11.346351265143912
+31,0,9,Bachelor's,Blue Collar,Plumber,53077,10.879498968386217
+46,1,24,Master's,White Collar,Manager,83598,11.333774875341646
+29,1,7,Bachelor's,White Collar,Manager,72708,11.19420669873299
+40,1,18,Some College,White Collar,Teacher,89634,11.403489991270373
+40,0,17,Bachelor's,White Collar,Engineer,56983,10.950508256718583
+53,1,31,Some College,White Collar,Accountant,28501,10.25769445336048
+46,0,24,Some College,Blue Collar,Construction Worker,25000,10.126631103850338
+40,0,18,PhD,White Collar,Teacher,69283,11.145954844839205
+50,1,25,Bachelor's,White Collar,Analyst,113219,11.637079275189873
+57,0,35,Bachelor's,White Collar,Accountant,90453,11.412585657769267
+47,0,24,Some College,White Collar,Manager,42985,10.668606496608545
+40,0,15,High School,Blue Collar,Manufacturing Worker,27350,10.216471807850127
+24,1,2,High School,White Collar,Manager,46712,10.751756369963374
+27,1,3,Bachelor's,Blue Collar,Welder,46010,10.736614043149514
+36,1,14,Bachelor's,White Collar,Engineer,80445,11.295329000085136
+33,1,8,Bachelor's,Blue Collar,Electrician,92293,11.432723577961667
+38,0,16,Master's,Blue Collar,Manufacturing Worker,106697,11.577748320680893
+41,0,16,High School,White Collar,Manager,25000,10.126631103850338
+46,0,24,Some College,White Collar,Accountant,46447,10.746067156580358
+39,0,17,High School,Blue Collar,Mechanic,25000,10.126631103850338
+46,0,22,Some College,White Collar,Programmer,46326,10.74345863753687
+41,1,19,High School,White Collar,Consultant,52097,10.86086264450968
+22,0,0,PhD,Blue Collar,Plumber,73682,11.207513814969037
+29,0,7,High School,White Collar,Sales Rep,47450,10.767431804038074
+38,0,16,Master's,White Collar,Teacher,95000,11.461632170582678
+25,0,1,Some College,White Collar,Analyst,56901,10.949068194652432
+47,1,24,PhD,Blue Collar,Welder,62623,11.044887901749453
+58,0,36,Bachelor's,Blue Collar,Electrician,70417,11.162189990267917
+55,0,31,Master's,White Collar,Sales Rep,52180,10.86245455869072
+37,1,13,High School,White Collar,Analyst,25000,10.126631103850338
+58,0,35,Bachelor's,White Collar,Manager,135512,11.816815476266218
+42,0,16,Master's,Blue Collar,Welder,66808,11.109578112833065
+36,0,14,High School,White Collar,Analyst,25000,10.126631103850338
+33,1,9,High School,White Collar,Teacher,43265,10.67509927304084
+36,1,14,Some College,Blue Collar,Manufacturing Worker,25149,10.132573413305968
+35,1,13,Master's,White Collar,Sales Rep,77284,11.255242227381274
+42,0,17,Bachelor's,White Collar,Manager,112523,11.630912924175139
+42,1,20,Bachelor's,Blue Collar,Electrician,68352,11.132426102879812
+40,0,18,High School,White Collar,Engineer,27462,10.220558509881696
+45,0,22,High School,Blue Collar,Welder,25000,10.126631103850338
+54,0,32,Master's,White Collar,Consultant,107508,11.58532054238558
+51,0,29,High School,White Collar,Engineer,102762,11.540170913860424
+22,1,0,Bachelor's,White Collar,Accountant,55296,10.920455852163727
+22,1,0,Master's,White Collar,Analyst,36371,10.50152703279139
+51,1,26,High School,White Collar,Engineer,40871,10.618176044083802
+24,1,0,Bachelor's,Blue Collar,Plumber,25000,10.126631103850338
+37,1,15,High School,White Collar,Teacher,95745,11.469443686358268
+26,0,4,Bachelor's,Blue Collar,Mechanic,29858,10.304208089613535
+22,0,0,High School,Blue Collar,Construction Worker,27453,10.220230730583488
+46,1,24,Bachelor's,Blue Collar,Manufacturing Worker,70687,11.166016959447076
+49,0,27,Some College,White Collar,Programmer,59480,10.99339540057409
+33,1,10,Bachelor's,Blue Collar,Manufacturing Worker,47509,10.768674445759071
+22,0,0,Bachelor's,Blue Collar,Welder,61546,11.027540141686016
+33,0,11,High School,Blue Collar,Welder,75917,11.23739591722382
+45,0,23,Bachelor's,Blue Collar,Construction Worker,70978,11.170125248852257
+22,0,0,Some College,White Collar,Engineer,90963,11.418208109410882
+42,0,20,Bachelor's,White Collar,Programmer,53733,10.891782616893368
+40,1,18,High School,Blue Collar,Manufacturing Worker,35779,10.485116408097518
+47,0,25,Bachelor's,White Collar,Manager,70879,11.168729476827295
+41,1,16,High School,White Collar,Analyst,46060,10.737700173374677
+28,0,5,Some College,White Collar,Sales Rep,81130,11.303808085389111
+54,0,31,High School,White Collar,Consultant,69472,11.148679072678018
+38,0,16,Bachelor's,White Collar,Engineer,68185,11.129979878291934
+40,1,18,Some College,Blue Collar,Manufacturing Worker,48782,10.795116671339422
+29,0,4,Master's,White Collar,Programmer,47755,10.773839052468839
+35,1,13,Master's,White Collar,Sales Rep,72268,11.188136709893818
+29,0,1,High School,White Collar,Sales Rep,37593,10.534573141833395
+38,1,16,Bachelor's,White Collar,Sales Rep,43854,10.688621213708446
+61,0,37,High School,Blue Collar,Mechanic,88140,11.386681738395978
+24,1,2,Some College,White Collar,Sales Rep,25000,10.126631103850338
+22,1,0,Bachelor's,White Collar,Teacher,51903,10.857131870951632
+58,1,36,Bachelor's,Blue Collar,Manufacturing Worker,38741,10.564653749740895
+37,0,6,Bachelor's,Blue Collar,Plumber,87457,11.378902522983681
+32,0,10,Some College,White Collar,Teacher,48793,10.79534213892941
+52,0,30,Some College,White Collar,Programmer,83822,11.336450781848184
+33,1,10,High School,White Collar,Teacher,52261,10.864005673985291
+62,1,40,Bachelor's,White Collar,Consultant,102821,11.540744891296495
+48,1,23,Bachelor's,White Collar,Consultant,60550,11.011224748981238
+34,0,12,Bachelor's,Blue Collar,Construction Worker,25000,10.126631103850338
+65,0,43,High School,Blue Collar,Plumber,68584,11.135814550358592
+33,0,11,Some College,Blue Collar,Mechanic,25000,10.126631103850338
+49,1,25,Some College,Blue Collar,Welder,86106,11.363334374398987
+44,1,20,High School,Blue Collar,Manufacturing Worker,76633,11.246783072356434
+56,1,34,Some College,White Collar,Sales Rep,63245,11.054771352081643
+59,0,37,Master's,White Collar,Accountant,27297,10.2145320850248
+40,1,13,Master's,Blue Collar,Manufacturing Worker,74340,11.216404443851243
+31,1,7,Bachelor's,Blue Collar,Manufacturing Worker,25996,10.16569795901424
+46,0,24,Bachelor's,Blue Collar,Mechanic,36081,10.493521689978726
+32,1,10,High School,White Collar,Sales Rep,25776,10.157199105416755
+64,1,40,Master's,Blue Collar,Mechanic,86801,11.371373421319406
+42,1,11,High School,Blue Collar,Electrician,62269,11.039218988640071
+36,1,14,Master's,White Collar,Analyst,86900,11.372513311253483
+42,0,16,Bachelor's,White Collar,Accountant,51669,10.852613267503855
+24,0,0,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+28,1,0,Master's,White Collar,Sales Rep,92203,11.43174794697629
+54,0,32,High School,Blue Collar,Welder,45086,10.716327056014078
+32,1,10,Bachelor's,White Collar,Teacher,72818,11.195718456370107
+27,1,4,Bachelor's,White Collar,Manager,56382,10.93990523761112
+46,1,24,High School,Blue Collar,Manufacturing Worker,35976,10.490607328450544
+54,1,32,Some College,White Collar,Accountant,51446,10.848287992856
+49,0,27,Bachelor's,Blue Collar,Electrician,41328,10.629295515335622
+52,0,26,Bachelor's,Blue Collar,Plumber,75144,11.227161551674351
+31,0,9,High School,Blue Collar,Construction Worker,91144,11.420195952377952
+23,0,0,Master's,White Collar,Consultant,106211,11.573182960580555
+58,0,35,High School,Blue Collar,Plumber,49309,10.805861899150436
+36,0,13,High School,Blue Collar,Mechanic,36524,10.505724857736231
+37,1,15,Some College,Blue Collar,Mechanic,25000,10.126631103850338
+56,1,34,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+47,0,25,High School,White Collar,Teacher,30572,10.327839836362775
+45,0,23,PhD,Blue Collar,Welder,75244,11.228491445212912
+65,1,43,Some College,Blue Collar,Manufacturing Worker,51302,10.845485016753688
+32,0,9,High School,White Collar,Programmer,25362,10.141007269794844
+51,0,26,High School,White Collar,Sales Rep,65016,11.08238867243304
+41,0,19,Bachelor's,White Collar,Engineer,75134,11.2270284649948
+43,1,19,Master's,White Collar,Accountant,77082,11.252625069259665
+58,0,36,Some College,Blue Collar,Electrician,25142,10.132295033474776
+46,1,23,High School,White Collar,Teacher,32440,10.387147508229349
+46,0,22,High School,White Collar,Manager,56353,10.939390756737573
+53,1,30,High School,Blue Collar,Manufacturing Worker,59629,10.995897311894359
+36,0,14,High School,White Collar,Manager,27630,10.226657417917462
+30,0,8,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+27,1,3,High School,White Collar,Teacher,54343,10.903071089406382
+22,1,0,Bachelor's,White Collar,Analyst,72809,11.195594852917294
+65,1,40,Some College,White Collar,Consultant,29547,10.293737494837812
+27,1,5,Master's,White Collar,Teacher,51828,10.855685822748702
+37,1,15,Master's,White Collar,Sales Rep,70212,11.159274515576236
+37,1,10,Bachelor's,Blue Collar,Construction Worker,34104,10.437169958445047
+44,1,22,Some College,White Collar,Sales Rep,37018,10.519159559816663
+50,0,25,Some College,Blue Collar,Construction Worker,34433,10.446770685850653
+50,0,28,Some College,Blue Collar,Welder,55925,10.931766786358331
+33,0,8,Bachelor's,White Collar,Accountant,47454,10.767516099747473
+38,1,16,Bachelor's,Blue Collar,Electrician,49727,10.814303324130014
+43,0,21,Master's,Blue Collar,Mechanic,66708,11.10808016474147
+37,0,15,Master's,White Collar,Manager,68883,11.140164692160132
+59,1,37,Some College,White Collar,Accountant,87306,11.377174467988334
+46,1,23,Bachelor's,Blue Collar,Manufacturing Worker,72145,11.186433261731356
+49,1,25,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+48,0,26,High School,Blue Collar,Construction Worker,25763,10.156694633064722
+54,1,30,Some College,White Collar,Accountant,56762,10.946622366734951
+42,0,17,High School,Blue Collar,Welder,25000,10.126631103850338
+24,0,2,Master's,White Collar,Teacher,35417,10.47494720983897
+45,0,21,High School,Blue Collar,Plumber,41079,10.623252321000344
+32,0,7,Bachelor's,Blue Collar,Electrician,54681,10.909271578893042
+34,0,8,Bachelor's,White Collar,Accountant,40291,10.603883397931984
+47,1,24,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+55,0,33,Some College,White Collar,Programmer,82424,11.319631935624903
+40,1,18,Master's,Blue Collar,Electrician,69274,11.145824934405049
+44,1,22,Bachelor's,White Collar,Analyst,59550,10.994571574783446
+60,0,38,Some College,White Collar,Accountant,90532,11.413458658349617
+43,0,20,High School,Blue Collar,Construction Worker,27495,10.221759448941915
+65,0,42,Bachelor's,Blue Collar,Mechanic,76020,11.23875174254324
+47,1,25,Master's,Blue Collar,Construction Worker,46601,10.74937727911096
+22,0,0,Bachelor's,White Collar,Programmer,63751,11.062740149172154
+49,0,27,Master's,White Collar,Programmer,68730,11.137941064115651
+45,0,22,Bachelor's,White Collar,Teacher,74553,11.21926556083191
+55,1,30,High School,White Collar,Manager,48308,10.785352457395266
+48,1,22,High School,Blue Collar,Plumber,65040,11.082757744221691
+38,0,16,Some College,Blue Collar,Construction Worker,57400,10.957799582307658
+25,1,3,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+37,1,15,Bachelor's,Blue Collar,Manufacturing Worker,86431,11.367101686736445
+30,1,8,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+33,1,11,Bachelor's,White Collar,Programmer,104732,11.559159985309764
+47,1,24,Some College,White Collar,Manager,54691,10.909454441052057
+60,1,38,Some College,White Collar,Teacher,30249,10.317218405061325
+45,1,23,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+26,0,2,High School,White Collar,Programmer,58756,10.981148554451305
+45,0,23,High School,White Collar,Programmer,31160,10.346890499984685
+54,0,32,High School,White Collar,Engineer,47025,10.758434654169232
+33,1,11,High School,Blue Collar,Manufacturing Worker,77662,11.260121356237592
+38,1,16,High School,Blue Collar,Mechanic,32562,10.39090124329146
+40,0,18,Bachelor's,Blue Collar,Mechanic,67448,11.11911220960251
+31,1,9,Some College,Blue Collar,Electrician,80855,11.300412706012045
+48,0,26,PhD,White Collar,Manager,117612,11.67514635005718
+39,0,17,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+45,1,23,Some College,Blue Collar,Electrician,53600,10.889304347058893
+29,0,7,Some College,White Collar,Engineer,26819,10.196865870532788
+35,0,13,High School,White Collar,Programmer,87639,11.38098138332938
+49,1,27,Master's,White Collar,Manager,73967,11.211374326776896
+36,1,13,High School,White Collar,Analyst,125007,11.736125014716496
+61,0,39,Master's,Blue Collar,Welder,133418,11.801242335894818
+35,1,3,Master's,Blue Collar,Manufacturing Worker,40868,10.618102639711314
+43,1,21,Bachelor's,Blue Collar,Electrician,39411,10.581800244137618
+51,0,28,Bachelor's,White Collar,Engineer,93781,11.448717555841151
+23,0,1,Bachelor's,White Collar,Sales Rep,82513,11.320711135666592
+22,1,0,Some College,Blue Collar,Electrician,48058,10.78016389377619
+22,0,0,Bachelor's,White Collar,Analyst,96804,11.480443594724974
+55,1,33,High School,Blue Collar,Electrician,51083,10.841207039823576
+33,1,8,High School,White Collar,Accountant,36192,10.496593378915847
+65,1,43,Bachelor's,Blue Collar,Manufacturing Worker,55972,10.932606844675604
+33,0,11,Bachelor's,Blue Collar,Electrician,83477,11.332326423794079
+42,1,20,Master's,White Collar,Accountant,90021,11.407798255427746
+59,0,35,High School,White Collar,Engineer,59716,10.99735527017348
+64,0,42,Master's,White Collar,Analyst,118431,11.68208579148636
+65,0,39,High School,Blue Collar,Mechanic,25000,10.126631103850338
+55,0,33,Some College,Blue Collar,Mechanic,66334,11.102457865239273
+52,1,30,Some College,Blue Collar,Electrician,43766,10.686612539214305
+47,0,25,Some College,White Collar,Accountant,101549,11.528296719594216
+49,0,27,High School,White Collar,Programmer,25000,10.126631103850338
+33,1,11,Bachelor's,White Collar,Analyst,109212,11.601046226365357
+30,0,8,Master's,Blue Collar,Mechanic,67246,11.116112816141204
+40,1,17,Some College,White Collar,Sales Rep,61542,11.027475147535466
+38,0,16,Bachelor's,White Collar,Accountant,112566,11.631294995271666
+35,1,10,Master's,White Collar,Accountant,98529,11.498106200071877
+48,1,23,Bachelor's,Blue Collar,Manufacturing Worker,65661,11.092260420912195
+51,0,29,Bachelor's,White Collar,Analyst,107885,11.588821123973485
+41,0,19,Some College,White Collar,Engineer,40101,10.599156550639583
+58,0,35,Master's,White Collar,Programmer,101164,11.524498241322844
+26,1,3,Bachelor's,White Collar,Analyst,45652,10.72880269667349
+38,0,15,High School,Blue Collar,Welder,40676,10.613393516911028
+31,0,7,Some College,White Collar,Consultant,25000,10.126631103850338
+22,0,0,Master's,White Collar,Analyst,92726,11.437404186877691
+39,0,13,High School,Blue Collar,Electrician,34238,10.441091417334723
+39,0,17,PhD,Blue Collar,Welder,78782,11.274439823356749
+58,1,34,High School,Blue Collar,Plumber,41897,10.642969504301549
+48,0,26,Bachelor's,White Collar,Engineer,37322,10.527338244093418
+28,0,2,Some College,Blue Collar,Mechanic,87468,11.379028291170213
+62,1,40,Bachelor's,White Collar,Analyst,83822,11.336450781848184
+55,1,33,Master's,Blue Collar,Manufacturing Worker,60297,11.007037630233862
+47,0,25,Some College,White Collar,Sales Rep,28730,10.265697151973335
+37,0,12,Bachelor's,Blue Collar,Welder,66271,11.10150767475264
+28,0,6,High School,Blue Collar,Mechanic,68869,11.139961428322973
+36,1,10,High School,White Collar,Sales Rep,66352,11.102729182486163
+53,0,30,High School,White Collar,Sales Rep,63586,11.060148599310812
+63,1,41,Bachelor's,Blue Collar,Manufacturing Worker,65303,11.086793256016275
+59,1,37,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+34,1,12,High School,Blue Collar,Electrician,25000,10.126631103850338
+27,0,2,Some College,White Collar,Programmer,50650,10.832694509676829
+42,0,20,Bachelor's,White Collar,Consultant,61310,11.023698240756733
+22,0,0,Bachelor's,White Collar,Manager,94720,11.458680450117832
+44,0,15,High School,White Collar,Engineer,59375,10.991628541336942
+38,1,16,High School,White Collar,Manager,89550,11.402552407488859
+34,1,12,Master's,Blue Collar,Mechanic,104858,11.56036233289485
+22,1,0,Some College,White Collar,Sales Rep,33988,10.433762800123432
+46,1,21,Master's,White Collar,Manager,43559,10.681871619942246
+34,0,2,Master's,Blue Collar,Welder,99309,11.5059914803673
+26,0,4,Bachelor's,Blue Collar,Electrician,86356,11.36623356581635
+22,0,0,High School,Blue Collar,Plumber,25000,10.126631103850338
+40,1,13,Master's,Blue Collar,Welder,104500,11.556942350387002
+61,1,36,Bachelor's,White Collar,Manager,83496,11.332554005499887
+60,1,38,Bachelor's,White Collar,Consultant,70058,11.157078749384256
+35,0,12,Some College,White Collar,Manager,92552,11.435525927708724
+33,0,11,Some College,White Collar,Analyst,88777,11.393882886422626
+46,1,22,High School,White Collar,Consultant,54913,10.913505393637527
+28,0,0,Bachelor's,White Collar,Programmer,84330,11.342492952568687
+44,1,21,Bachelor's,Blue Collar,Construction Worker,65704,11.092915085420028
+49,1,26,Some College,Blue Collar,Mechanic,33953,10.432732494325869
+55,1,32,Bachelor's,White Collar,Sales Rep,51931,10.857671193344657
+39,0,17,Some College,Blue Collar,Welder,25000,10.126631103850338
+38,0,16,Bachelor's,Blue Collar,Construction Worker,44947,10.71323929684936
+29,0,7,Master's,White Collar,Consultant,77459,11.257504043096436
+30,0,4,High School,White Collar,Accountant,30161,10.314304978070902
+37,0,15,Some College,Blue Collar,Mechanic,47751,10.773755288097965
+44,1,16,High School,White Collar,Teacher,25243,10.136304168546024
+51,1,23,Bachelor's,White Collar,Teacher,68876,11.140063065406077
+30,0,8,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+58,0,36,Master's,Blue Collar,Electrician,100943,11.52231128007872
+37,0,15,Some College,White Collar,Programmer,67403,11.118444806295598
+40,0,14,PhD,Blue Collar,Construction Worker,79155,11.279163234507878
+31,1,7,High School,Blue Collar,Electrician,33124,10.40801337415359
+22,0,0,Bachelor's,White Collar,Consultant,27869,10.235270238956767
+51,0,24,High School,White Collar,Consultant,40617,10.611941977163221
+49,0,25,Master's,Blue Collar,Electrician,100530,11.518211469399466
+37,1,15,Bachelor's,Blue Collar,Mechanic,74716,11.221449538279193
+41,1,19,Bachelor's,Blue Collar,Plumber,71050,11.171139133525246
+46,0,23,Master's,White Collar,Programmer,93053,11.440924502281465
+22,1,0,High School,Blue Collar,Manufacturing Worker,40467,10.608242106137789
+34,1,6,High School,White Collar,Consultant,48416,10.787585616588082
+50,1,28,Master's,White Collar,Teacher,93445,11.445128306904403
+25,0,1,Some College,Blue Collar,Construction Worker,25000,10.126631103850338
+44,1,22,High School,White Collar,Consultant,40283,10.603684822708555
+24,1,1,Bachelor's,White Collar,Teacher,95913,11.471196809557176
+46,1,24,Bachelor's,White Collar,Sales Rep,25000,10.126631103850338
+40,1,15,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+22,1,0,Some College,White Collar,Manager,79307,11.281081676110515
+54,0,31,High School,White Collar,Accountant,61593,11.028303506700874
+31,1,9,Some College,White Collar,Manager,43848,10.688484386725952
+30,1,7,Master's,Blue Collar,Electrician,71692,11.180134444351488
+42,1,17,PhD,White Collar,Analyst,95419,11.46603299903195
+54,0,32,Bachelor's,Blue Collar,Mechanic,72465,11.190858965656616
+28,1,6,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+41,1,19,Master's,White Collar,Analyst,119071,11.687475232831051
+45,0,23,Bachelor's,White Collar,Consultant,94910,11.460684353124538
+48,1,26,High School,White Collar,Engineer,45124,10.71716953472481
+42,1,20,Master's,White Collar,Accountant,46068,10.737873844788798
+36,1,11,Bachelor's,White Collar,Consultant,55545,10.924948782015823
+30,0,8,Bachelor's,Blue Collar,Plumber,46894,10.755645014480681
+41,0,15,Bachelor's,White Collar,Consultant,82137,11.316143863834073
+27,1,5,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+22,0,0,High School,Blue Collar,Construction Worker,25000,10.126631103850338
+45,1,17,Bachelor's,White Collar,Consultant,85166,11.3523575721385
+51,0,29,High School,White Collar,Consultant,55847,10.930371087745765
+22,1,0,Some College,White Collar,Accountant,30960,10.340451327703663
+28,0,4,Bachelor's,White Collar,Sales Rep,31443,10.355931661838287
+47,1,25,Bachelor's,Blue Collar,Manufacturing Worker,131815,11.789154703376028
+65,0,41,Bachelor's,Blue Collar,Manufacturing Worker,69195,11.144683884660031
+40,0,16,Bachelor's,White Collar,Consultant,66628,11.106880188596998
+31,0,9,Master's,Blue Collar,Plumber,92372,11.433579181403786
+38,0,16,Bachelor's,Blue Collar,Mechanic,42298,10.652495082592695
+56,1,34,High School,White Collar,Consultant,88931,11.395616067129744
+32,1,10,Some College,Blue Collar,Manufacturing Worker,36983,10.518213626583062
+30,0,8,Some College,Blue Collar,Construction Worker,41410,10.631277676539613
+34,1,5,High School,White Collar,Consultant,43372,10.677569350592073
+29,0,5,Some College,White Collar,Consultant,25000,10.126631103850338
+41,1,17,High School,White Collar,Teacher,79851,11.287917677046268
+59,1,37,Bachelor's,White Collar,Engineer,54976,10.914652005343926
+44,1,14,Master's,White Collar,Analyst,64177,11.069400170037524
+37,0,15,High School,White Collar,Sales Rep,30966,10.340645107376782
+36,1,14,Bachelor's,White Collar,Teacher,48709,10.793619096924486
+22,0,0,Bachelor's,Blue Collar,Welder,49707,10.813901047237406
+51,1,29,High School,Blue Collar,Welder,60707,11.013814291650665
+39,0,17,Master's,White Collar,Consultant,106446,11.575393093288703
+38,1,16,Bachelor's,White Collar,Teacher,75898,11.237145612575409
+65,1,43,Some College,White Collar,Sales Rep,44147,10.695280253553513
+44,1,22,Bachelor's,White Collar,Teacher,53837,10.893716242112367
+31,0,9,Some College,White Collar,Engineer,66857,11.11031128909005
+35,1,12,Bachelor's,White Collar,Manager,25000,10.126631103850338
+54,0,30,High School,White Collar,Analyst,97526,11.48787428810337
+41,1,17,Master's,Blue Collar,Plumber,25000,10.126631103850338
+23,0,0,Some College,White Collar,Engineer,105009,11.561801339752115
+51,0,29,Bachelor's,Blue Collar,Construction Worker,54581,10.90744111582406
+32,1,5,High School,White Collar,Programmer,42702,10.662001036527325
+62,0,40,Bachelor's,White Collar,Manager,78994,11.277127179197771
+53,0,31,Bachelor's,White Collar,Consultant,57977,10.967801659156992
+35,0,13,Bachelor's,White Collar,Analyst,111352,11.620451633907237
+55,0,31,Bachelor's,White Collar,Manager,114637,11.64952589328316
+41,1,19,Bachelor's,Blue Collar,Welder,25000,10.126631103850338
+50,1,28,Master's,Blue Collar,Manufacturing Worker,94136,11.452495824143766
+46,0,20,Bachelor's,White Collar,Accountant,108210,11.591829062565694
+30,0,8,Master's,White Collar,Engineer,81781,11.311800221772462
+32,0,8,Master's,White Collar,Manager,99539,11.508304806149503
+52,0,27,Some College,Blue Collar,Manufacturing Worker,60764,11.014752787327554
+36,1,10,High School,White Collar,Manager,94590,11.457307041207216
+35,1,13,Some College,White Collar,Manager,40449,10.607797200302183
+29,0,5,Master's,White Collar,Consultant,87762,11.382383884115143
+45,0,23,High School,White Collar,Accountant,65677,11.092504067078258
+65,0,43,Bachelor's,White Collar,Analyst,31975,10.372709626447044
+27,1,5,Master's,White Collar,Teacher,131156,11.784142733390762
+40,1,15,Some College,White Collar,Consultant,32589,10.39173008710186
+57,0,35,Bachelor's,White Collar,Programmer,97535,11.487966566929034
+39,0,17,High School,Blue Collar,Plumber,25000,10.126631103850338
+45,1,22,High School,White Collar,Consultant,41458,10.632436145559456
+27,1,3,Bachelor's,Blue Collar,Manufacturing Worker,55019,10.915433859104379
+45,0,23,High School,Blue Collar,Mechanic,25000,10.126631103850338
+38,0,16,Some College,White Collar,Sales Rep,69867,11.1543487137419
+52,0,30,Master's,Blue Collar,Electrician,73276,11.201988412705349
+54,1,30,Some College,White Collar,Teacher,35202,10.468858178153916
+65,0,39,PhD,White Collar,Analyst,123464,11.723704894580667
+47,0,23,PhD,White Collar,Programmer,91428,11.42330705626101
+44,1,22,Some College,White Collar,Sales Rep,59327,10.990819793335792
+42,0,17,High School,Blue Collar,Mechanic,46346,10.743890267377827
+36,1,14,Bachelor's,White Collar,Sales Rep,81792,11.311934718297152
+44,0,17,Bachelor's,Blue Collar,Construction Worker,62059,11.03584082443394
+36,0,11,High School,White Collar,Manager,50011,10.819998260213833
+42,1,20,Bachelor's,White Collar,Teacher,63317,11.055909134477105
+56,0,34,High School,Blue Collar,Mechanic,57052,10.951718411643313
+28,1,5,Master's,White Collar,Manager,118392,11.681756431581684
+54,1,29,High School,White Collar,Sales Rep,65012,11.082327147223067
+56,0,31,High School,White Collar,Analyst,101808,11.530843965472574
+39,1,16,High School,White Collar,Accountant,69422,11.147959099141943
+22,0,0,PhD,Blue Collar,Manufacturing Worker,70655,11.165564157016847
+33,1,11,Bachelor's,White Collar,Engineer,82736,11.323410094636003
+56,0,33,Master's,White Collar,Programmer,87487,11.379245489879306
+40,1,15,Some College,White Collar,Accountant,79809,11.28739155903338
+28,0,6,Some College,Blue Collar,Welder,25000,10.126631103850338
+34,0,10,High School,White Collar,Programmer,54231,10.901007979642964
+50,1,26,Bachelor's,Blue Collar,Manufacturing Worker,54970,10.914542860854706
+47,1,25,Bachelor's,Blue Collar,Manufacturing Worker,26149,10.171566227844085
+37,0,15,Bachelor's,White Collar,Programmer,85449,11.355674985725113
+36,0,14,Some College,White Collar,Programmer,48341,10.786035340845325
+35,1,9,Master's,White Collar,Accountant,78129,11.266116585728028
+29,1,7,High School,White Collar,Sales Rep,67032,11.112925396293122
+59,0,37,PhD,White Collar,Consultant,151059,11.92542576795939
+36,0,13,High School,Blue Collar,Mechanic,25000,10.126631103850338
+55,0,33,Bachelor's,White Collar,Sales Rep,61599,11.028400915623608
+58,1,36,Some College,Blue Collar,Electrician,90272,11.410582613801722
+52,0,30,Some College,White Collar,Consultant,72763,11.194962863227914
+35,0,13,Bachelor's,Blue Collar,Manufacturing Worker,101465,11.52746919041107
+45,1,23,Some College,Blue Collar,Manufacturing Worker,77427,11.257090835957568
+40,0,18,Some College,White Collar,Engineer,48841,10.796325403035505
+29,0,7,Bachelor's,Blue Collar,Construction Worker,110287,11.610841337914733
+44,0,20,Bachelor's,Blue Collar,Welder,62026,11.035308930961273
+26,0,3,Master's,White Collar,Manager,62621,11.044855964091758
+54,0,32,High School,Blue Collar,Construction Worker,47327,10.76483623614599
+34,1,8,Bachelor's,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+42,0,20,Bachelor's,Blue Collar,Electrician,97828,11.490966113615801
+43,1,21,Some College,White Collar,Teacher,74698,11.221208597000771
+37,1,8,Bachelor's,White Collar,Analyst,44244,10.697475048022145
+47,1,25,Some College,White Collar,Engineer,70687,11.166016959447076
+34,0,12,High School,White Collar,Engineer,60221,11.005776407676661
+50,0,27,High School,Blue Collar,Electrician,35932,10.489383542349097
+24,0,2,High School,White Collar,Engineer,25000,10.126631103850338
+42,0,20,Bachelor's,Blue Collar,Welder,49075,10.801105019144662
+63,0,41,Bachelor's,White Collar,Teacher,48767,10.794809133586739
+28,1,6,PhD,White Collar,Manager,92022,11.429782957878835
+32,0,6,Bachelor's,White Collar,Consultant,75232,11.228331951339795
+46,0,24,High School,Blue Collar,Mechanic,80318,11.29374903421713
+42,0,19,Master's,Blue Collar,Plumber,64294,11.071221593274618
+44,1,22,Master's,White Collar,Analyst,92791,11.43810493131254
+46,0,22,Some College,Blue Collar,Electrician,57428,10.958287268247584
+48,1,26,Bachelor's,White Collar,Sales Rep,98395,11.49674526874119
+53,0,31,PhD,White Collar,Programmer,103725,11.549498445201069
+45,1,21,Bachelor's,White Collar,Analyst,73678,11.20745952615252
+37,1,11,Master's,Blue Collar,Manufacturing Worker,73978,11.211523030687408
+48,0,25,High School,White Collar,Teacher,25000,10.126631103850338
+63,0,41,High School,White Collar,Programmer,125302,11.738482102448712
+38,0,16,Some College,White Collar,Programmer,102627,11.538856334993579
+28,0,6,Bachelor's,Blue Collar,Manufacturing Worker,26959,10.202072472350189
+53,1,31,Master's,Blue Collar,Manufacturing Worker,89070,11.397177856425914
+39,1,17,PhD,Blue Collar,Construction Worker,105198,11.563599567698184
+22,1,0,Some College,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+50,1,24,High School,White Collar,Teacher,74118,11.213413696764869
+34,0,11,Master's,White Collar,Engineer,96673,11.479089428389766
+39,0,17,Bachelor's,Blue Collar,Electrician,25000,10.126631103850338
+44,1,22,High School,White Collar,Programmer,72296,11.188524081581791
+42,0,20,Bachelor's,Blue Collar,Welder,33945,10.432496846735747
+49,1,26,Bachelor's,Blue Collar,Manufacturing Worker,72537,11.19185205548872
+35,0,10,Bachelor's,Blue Collar,Electrician,42588,10.659327802434497
+46,0,24,Bachelor's,Blue Collar,Welder,36556,10.506600610392093
+37,1,15,Some College,White Collar,Manager,97736,11.490025245083896
+49,0,25,PhD,Blue Collar,Plumber,90433,11.412364524015615
+47,1,24,Bachelor's,White Collar,Teacher,26094,10.169460681825694
+29,1,4,Some College,White Collar,Analyst,25000,10.126631103850338
+53,1,31,Some College,White Collar,Teacher,42929,10.667302867213317
+34,1,11,Bachelor's,Blue Collar,Manufacturing Worker,61668,11.02952043678023
+50,1,28,High School,Blue Collar,Electrician,42260,10.651596291170048
+44,1,22,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+62,0,40,Bachelor's,White Collar,Analyst,29659,10.297520899681873
+37,0,12,Some College,Blue Collar,Construction Worker,46492,10.747035533763599
+36,1,8,Bachelor's,White Collar,Consultant,69254,11.145536184114292
+40,0,14,High School,White Collar,Accountant,101001,11.522885696764481
+36,0,10,Bachelor's,White Collar,Sales Rep,71712,11.180413376600654
+50,0,28,Some College,White Collar,Sales Rep,122932,11.719386635950663
+22,1,0,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+27,1,5,High School,White Collar,Analyst,25000,10.126631103850338
+27,0,0,Master's,White Collar,Consultant,55998,10.933071254793802
+51,1,25,Master's,White Collar,Engineer,143283,11.872576974538847
+61,1,39,High School,White Collar,Manager,71391,11.175927089962485
+39,1,17,Bachelor's,White Collar,Sales Rep,52436,10.8673486573177
+38,1,16,Bachelor's,Blue Collar,Manufacturing Worker,41390,10.630794584742778
+41,1,19,PhD,Blue Collar,Manufacturing Worker,59727,10.997539458447907
+54,0,32,Some College,Blue Collar,Electrician,25000,10.126631103850338
+29,1,6,Bachelor's,Blue Collar,Manufacturing Worker,64341,11.07195234310307
+43,0,21,High School,Blue Collar,Plumber,40877,10.618322836666145
+52,1,30,Some College,White Collar,Accountant,50183,10.823431602908185
+46,1,24,PhD,White Collar,Accountant,80382,11.29454554950504
+42,0,14,Bachelor's,White Collar,Consultant,105831,11.569598761159636
+52,0,30,Some College,White Collar,Engineer,44077,10.693693383434516
+22,1,0,High School,White Collar,Analyst,56041,10.933838844688593
+48,0,26,Bachelor's,Blue Collar,Mechanic,37628,10.535503733091842
+32,1,8,Bachelor's,Blue Collar,Manufacturing Worker,50021,10.820198196234971
+22,0,0,Some College,White Collar,Programmer,63284,11.055387811568954
+46,0,24,PhD,Blue Collar,Plumber,93201,11.442513730229855
+56,1,34,High School,Blue Collar,Manufacturing Worker,53671,10.890628097380375
+38,1,16,Some College,Blue Collar,Manufacturing Worker,63559,11.059723887361372
+51,1,26,Master's,Blue Collar,Manufacturing Worker,47449,10.767410729000401
+59,0,36,Some College,White Collar,Engineer,60779,11.014999613554915
+56,1,33,Some College,White Collar,Manager,39333,10.579819140167512
+60,1,33,Bachelor's,White Collar,Teacher,55892,10.931176536200338
+49,1,26,Master's,White Collar,Consultant,95960,11.47168671695363
+41,1,19,High School,Blue Collar,Electrician,25000,10.126631103850338
+22,1,0,Master's,Blue Collar,Manufacturing Worker,27055,10.205627110076836
+37,0,15,Bachelor's,Blue Collar,Mechanic,25000,10.126631103850338
+30,0,8,High School,Blue Collar,Electrician,53906,10.894997067955957
+65,1,41,Bachelor's,White Collar,Sales Rep,74862,11.223401697639076
+38,0,16,Some College,White Collar,Programmer,95988,11.471978462636821
+41,1,19,Some College,White Collar,Consultant,73515,11.205244746011758
+47,0,25,Bachelor's,Blue Collar,Electrician,30803,10.335367366815744
+41,1,19,PhD,White Collar,Accountant,83062,11.327342595873901
+60,1,37,High School,White Collar,Manager,55606,10.926046388085478
+33,0,11,Some College,White Collar,Sales Rep,61066,11.019710525463898
+42,0,18,Bachelor's,White Collar,Engineer,71834,11.182113180557224
+31,0,3,Some College,White Collar,Teacher,49754,10.81484614136472
+24,1,2,Some College,White Collar,Accountant,47548,10.769495006100515
+33,1,11,High School,White Collar,Analyst,33911,10.431494724510879
+40,0,18,Bachelor's,Blue Collar,Manufacturing Worker,53166,10.881174373275357
+35,1,13,Some College,White Collar,Manager,82942,11.325896847326856
+32,0,8,High School,Blue Collar,Manufacturing Worker,25000,10.126631103850338
+23,0,0,Master's,Blue Collar,Manufacturing Worker,27734,10.23041437631381
+39,1,12,Master's,White Collar,Manager,69506,11.149168358761834
+22,0,0,Bachelor's,White Collar,Engineer,61788,11.031464449834141
+49,0,23,Some College,Blue Collar,Construction Worker,77141,11.253390195121284
+41,0,16,Bachelor's,White Collar,Programmer,67387,11.1182073999587
+23,0,0,Some College,Blue Collar,Mechanic,32346,10.384245644679723
+36,0,14,High School,White Collar,Manager,25000,10.126631103850338
+31,0,9,Bachelor's,White Collar,Accountant,85843,11.360275325435733
+44,1,18,High School,White Collar,Consultant,38539,10.559425994563744
+56,0,34,High School,White Collar,Consultant,39747,10.590289645536233
+22,1,0,High School,Blue Collar,Manufacturing Worker,65505,11.08988175458777
+41,0,19,High School,White Collar,Sales Rep,63068,11.051968788357373
+38,0,16,High School,Blue Collar,Plumber,25000,10.126631103850338
+48,1,26,PhD,White Collar,Sales Rep,36689,10.510232261594956
+43,1,21,Some College,White Collar,Accountant,58773,10.981437844756142
+31,0,7,High School,White Collar,Programmer,25000,10.126631103850338
+36,1,14,High School,Blue Collar,Plumber,52664,10.871687389147713
+30,1,8,Master's,Blue Collar,Mechanic,61399,11.025148827357654
+53,1,31,Bachelor's,Blue Collar,Manufacturing Worker,49835,10.816472827401556
+40,1,13,Some College,White Collar,Accountant,40311,10.604379663543519

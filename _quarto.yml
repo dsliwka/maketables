@@ -11,6 +11,10 @@ website:
         text: Home
       - href: getting-started.ipynb
         text: Getting Started
+      - href: ETable.ipynb
+        text: ETable
+      - href: DTable.ipynb
+        text: DTable
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables
