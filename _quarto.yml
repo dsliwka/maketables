@@ -24,13 +24,11 @@ website:
 format:
   html:
     theme: sandstone
-    css: styles.css
     toc: true
     code-copy: true
     code-fold: false
     html-table-processing: none
-  # PDF disabled globally for website - individual files can override
-
+  
 execute:
   freeze: auto
 
