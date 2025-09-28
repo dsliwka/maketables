@@ -45,6 +45,11 @@ class ETable(MTable):
           - whitespace, ',', parentheses '(', ')', brackets '[', ']', and
           - '\\n' for line breaks.
         You may also reference keys from custom_stats to inject custom values.
+        Format specifiers can be added after tokens (e.g., 'b:.3f', 'se:.2e', 'N:,.0f'):
+          - '.Nf' for N decimal places (e.g., '.3f' for 3 decimals)
+          - '.Ne' for scientific notation with N decimals (e.g., '.2e')
+          - ',.Nf' for comma thousands separator (e.g., ',.0f')
+          - ':d' for integer formatting
         Default ETable.DEFAULT_COEF_FMT = "b \\n (se)".
     model_stats : list[str], optional
         Bottom panel statistics to display (order is kept). Examples:
@@ -96,8 +101,8 @@ class ETable(MTable):
     tab_label : str, optional
         Label/anchor for LaTeX/HTML (passed to MTable).
     digits : int, optional
-        Rounding for numeric values (estimates, SEs, stats). Default
-        ETable.DEFAULT_DIGITS = 3.
+        DEPRECATED: Use format specifiers in coef_fmt instead (e.g., 'b:.3f').
+        This parameter is kept for backward compatibility but ignored.
     **kwargs
         Forwarded to MTable (e.g., rgroup_display, rendering options).
 
@@ -114,9 +119,20 @@ class ETable(MTable):
 
     Examples
     --------
+    Basic usage:
     >>> import statsmodels.formula.api as smf
     >>> fit_sm = smf.ols("Y ~ X1 + X2", data=df).fit()
     >>> ETable([fit_sm])  # displays in notebooks; use .make(...) to export
+    
+    Custom formatting:
+    >>> # High precision coefficients, scientific notation for standard errors
+    >>> ETable([fit_sm], coef_fmt="b:.4f \\n (se:.2e)")
+    
+    >>> # Integer formatting for large numbers, comma separators
+    >>> ETable([fit_sm], coef_fmt="b:,.0f \\n (se:.3f)")
+    
+    >>> # Different formats for different statistics
+    >>> ETable([fit_sm], coef_fmt="b:.3f [t:.2f] \\n (se:.3f)")
 
     Returns
     -------
@@ -154,7 +170,6 @@ class ETable(MTable):
     DEFAULT_SHOW_SE_TYPE = True
     DEFAULT_SHOW_FE = True
     DEFAULT_HEAD_ORDER = "dh"
-    DEFAULT_DIGITS = 3
     DEFAULT_FELABELS: Dict[str, str] = {}
     DEFAULT_CAT_TEMPLATE = "{variable}={value}"
     DEFAULT_LINEBREAK = "\n"
@@ -180,6 +195,15 @@ class ETable(MTable):
                  tab_label: Optional[str] = None,
                  digits: Optional[int] = None,
                  **kwargs):
+        # --- Handle deprecated digits parameter ---
+        if digits is not None:
+            warnings.warn(
+                "The 'digits' parameter is deprecated. Use format specifiers in coef_fmt instead "
+                "(e.g., 'b:.3f' for 3 decimal places).",
+                DeprecationWarning,
+                stacklevel=2
+            )
+        
         # --- defaults from class attributes ---
         signif_code = self.DEFAULT_SIGNIF_CODE if signif_code is None else signif_code
         coef_fmt = self.DEFAULT_COEF_FMT if coef_fmt is None else coef_fmt
@@ -187,7 +211,6 @@ class ETable(MTable):
         show_fe = self.DEFAULT_SHOW_FE if show_fe is None else show_fe
         felabels = dict(self.DEFAULT_FELABELS) if felabels is None else felabels
         head_order = self.DEFAULT_HEAD_ORDER if head_order is None else head_order
-        digits = self.DEFAULT_DIGITS if digits is None else digits
         custom_stats = {} if custom_stats is None else custom_stats
         keep = [] if keep is None else keep
         drop = [] if drop is None else drop
@@ -238,7 +261,6 @@ class ETable(MTable):
             models=models,
             coef_fmt=coef_fmt,
             signif_code=signif_code,
-            digits=digits,
             custom_stats=custom_stats,
             keep=keep,
             drop=drop,
@@ -261,7 +283,6 @@ class ETable(MTable):
             stat_keys=model_stats,
             stat_labels=model_stats_labels,
             custom_model_stats=custom_model_stats,
-            digits=digits,
             like_index=res.index,
             like_columns=res.columns,
         )
@@ -336,7 +357,7 @@ class ETable(MTable):
             df.index.name = "Coefficient"
         return df
 
-    def _extract_stat(self, model: Any, key: str, digits: int) -> str:
+    def _extract_stat(self, model: Any, key: str) -> str:
         raw = self._get_extractor(model).stat(model, key)
         # format uniformly
         if key == "se_type":
@@ -344,9 +365,9 @@ class ETable(MTable):
         if raw is None:
             return "-"
         if isinstance(raw, (int, np.integer)):
-            return _number_formatter(float(raw), integer=True, digits=digits)
+            return _format_number(float(raw))
         if isinstance(raw, (float, np.floating)):
-            return "-" if math.isnan(raw) else _number_formatter(float(raw), digits=digits)
+            return "-" if math.isnan(raw) else _format_number(float(raw))
         return str(raw)
 
     def _collect_labels_from_models(self, models: List[Any]) -> Dict[str, str]:
@@ -397,7 +418,6 @@ class ETable(MTable):
         models: List[Any],
         coef_fmt: str,
         signif_code: List[float],
-        digits: int,
         custom_stats: Dict[str, List[list]],
         keep: List[str],
         drop: List[str],
@@ -415,22 +435,25 @@ class ETable(MTable):
 
             cell = pd.Series("", index=tidy.index, dtype=object)
             for element in coef_fmt_elements:
-                if element == "b":
-                    cell += tidy["Estimate"].apply(_number_formatter, digits=digits) + stars
-                elif element == "se":
-                    cell += tidy["Std. Error"].apply(_number_formatter, digits=digits)
-                elif element == "t":
+                token = element['token']
+                format_spec = element['format']
+                
+                if token == "b":
+                    cell += tidy["Estimate"].apply(_format_number, format_spec=format_spec) + stars
+                elif token == "se":
+                    cell += tidy["Std. Error"].apply(_format_number, format_spec=format_spec)
+                elif token == "t":
                     if "t value" in tidy.columns:
-                        cell += tidy["t value"].apply(_number_formatter, digits=digits)
-                elif element == "p":
-                    cell += tidy["Pr(>|t|)"].apply(_number_formatter, digits=digits)
-                elif element in custom_stats:
-                    assert len(custom_stats[element][i]) == len(tidy["Estimate"])
-                    cell += pd.Series(custom_stats[element][i], index=tidy.index).apply(_number_formatter, digits=digits)
-                elif element == "\n":
+                        cell += tidy["t value"].apply(_format_number, format_spec=format_spec)
+                elif token == "p":
+                    cell += tidy["Pr(>|t|)"].apply(_format_number, format_spec=format_spec)
+                elif token in custom_stats:
+                    assert len(custom_stats[token][i]) == len(tidy["Estimate"])
+                    cell += pd.Series(custom_stats[token][i], index=tidy.index).apply(_format_number, format_spec=format_spec)
+                elif token == "\n":
                     cell += lbcode
                 else:
-                    cell += element
+                    cell += token
 
             # one column per model, indexed by 'Coefficient'
             df_i = pd.DataFrame({f"est{i+1}": pd.Categorical(cell)}, index=tidy.index)
@@ -496,7 +519,6 @@ class ETable(MTable):
         stat_keys: List[str],
         stat_labels: Optional[Dict[str, str]],
         custom_model_stats: Optional[Dict[str, list]],
-        digits: int,
         like_index: pd.Index,
         like_columns: pd.Index,
     ) -> pd.DataFrame:
@@ -505,7 +527,7 @@ class ETable(MTable):
             default = self.DEFAULT_STAT_LABELS.get(k, k)
             return stat_labels.get(k, default) if stat_labels else default
 
-        rows = {label_of(k): [self._extract_stat(m, k, digits) for m in models] for k in stat_keys}
+        rows = {label_of(k): [self._extract_stat(m, k) for m in models] for k in stat_keys}
         builtin_df = pd.DataFrame.from_dict(rows, orient="index") if rows else pd.DataFrame()
 
         # custom bottom rows
@@ -647,53 +669,58 @@ def _post_processing_input_checks(
 
 
 
-def _number_formatter(x: float, **kwargs) -> str:
+def _format_number(x: float, format_spec: str = None) -> str:
     """
-    Format a number.
-
+    Format a number with optional format specifier.
+    
     Parameters
     ----------
-    x: float
-        The series to be formatted.
-    digits: int
-        The number of digits to round to.
-    thousands_sep: bool, optional
-        The thousands separator. Default is False.
-    scientific_notation: bool, optional
-        Whether to use scientific notation. Default is True.
-    scientific_notation_threshold: int, optional
-        The threshold for using scientific notation. Default is 10_000.
-    integer: bool, optional
-        Whether to format the number as an integer. Default is False.
-
+    x : float
+        The number to format.
+    format_spec : str, optional
+        Format specifier (e.g., '.3f', '.2e', ',.0f', 'd').
+        If None, uses sensible default formatting without scientific notation.
+        
     Returns
     -------
-    formatted_x: pd.Series
-        The formatted series.
+    str
+        The formatted number.
     """
-    digits = kwargs.get("digits", 3)
-    thousands_sep = kwargs.get("thousands_sep", False)
-    scientific_notation = kwargs.get("scientific_notation", True)
-    scientific_notation_threshold = kwargs.get("scientific_notation_threshold", 10_000)
-    integer = kwargs.get("integer", False)
-
-    assert digits >= 0, "digits must be a positive integer"
-
-    if integer:
-        digits = 0
-    x = np.round(x, digits)
-
-    if scientific_notation and x > scientific_notation_threshold:
-        return f"%.{digits}E" % x
-
-    x_str = f"{x:,}" if thousands_sep else str(x)
-
-    if "." not in x_str:
-        x_str += ".0"  # Add a decimal point if it's an integer
-    _int, _float = str(x_str).split(".")
-    _float = _float.ljust(digits, "0")
-    return _int if digits == 0 else f"{_int}.{_float}"
-
+    if pd.isna(x) or (isinstance(x, float) and np.isnan(x)):
+        return "-"
+    
+    if format_spec is None:
+        # Sensible default formatting without scientific notation
+        abs_x = abs(x)
+        
+        # For very small numbers (close to zero), show more precision
+        if abs_x < 0.001 and abs_x > 0:
+            return f"{x:.6f}".rstrip('0').rstrip('.')
+        # For small numbers, use standard precision
+        elif abs_x < 1:
+            return f"{x:.3f}".rstrip('0').rstrip('.')
+        # For medium numbers, use standard precision
+        elif abs_x < 1000:
+            return f"{x:.3f}"
+        # For large numbers, use comma separators but no decimals if integer-like
+        elif abs_x >= 1000:
+            if abs(x - round(x)) < 1e-10:  # essentially an integer
+                return f"{int(round(x)):,}"
+            else:
+                return f"{x:,.2f}"
+        else:
+            return f"{x:.3f}"
+    
+    try:
+        # Handle integer formatting
+        if format_spec == 'd':
+            return f"{int(round(x)):d}"
+        
+        # Use Python's format specification
+        return f"{x:{format_spec}}"
+    except (ValueError, TypeError):
+        # Fallback to default formatting if format_spec is invalid
+        return _format_number(x, None)
 
 
 def _relabel_index(index, labels=None, stats_labels=None):
@@ -724,12 +751,12 @@ def _relabel_index(index, labels=None, stats_labels=None):
 
 def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
     """
-    Parse the coef_fmt string.
+    Parse the coef_fmt string with format specifiers.
 
     Parameters
     ----------
     coef_fmt: str
-        The coef_fmt string.
+        The coef_fmt string. Supports format specifiers like 'b:.3f', 'se:.2e', etc.
     custom_stats: dict
         A dictionary of custom statistics. Key should be lowercased (e.g., simul_intv).
         If you provide "b", "se", "t", or "p" as a key, it will overwrite the default
@@ -737,8 +764,8 @@ def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
 
     Returns
     -------
-    coef_fmt_elements: str
-        The parsed coef_fmt string.
+    coef_fmt_elements: list
+        List of parsed elements, each being a dict with 'token' and 'format' keys.
     coef_fmt_title: str
         The title for the coef_fmt string.
     """
@@ -755,25 +782,73 @@ def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
         "p": "p-value",
     }
 
-    allowed_elements = [
-        "b",
-        "se",
-        "t",
-        "p",
-        " ",
-        "\n",
-        r"\(",
-        r"\)",
-        r"\[",
-        r"\]",
-        ",",
-        *custom_elements,
-    ]
-    allowed_elements.sort(key=len, reverse=True)
+    # All possible tokens (base + custom)
+    all_tokens = ["b", "se", "t", "p"] + custom_elements
+    
+    coef_fmt_elements = []
+    title_parts = []
+    i = 0
+    
+    while i < len(coef_fmt):
+        found_token = False
+        
+        # Check for tokens with potential format specifiers
+        for token in all_tokens:
+            if coef_fmt[i:].startswith(token):
+                # Check if followed by format specifier
+                after_token_pos = i + len(token)
+                if after_token_pos < len(coef_fmt) and coef_fmt[after_token_pos] == ':':
+                    # Find the end of the format specifier
+                    format_start = after_token_pos + 1
+                    format_end = format_start
+                    # Read until we hit a delimiter or token (but allow comma in format spec)
+                    while (format_end < len(coef_fmt) and 
+                           coef_fmt[format_end] not in [' ', '\n', '(', ')', '[', ']', '\\'] and
+                           not any(coef_fmt[format_end:].startswith(t) for t in all_tokens)):
+                        format_end += 1
+                    
+                    format_spec = coef_fmt[format_start:format_end]
+                    coef_fmt_elements.append({'token': token, 'format': format_spec})
+                    title_parts.append(title_map.get(token, token))
+                    i = format_end
+                else:
+                    # No format specifier
+                    coef_fmt_elements.append({'token': token, 'format': None})
+                    title_parts.append(title_map.get(token, token))
+                    i = after_token_pos
+                found_token = True
+                break
+        
+        if not found_token:
+            # Handle special sequences and single characters
+            if coef_fmt[i:i+2] == '\\n':
+                coef_fmt_elements.append({'token': '\n', 'format': None})
+                title_parts.append('\n')
+                i += 2
+            elif coef_fmt[i:i+2] == '\\(':
+                coef_fmt_elements.append({'token': r'\(', 'format': None})
+                title_parts.append('(')
+                i += 2
+            elif coef_fmt[i:i+2] == '\\)':
+                coef_fmt_elements.append({'token': r'\)', 'format': None})
+                title_parts.append(')')
+                i += 2
+            elif coef_fmt[i:i+2] == '\\[':
+                coef_fmt_elements.append({'token': r'\[', 'format': None})
+                title_parts.append('[')
+                i += 2
+            elif coef_fmt[i:i+2] == '\\]':
+                coef_fmt_elements.append({'token': r'\]', 'format': None})
+                title_parts.append(']')
+                i += 2
+            else:
+                # Single character literal
+                char = coef_fmt[i]
+                coef_fmt_elements.append({'token': char, 'format': None})
+                title_parts.append(char)
+                i += 1
 
-    coef_fmt_elements = re.findall("|".join(allowed_elements), coef_fmt)
-    coef_fmt_title = "".join([title_map.get(x, x) for x in coef_fmt_elements])
-
+    coef_fmt_title = "".join(title_parts)
     return coef_fmt_elements, coef_fmt_title
 
 
