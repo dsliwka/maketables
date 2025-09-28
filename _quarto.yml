@@ -12,9 +12,9 @@ website:
       - href: getting-started.ipynb
         text: Getting Started
       - href: ETable.ipynb
-        text: ETable
+        text: Regression Tables
       - href: DTable.ipynb
-        text: DTable
+        text: Descriptive Statistics
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables
