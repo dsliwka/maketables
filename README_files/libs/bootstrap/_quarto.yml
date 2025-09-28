@@ -23,7 +23,7 @@ website:
 
 format:
   html:
-    theme: yeti
+    theme: sandstone
     toc: true
     code-copy: true
     code-fold: false
