@@ -15,13 +15,15 @@ website:
         text: Regression Tables
       - href: DTable.ipynb
         text: Descriptive Statistics
+      - href: quartoExample.ipynb
+        text: Using Quarto
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables
 
 format:
   html:
-    theme: flatly
+    theme: sandstone
     css: styles.css
     toc: true
     code-copy: true
