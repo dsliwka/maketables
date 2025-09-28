@@ -48,11 +48,9 @@ df = mt.import_dta("https://www.stata-press.com/data/r18/auto.dta")
 mt.DTable(df, vars=["mpg","weight","length"], bycol=["foreign"])
 ```
 
-**Sample Output:** [View HTML table](https://dsliwka.github.io/maketables/docs/tab1.html)
-
 ### Regression Tables
 
-## With pyfixest
+#### With pyfixest
 ```python
 import pyfixest as pf
 
@@ -63,9 +61,8 @@ est2 = pf.feols("mpg ~ weight + length", data=df)
 # Make the table
 mt.ETable([est1, est2])
 ```
-**Sample Output:** [View HTML table](https://dsliwka.github.io/maketables/docs/tab2.html)
 
-## With statsmodels
+#### With statsmodels
 ```python
 import statsmodels.formula.api as smf
 
@@ -80,7 +77,6 @@ est2 = smf.probit("foreign_i ~ weight + length + price", data=df).fit(disp=0)
 # Make the table
 mt.ETable([est1, est2], model_stats=["N","r2","pseudo_r2",""], model_heads=["OLS","Probit"])
 ```
-**Sample Output:** [View HTML table](https://dsliwka.github.io/maketables/docs/tab3.html)
 
 
 ## Main Classes
@@ -115,26 +111,6 @@ Extends MTable for simple balance tables.
 - **Flexible Formatting**: Customizable labels, notes, significance levels, and styling
 - **Data Import**: Built-in Stata file (.dta) import/export with variable label preservation
 - **Extensible**: Plugin system for custom model extractors
-
-## Output Formats
-
-### Great Tables (HTML)
-```python
-table = DTable(df, vars=['x1', 'x2'], type='gt')
-table.make()  # Displays HTML table
-```
-
-### LaTeX
-```python
-table = DTable(df, vars=['x1', 'x2'], type='tex')
-latex_code = table.make()  # Returns LaTeX string
-```
-
-### Word Documents
-```python
-table = DTable(df, vars=['x1', 'x2'], type='docx')
-table.save('output.docx')  # Saves to Word file
-```
 
 ## Dependencies
 
