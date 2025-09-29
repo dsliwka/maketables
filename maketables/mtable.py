@@ -82,6 +82,8 @@ class MTable:
         "cell_margins_dxa": {"left": 0, "right": 0, "top": 60, "bottom": 60},
         # optional table style name in Word (None => 'Table Grid')
         "table_style_name": None,
+        # prevent page breaks within tables
+        "prevent_page_breaks": True,
     }
     # Default GT styling (override globally via MTable.DEFAULT_GT_STYLE.update({...})
     # or per instance via MTable(..., gt_style={...}))
@@ -404,6 +406,8 @@ class MTable:
             table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
             table.style = s.get("table_style_name") or "Table Grid"
             self._build_docx_table(table, s)
+            # Add a line break after the table
+            document.add_paragraph()
 
         # Save the document
         document.save(file_name)
@@ -465,6 +469,12 @@ class MTable:
             r_.font.name = cap_font_name
             r_.font.color.rgb = RGBColor(*rgb)
             r_.font.size = cap_font_size
+
+        # Apply "Keep with next" to caption paragraph if page break prevention is enabled
+        if s.get("prevent_page_breaks", True):
+            pPr = paragraph._element.get_or_add_pPr()
+            keepNext = OxmlElement("w:keepNext")
+            pPr.append(keepNext)
 
     def _build_docx_table(self, table, s: Dict[str, object]):
         # Make a copy of the DataFrame to avoid modifying the original
@@ -674,6 +684,23 @@ class MTable:
             node.set(qn("w:type"), "dxa")
             tblCellMar.append(node)
         tblPr.append(tblCellMar)
+
+        # Prevent page breaks within table (keep table together)
+        if s.get("prevent_page_breaks", True):
+            # Apply "Keep lines together" and "Keep with next" to all paragraphs in the table
+            for row in table.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        # Get paragraph properties
+                        pPr = paragraph._element.get_or_add_pPr()
+
+                        # Add "Keep lines together" property
+                        keepLines = OxmlElement("w:keepLines")
+                        pPr.append(keepLines)
+
+                        # Add "Keep with next" property
+                        keepNext = OxmlElement("w:keepNext")
+                        pPr.append(keepNext)
 
     def _output_tex(
         self,
