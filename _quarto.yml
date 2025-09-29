@@ -13,10 +13,10 @@ website:
         text: Regression Tables
       - href: DTable.ipynb
         text: Descriptive Statistics
-      - href: DocxTables
-        text: Word
-      - href: https://github.com/dsliwka/maketables/blob/main/docs/quartoExample.ipynb
-        text: Using Quarto
+      - href: DocxTables.ipynb
+        text: Word Output
+      - href: LatexTables.ipynb
+        text: LaTeX Output
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables
