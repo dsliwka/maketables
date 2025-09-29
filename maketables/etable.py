@@ -101,8 +101,10 @@ class ETable(MTable):
     tab_label : str, optional
         Label/anchor for LaTeX/HTML (passed to MTable).
     digits : int, optional
-        DEPRECATED: Use format specifiers in coef_fmt instead (e.g., 'b:.3f').
-        This parameter is kept for backward compatibility but ignored.
+        Number of decimal places for coefficient display. This parameter is only
+        applied when coef_fmt does not already contain format specifiers. If coef_fmt
+        contains format specifiers (e.g., 'b:.3f'), this parameter is ignored.
+        For precise control, use format specifiers in coef_fmt directly.
     **kwargs
         Forwarded to MTable (e.g., rgroup_display, rendering options).
 
@@ -114,25 +116,7 @@ class ETable(MTable):
     - When labels is None, labels are sourced from each model’s DataFrame (if
       available) and supplemented by MTable.DEFAULT_LABELS. Use set_var_labels()
       or import_dta() to populate df.attrs['variable_labels'].
-    - Statsmodels usage: pass fitted results (e.g., from statsmodels.formula.api).
-      Coefficients, standard errors, p-values, R², and N are extracted automatically.
-
-    Examples
-    --------
-    Basic usage:
-    >>> import statsmodels.formula.api as smf
-    >>> fit_sm = smf.ols("Y ~ X1 + X2", data=df).fit()
-    >>> ETable([fit_sm])  # displays in notebooks; use .make(...) to export
-    
-    Custom formatting:
-    >>> # High precision coefficients, scientific notation for standard errors
-    >>> ETable([fit_sm], coef_fmt="b:.4f \\n (se:.2e)")
-    
-    >>> # Integer formatting for large numbers, comma separators
-    >>> ETable([fit_sm], coef_fmt="b:,.0f \\n (se:.3f)")
-    
-    >>> # Different formats for different statistics
-    >>> ETable([fit_sm], coef_fmt="b:.3f [t:.2f] \\n (se:.3f)")
+    - Supported model types are automatically detected via their extractor.
 
     Returns
     -------
@@ -142,7 +126,7 @@ class ETable(MTable):
     """
     # ---- Class defaults ----
     DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05]
-    DEFAULT_COEF_FMT = "b \n (se)"
+    DEFAULT_COEF_FMT = "b:.3f \n (se:.3f)"
     DEFAULT_MODEL_STATS = ["N", "r2"]
     # Canonical stat key -> printable label (used if model_stats_labels is None)
     DEFAULT_STAT_LABELS: Dict[str, str] = {
@@ -195,18 +179,23 @@ class ETable(MTable):
                  tab_label: Optional[str] = None,
                  digits: Optional[int] = None,
                  **kwargs):
-        # --- Handle deprecated digits parameter ---
-        if digits is not None:
-            warnings.warn(
-                "The 'digits' parameter is deprecated. Use format specifiers in coef_fmt instead "
-                "(e.g., 'b:.3f' for 3 decimal places).",
-                DeprecationWarning,
-                stacklevel=2
-            )
-        
         # --- defaults from class attributes ---
         signif_code = self.DEFAULT_SIGNIF_CODE if signif_code is None else signif_code
         coef_fmt = self.DEFAULT_COEF_FMT if coef_fmt is None else coef_fmt
+        
+        # --- Handle digits parameter for backward compatibility ---
+        if digits is not None:
+            # Check if coef_fmt already has format specifiers
+            if not _has_format_specifiers(coef_fmt):
+                # Apply digits to the default or user-provided coef_fmt
+                coef_fmt = _apply_digits_to_coef_fmt(coef_fmt, digits)
+            else:
+                warnings.warn(
+                    "The 'digits' parameter is ignored when coef_fmt already contains format specifiers "
+                    "(e.g., 'b:.3f'). Use format specifiers in coef_fmt for precise control.",
+                    UserWarning,
+                    stacklevel=2
+                )
         cat_template = self.DEFAULT_CAT_TEMPLATE if cat_template is None else cat_template
         show_fe = self.DEFAULT_SHOW_FE if show_fe is None else show_fe
         felabels = dict(self.DEFAULT_FELABELS) if felabels is None else felabels
@@ -925,3 +914,63 @@ def _select_order_coefs(
         res = _coefs
 
     return res
+
+
+def _has_format_specifiers(coef_fmt: str) -> bool:
+    """
+    Check if coef_fmt contains any format specifiers (e.g., 'b:.3f', 'se:.2e').
+    
+    Parameters
+    ----------
+    coef_fmt : str
+        The coefficient format string to check.
+        
+    Returns
+    -------
+    bool
+        True if format specifiers are found, False otherwise.
+    """
+    # Look for pattern like 'token:format' where token is b, se, t, p or custom
+    # This is a simple check - if there's a colon after known tokens, assume format specs
+    import re
+    # Match patterns like 'b:', 'se:', 't:', 'p:', or any word followed by ':'
+    return bool(re.search(r'\w+:', coef_fmt))
+
+
+def _apply_digits_to_coef_fmt(coef_fmt: str, digits: int) -> str:
+    """
+    Apply digits formatting to a coef_fmt string that doesn't have format specifiers.
+    
+    Parameters
+    ----------
+    coef_fmt : str
+        The coefficient format string.
+    digits : int
+        Number of decimal places to use.
+        
+    Returns
+    -------
+    str
+        The updated coef_fmt string with format specifiers applied.
+    """
+    if digits < 0:
+        digits = 0
+        
+    format_spec = f".{digits}f"
+    
+    # Replace tokens with formatted versions
+    updated_fmt = coef_fmt
+    
+    # Replace 'b' with 'b:.Nf' (but not if it's already formatted)
+    updated_fmt = re.sub(r'\bb\b(?!:)', f'b:{format_spec}', updated_fmt)
+    
+    # Replace 'se' with 'se:.Nf' (but not if it's already formatted)  
+    updated_fmt = re.sub(r'\bse\b(?!:)', f'se:{format_spec}', updated_fmt)
+    
+    # Replace 't' with 't:.Nf' (but not if it's already formatted)
+    updated_fmt = re.sub(r'\bt\b(?!:)', f't:{format_spec}', updated_fmt)
+    
+    # Replace 'p' with 'p:.Nf' (but not if it's already formatted)
+    updated_fmt = re.sub(r'\bp\b(?!:)', f'p:{format_spec}', updated_fmt)
+    
+    return updated_fmt
