@@ -7,7 +7,7 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Pt, RGBColor
+from docx.shared import Cm, Inches, Pt, RGBColor
 from great_tables import GT
 from IPython.display import display
 
@@ -84,6 +84,8 @@ class MTable:
         "table_style_name": None,
         # prevent page breaks within tables
         "prevent_page_breaks": True,
+        # first column width (in inches, cm, pt, or None for auto)
+        "first_col_width": None,  # e.g., "2.5in", "6cm", "180pt"
     }
     # Default GT styling (override globally via MTable.DEFAULT_GT_STYLE.update({...})
     # or per instance via MTable(..., gt_style={...}))
@@ -188,11 +190,15 @@ class MTable:
                 Overrides keys from MTable.DEFAULT_GT_STYLE (e.g., align, table_width,
                 data_row_padding, column_labels_padding, and border styles/colors/widths).
             - For type="docx" (Word):
+              - first_col_width: Optional[str] (default None)
+                Width for the first column in Word units (e.g., "2.5in", "6cm", "180pt").
+                Use None for automatic column width.
               - docx_style: Dict[str, object]
                 Overrides keys from MTable.DEFAULT_DOCX_STYLE such as:
                 font_name, font_color_rgb, font_size_pt, notes_font_size_pt,
                 caption_font_name, caption_font_size_pt, caption_align, notes_align,
-                align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name.
+                align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name,
+                first_col_width.
 
         Returns
         -------
@@ -273,7 +279,7 @@ class MTable:
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
             - type="tex": first_col_width, tab_width, tex_style, texlocation (see make()).
-            - type="docx": docx_style (see make()).
+            - type="docx": first_col_width, docx_style (see make()).
             - type="html": gt options via _output_gt (e.g., full_width, gt_style).
 
         Returns
@@ -326,6 +332,7 @@ class MTable:
         file_name: str = None,
         tab_num: Optional[int] = None,
         show: bool = False,
+        first_col_width: Optional[str] = None,
         docx_style: Optional[Dict[str, object]] = None,
         **kwargs,
     ):
@@ -341,6 +348,8 @@ class MTable:
             1-based index of the table to replace. If None or out of range, appends a new table.
         show : bool, optional
             If True, also returns a GT object for display (HTML). Default False.
+        first_col_width : str, optional
+            Width for the first column in Word units (e.g., "2.5in", "6cm", "180pt").
         docx_style : Dict[str, object], optional
             Per-call overrides for MTable.DEFAULT_DOCX_STYLE (see make()).
         **kwargs : dict.
@@ -355,6 +364,10 @@ class MTable:
         s = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
             s.update(docx_style)
+
+        # Override first_col_width if provided as parameter
+        if first_col_width is not None:
+            s["first_col_width"] = first_col_width
         # check if file_name is an absolute path, if not add default path
         if self.default_paths.get("docx") is not None and not os.path.isabs(file_name):
             file_name = os.path.join(self.default_paths.get("docx", ""), file_name)
@@ -416,13 +429,17 @@ class MTable:
         if show:
             return self._output_gt(**kwargs)
 
-    def _output_docx(self, docx_style: Optional[Dict[str, object]] = None, **kwargs):
+    def _output_docx(self, first_col_width: Optional[str] = None, docx_style: Optional[Dict[str, object]] = None, **kwargs):
         # Create a new Document
         document = Document()
         # Resolve DOCX style (per-call -> class default)
         s = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
             s.update(docx_style)
+
+        # Override first_col_width if provided as parameter
+        if first_col_width is not None:
+            s["first_col_width"] = first_col_width
 
         # Add caption if specified
         if self.caption is not None:
@@ -540,6 +557,33 @@ class MTable:
                 row_cells[0].text = str(idx)
                 for i, val in enumerate(row):
                     row_cells[i + 1].text = str(val)
+
+        # Set first column width if specified
+        if s.get("first_col_width") is not None:
+            first_col_width_str = str(s["first_col_width"]).strip().lower()
+            try:
+                # Parse width specification
+                if first_col_width_str.endswith('in'):
+                    width_val = float(first_col_width_str[:-2])
+                    width = Inches(width_val)
+                elif first_col_width_str.endswith('cm'):
+                    width_val = float(first_col_width_str[:-2])
+                    width = Cm(width_val)
+                elif first_col_width_str.endswith('pt'):
+                    width_val = float(first_col_width_str[:-2])
+                    width = Pt(width_val)
+                else:
+                    # Try to parse as points if no unit specified
+                    width_val = float(first_col_width_str)
+                    width = Pt(width_val)
+
+                # Set the width for the first column in all rows
+                for row in table.rows:
+                    if len(row.cells) > 0:
+                        row.cells[0].width = width
+            except (ValueError, IndexError):
+                # If parsing fails, ignore the width setting
+                pass
 
         # Center all columns except the first one
         if s.get("align_center_cells", True):
