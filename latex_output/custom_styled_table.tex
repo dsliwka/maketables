@@ -1,0 +1,42 @@
+\renewcommand\cellalign{t}
+\begin{table}[htbp]
+\centering
+\caption{Predicting Promotions}
+\label{tab:promotions}
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.3}
+\setlength{\tabcolsep}{8pt}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
+\toprule
+ & \multicolumn{2}{c}{Promotion} \\
+\cmidrule(l){2-3}
+ & \multicolumn{1}{c}{OLS} & \multicolumn{1}{c}{Probit} \\
+\cmidrule(l){2-2} \cmidrule(l){3-3}
+ & (1) & (2) \\
+\midrule
+\addlinespace[0.75ex]
+Years of Tenure & \makecell{0.001 \\ (0.001)} & \makecell{0.003 \\ (0.003)} \\
+\addlinespace[0.25ex]
+Female & \makecell{0.009 \\ (0.021)} & \makecell{0.027 \\ (0.063)} \\
+\addlinespace[0.25ex]
+Worker Type=White Collar & \makecell{0.125*** \\ (0.022)} & \makecell{0.379*** \\ (0.066)} \\
+\addlinespace[0.25ex]
+\addlinespace
+\midrule
+\addlinespace
+Observations & 1,800 & 1,800 \\
+\addlinespace[0.25ex]
+R² & 0.019 & - \\
+\addlinespace[0.25ex]
+Pseudo R² & - & 0.016 \\
+\addlinespace[0.25ex]
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)\end{minipage}
+
+\end{threeparttable}
+\end{table}

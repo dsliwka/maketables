@@ -824,7 +824,8 @@ class MTable:
             n_flex = max(0, stub_cols - 1) + data_cols
             rest_spec = x_align * n_flex
             first_spec = f"p{{{_fcw}}}" if _fcw else r">{\raggedright\arraybackslash}X"
-            colspec = first_spec + rest_spec
+            # Start flush left by removing left padding with @{}
+            colspec = "@{}" + first_spec + rest_spec
         else:
             first_stub = f"p{{{_fcw}}}" if _fcw else "l"
             other_stubs = "l" * max(0, stub_cols - 1)
@@ -832,7 +833,8 @@ class MTable:
             if data_align not in {"l", "c", "r"}:
                 data_align = "c"
             data_spec = data_align * data_cols
-            colspec = first_stub + other_stubs + data_spec
+            # Start flush left by removing left padding with @{}
+            colspec = "@{}" + first_stub + other_stubs + data_spec
 
         # Build header rows (MultiIndex columns -> spanners + cmidrules)
         header_lines = []
@@ -984,6 +986,7 @@ class MTable:
                     if self.tab_label is not None
                     else ""
                 )
+                + "\\smallskip\n"  # Add space between caption and table
                 + latex_res
                 + "\n\\end{table}"
             )

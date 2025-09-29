@@ -1,0 +1,137 @@
+\documentclass{article}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+\usepackage{lastpage}%
+\usepackage{geometry}%
+\geometry{margin=1.5in}%
+\usepackage{booktabs}%
+\usepackage{threeparttable}%
+\usepackage{makecell}%
+\usepackage{tabularx}%
+\usepackage{array}%
+%
+%
+%
+\begin{document}%
+\normalsize%
+\section{LaTeX Tables}%
+\label{sec:LaTeXTables}%
+\renewcommand\cellalign{t}
+\begin{table}[htbp]
+\centering
+\caption{Descriptive statistics by worker type and gender}
+\label{tab:descriptives}
+\smallskip
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}p{2.5cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{3}{c}{Blue Collar} & \multicolumn{3}{c}{White Collar} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+ & N & Mean & Std. Dev. & N & Mean & Std. Dev. \\
+\midrule
+\addlinespace[0.5ex]
+\emph{Female} \\
+\addlinespace
+Wage & 357 & 53,899.74 & 24679.29 & 530 & 65,614.76 & 27897.84 \\
+Age & 357 & 41.10 & 10.96 & 530 & 41.79 & 11.02 \\
+Years of Tenure & 357 & 17.86 & 11.19 & 530 & 18.59 & 11.08 \\
+\addlinespace
+\midrule
+\addlinespace
+\emph{Male} \\
+\addlinespace
+Wage & 368 & 54,360.28 & 26129.05 & 545 & 71,399.23 & 29204.37 \\
+Age & 368 & 39.83 & 11.14 & 545 & 40.20 & 11.17 \\
+Years of Tenure & 368 & 16.73 & 11.15 & 545 & 17.10 & 11.23 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+\end{minipage}
+
+\end{threeparttable}
+\end{table}%
+\vspace{1cm}%
+\renewcommand\cellalign{t}
+\begin{table}[htbp]
+\centering
+\caption{Wage regressions}
+\label{tab:regressions}
+\smallskip
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{2}{c}{ln(Wage)} & \multicolumn{2}{c}{Wage} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+ & (1) & (2) & (3) & (4) \\
+\midrule
+\addlinespace[0.5ex]
+Age & \makecell{0.005*** \\ (0.001)} & \makecell{0.007*** \\ (0.001)} & \makecell{340.031*** \\ (59.661)} & \makecell{422.053*** \\ (83.182)} \\
+Female & \makecell{-0.057* \\ (0.023)} & \makecell{0.051 \\ (0.086)} & \makecell{-4128.632** \\ (1323.781)} & \makecell{2759.371 \\ (5045.686)} \\
+Age x Female &  & \makecell{-0.003 \\ (0.002)} &  & \makecell{-168.821 \\ (119.337)} \\
+Intercept & \makecell{10.748*** \\ (0.044)} & \makecell{10.697*** \\ (0.059)} & \makecell{50913.384*** \\ (2563.005)} & \makecell{47628.477*** \\ (3457.930)} \\
+\addlinespace
+\midrule
+\addlinespace
+Observations & 1,800 & 1,800 & 1,800 & 1,800 \\
+R² & 0.018 & 0.019 & 0.022 & 0.023 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)\end{minipage}
+
+\end{threeparttable}
+\end{table}%
+\vspace{1cm}%
+\renewcommand\cellalign{t}
+\begin{table}[htbp]
+\centering
+\caption{Predicting Promotions}
+\label{tab:promotions}
+\smallskip
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{2}{c}{Promotion} \\
+\cmidrule(lr){2-3}
+ & \multicolumn{1}{c}{OLS} & \multicolumn{1}{c}{Probit} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3}
+ & (1) & (2) \\
+\midrule
+\addlinespace[0.5ex]
+Years of Tenure & \makecell{0.001 \\ (0.001)} & \makecell{0.003 \\ (0.003)} \\
+Female & \makecell{0.009 \\ (0.021)} & \makecell{0.027 \\ (0.063)} \\
+Worker Type=White Collar & \makecell{0.125*** \\ (0.022)} & \makecell{0.379*** \\ (0.066)} \\
+\addlinespace
+\midrule
+\addlinespace
+Observations & 1,800 & 1,800 \\
+R² & 0.019 & - \\
+Pseudo R² & - & 0.016 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)\end{minipage}
+
+\end{threeparttable}
+\end{table}%
+\vspace{1cm}
+
+%
+\end{document}
