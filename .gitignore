@@ -158,11 +158,6 @@ Desktop.ini
 # *.xlsx
 # *.dta
 
-# Output files
-*.pdf
-*.docx
-*.tex
-
 # Jupyter notebook outputs (optional - uncomment if you want to ignore outputs)
 # *.ipynb
 
