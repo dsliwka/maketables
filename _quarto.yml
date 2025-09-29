@@ -7,8 +7,6 @@ website:
   description: "A Python package for creating publication-ready tables"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
       - href: getting-started.ipynb
         text: Getting Started
       - href: ETable.ipynb
