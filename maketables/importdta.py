@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Dict, Optional, Union, Tuple
-from os import PathLike
-import warnings
+import contextlib
 import os
+import warnings
 from datetime import datetime
+from os import PathLike
 
 import pandas as pd
 from pandas.io.stata import StataReader
@@ -20,7 +20,7 @@ def import_dta(
     update_mtable_defaults: bool = False,
     override: bool = False,
     return_labels: bool = False,
-) -> Union[pd.DataFrame, Tuple[pd.DataFrame, Dict[str, str]]]:
+) -> pd.DataFrame | tuple[pd.DataFrame, dict[str, str]]:
     """
     Import a Stata .dta into a pandas DataFrame.
 
@@ -68,7 +68,9 @@ def import_dta(
     """
     try:
         with StataReader(path, convert_categoricals=convert_categoricals) as rdr:
-            var_labels: Dict[str, str] = {k: v for k, v in rdr.variable_labels().items() if v}
+            var_labels: dict[str, str] = {
+                k: v for k, v in rdr.variable_labels().items() if v
+            }
             df = rdr.read()
     except TypeError:
         with StataReader(path) as rdr:
@@ -76,10 +78,8 @@ def import_dta(
             df = rdr.read()
 
     if store_in_attrs:
-        try:
+        with contextlib.suppress(Exception):
             df.attrs["variable_labels"] = dict(var_labels)
-        except Exception:
-            pass
 
     if update_mtable_defaults:
         if override:
@@ -99,15 +99,15 @@ def export_dta(
     df: pd.DataFrame,
     path: str | PathLike[str],
     *,
-    labels: Optional[Dict[str, str]] = None,
+    labels: dict[str, str] | None = None,
     use_defaults: bool = True,
     use_df_attrs: bool = True,
     overwrite: bool = False,
-    data_label: Optional[str] = None,
+    data_label: str | None = None,
     version: int = 118,
     write_index: bool = False,
-    compression: Optional[str] = "infer",
-    time_stamp: Optional[datetime] = None,
+    compression: str | None = "infer",
+    time_stamp: datetime | None = None,
 ) -> None:
     """
     Export a DataFrame to a Stata .dta file, writing variable labels.
@@ -164,7 +164,7 @@ def export_dta(
     if os.path.exists(path) and not overwrite:
         raise FileExistsError(f"File exists: {path}. Set overwrite=True to replace.")
 
-    var_labels: Dict[str, str] = {}
+    var_labels: dict[str, str] = {}
     if use_defaults and getattr(MTable, "DEFAULT_LABELS", None):
         for k, v in MTable.DEFAULT_LABELS.items():
             if k in df.columns and v:
@@ -182,7 +182,11 @@ def export_dta(
     for k, v in var_labels.items():
         s = str(v)
         if len(s) > 80:
-            warnings.warn(f"Variable label for '{k}' exceeds 80 chars; truncating.", RuntimeWarning)
+            warnings.warn(
+                f"Variable label for '{k}' exceeds 80 chars; truncating.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             s = s[:80]
         trimmed[k] = s
     var_labels = trimmed
@@ -199,7 +203,11 @@ def export_dta(
             compression=compression,
         )
     except TypeError:
-        warnings.warn("This pandas version does not support writing variable_labels. Writing without labels.", RuntimeWarning)
+        warnings.warn(
+            "This pandas version does not support writing variable_labels. Writing without labels.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
         df.to_stata(
             path,
             write_index=write_index,
@@ -211,7 +219,9 @@ def export_dta(
         )
 
 
-def get_var_labels(df: pd.DataFrame, *, include_defaults: bool = False) -> Dict[str, str]:
+def get_var_labels(
+    df: pd.DataFrame, *, include_defaults: bool = False
+) -> dict[str, str]:
     """
     Get variable labels for a DataFrame.
 
@@ -235,7 +245,7 @@ def get_var_labels(df: pd.DataFrame, *, include_defaults: bool = False) -> Dict[
     >>> get_var_labels(df)
     >>> get_var_labels(df, include_defaults=True)
     """
-    labels: Dict[str, str] = {}
+    labels: dict[str, str] = {}
     attr = df.attrs.get("variable_labels")
     if isinstance(attr, dict):
         labels.update({k: str(v) for k, v in attr.items() if v})
@@ -248,11 +258,11 @@ def get_var_labels(df: pd.DataFrame, *, include_defaults: bool = False) -> Dict[
 
 def set_var_labels(
     df: pd.DataFrame,
-    labels: Dict[str, str],
+    labels: dict[str, str],
     *,
     overwrite: bool = True,
     update_mtable_defaults: bool = False,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """
     Set variable labels on a DataFrame and optionally sync them to MTable.DEFAULT_LABELS.
 
@@ -281,7 +291,7 @@ def set_var_labels(
     >>> set_var_labels(df, {"mpg": "Miles per gallon"}, update_mtable_defaults=True)
     >>> get_var_labels(df)
     """
-    current: Dict[str, str] = {}
+    current: dict[str, str] = {}
     if isinstance(df.attrs.get("variable_labels"), dict):
         current.update(df.attrs["variable_labels"])
 
@@ -295,7 +305,10 @@ def set_var_labels(
 
     if update_mtable_defaults:
         if overwrite:
-            MTable.DEFAULT_LABELS = {**MTable.DEFAULT_LABELS, **{k: v for k, v in current.items() if v}}
+            MTable.DEFAULT_LABELS = {
+                **MTable.DEFAULT_LABELS,
+                **{k: v for k, v in current.items() if v},
+            }
         else:
             merged = dict(MTable.DEFAULT_LABELS)
             for k, v in current.items():

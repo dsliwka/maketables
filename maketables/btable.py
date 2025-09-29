@@ -1,7 +1,8 @@
+from typing import Dict, List, Optional, Union
+
 import numpy as np
 import pandas as pd
 import pyfixest as pf
-from typing import Optional, Union, List, Dict
 
 from .dtable import DTable
 
@@ -85,7 +86,7 @@ class BTable(DTable):
             labels=labels,
             stats_labels=stats_labels,
             digits=digits,
-            notes="", 
+            notes="",
             counts_row_below=counts_row_below,
             hide_stats=hide_stats,
             observed=observed,
@@ -164,9 +165,13 @@ class BTable(DTable):
                 fe_str = ", ".join(labels.get(fx, fx) for fx in fixed_effects)
 
             if fe_str and se_str:
-                chunks.append(f"p-values based on specifications including {fe_str} fixed effects and {se_str}")
+                chunks.append(
+                    f"p-values based on specifications including {fe_str} fixed effects and {se_str}"
+                )
             elif fe_str:
-                chunks.append(f"p-values based on specifications including {fe_str} fixed effects.")
+                chunks.append(
+                    f"p-values based on specifications including {fe_str} fixed effects."
+                )
             elif se_str:
                 chunks.append(f"p-values based on {se_str}.")
 

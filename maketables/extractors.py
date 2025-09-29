@@ -1,7 +1,8 @@
-from typing import Any, Dict, List, Protocol, runtime_checkable
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
+
 import numpy as np
 import pandas as pd
-from typing import Optional
+
 from .importdta import get_var_labels
 
 # Optional imports for built-ins
@@ -10,13 +11,13 @@ try:
     from pyfixest.estimation.feols_ import Feols
     from pyfixest.estimation.fepois_ import Fepois
 except Exception:
-    Feols = Fepois = Feiv = tuple()  # type: ignore
+    Feols = Fepois = Feiv = ()  # type: ignore
 
 try:
-    from linearmodels.panel import PanelOLSResults, RandomEffectsResults
     from linearmodels.iv import IV2SLSResults, IVGMMResults
+    from linearmodels.panel import PanelOLSResults, RandomEffectsResults
 except Exception:
-    PanelOLSResults = RandomEffectsResults = IV2SLSResults = IVGMMResults = tuple()  # type: ignore
+    PanelOLSResults = RandomEffectsResults = IV2SLSResults = IVGMMResults = ()  # type: ignore
 
 
 @runtime_checkable
@@ -54,6 +55,7 @@ def get_extractor(model: Any) -> ModelExtractor:
 
 # ---------- small helpers ----------
 
+
 def _follow(obj: Any, chain: List[str]) -> Any:
     cur = obj
     for a in chain:
@@ -85,6 +87,7 @@ def _get_attr(model: Any, spec: Any) -> Any:
 
 # ---------- Built-in extractors ----------
 
+
 class PyFixestExtractor:
     def can_handle(self, model: Any) -> bool:
         try:
@@ -95,14 +98,18 @@ class PyFixestExtractor:
     def coef_table(self, model: Any) -> pd.DataFrame:
         df = model.tidy()
         if "Estimate" not in df.columns or "Std. Error" not in df.columns:
-            raise ValueError("PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'.")
+            raise ValueError(
+                "PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'."
+            )
         if "t value" not in df.columns and "z value" in df.columns:
             df = df.rename(columns={"z value": "t value"})
         if "Pr(>|t|)" not in df.columns:
             if "Pr(>|z|)" in df.columns:
                 df = df.rename(columns={"Pr(>|z|)": "Pr(>|t|)"})
             else:
-                raise ValueError("PyFixestExtractor: tidy() must contain 'Pr(>|t|)' (or 'Pr(>|z|)').")
+                raise ValueError(
+                    "PyFixestExtractor: tidy() must contain 'Pr(>|t|)' (or 'Pr(>|z|)')."
+                )
         keep = ["Estimate", "Std. Error", "Pr(>|t|)"]
         if "t value" in df.columns:
             keep.insert(2, "t value")
@@ -117,20 +124,25 @@ class PyFixestExtractor:
     # Build a clean map of unified stat keys -> pyfixest attributes/callables
     STAT_MAP: Dict[str, Any] = {
         "N": "_N",
-        "se_type": lambda m: ("by: " + "+".join(getattr(m, "_clustervar", []))
-                              if getattr(m, "_vcov_type", None) == "CRV" and getattr(m, "_clustervar", None)
-                              else getattr(m, "_vcov_type", None)),
+        "se_type": lambda m: (
+            "by: " + "+".join(getattr(m, "_clustervar", []))
+            if getattr(m, "_vcov_type", None) == "CRV"
+            and getattr(m, "_clustervar", None)
+            else getattr(m, "_vcov_type", None)
+        ),
         "r2": "_r2",
         "adj_r2": "_r2_adj",
         "r2_within": "_r2_within",
         "adj_r2_within": "_adj_r2_within",
         "rmse": "_rmse",
         "fvalue": "_F_stat",
-        "fstat_1st": "_f_stat_1st_stage", 
+        "fstat_1st": "_f_stat_1st_stage",
         # pyfixest may return a sequence; take the first element
         "deviance": lambda m: (
             (getattr(m, "deviance", None)[0])
-            if isinstance(getattr(m, "deviance", None), (list, tuple, np.ndarray, pd.Series))
+            if isinstance(
+                getattr(m, "deviance", None), (list, tuple, np.ndarray, pd.Series)
+            )
             else getattr(m, "deviance", None)
         ),
     }
@@ -163,7 +175,9 @@ class PyFixestExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
-        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
+        return {
+            k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
+        }
 
 
 class StatsmodelsExtractor:
@@ -186,12 +200,18 @@ class StatsmodelsExtractor:
             index=params.index,
         )
         if tvalues is not None:
-            df["t value"] = pd.to_numeric(pd.Series(tvalues, index=params.index), errors="coerce")
+            df["t value"] = pd.to_numeric(
+                pd.Series(tvalues, index=params.index), errors="coerce"
+            )
             df = df[["Estimate", "Std. Error", "t value", "Pr(>|t|)"]]
         return df
 
     def depvar(self, model: Any) -> str:
-        for chain in [("model", "endog_names"), ("endog_names",), ("model", "endog", "name")]:
+        for chain in [
+            ("model", "endog_names"),
+            ("endog_names",),
+            ("model", "endog", "name"),
+        ]:
             obj = model
             ok = True
             for a in chain:
@@ -257,7 +277,9 @@ class StatsmodelsExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
-        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
+        return {
+            k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
+        }
 
 
 class LinearmodelsExtractor:
@@ -265,7 +287,11 @@ class LinearmodelsExtractor:
         mod = type(model).__module__ or ""
         if mod.startswith("linearmodels."):
             # Core results interface in linearmodels
-            return hasattr(model, "params") and hasattr(model, "pvalues") and hasattr(model, "std_errors")
+            return (
+                hasattr(model, "params")
+                and hasattr(model, "pvalues")
+                and hasattr(model, "std_errors")
+            )
         # Fallback: attribute-based detection (avoid grabbing statsmodels)
         return False
 
@@ -284,14 +310,16 @@ class LinearmodelsExtractor:
             index=params.index,
         )
         if tstats is not None:
-            df["t value"] = pd.to_numeric(pd.Series(tstats, index=params.index), errors="coerce")
+            df["t value"] = pd.to_numeric(
+                pd.Series(tstats, index=params.index), errors="coerce"
+            )
             df = df[["Estimate", "Std. Error", "t value", "Pr(>|t|)"]]
         return df
 
     def depvar(self, model: Any) -> str:
         # Try common locations
         for chain in [
-            ("model", "formula"),                 # 'y ~ x1 + x2'
+            ("model", "formula"),  # 'y ~ x1 + x2'
             ("model", "dependent", "name"),
             ("model", "dependent", "var_name"),
             ("model", "dependent", "pandas", "name"),
@@ -323,40 +351,37 @@ class LinearmodelsExtractor:
         "N": "nobs",
         "df_model": "df_model",
         "df_resid": "df_resid",
-
         # VCOV type
         "se_type": "cov_type",
-
         # R-squared family
         "r2": "rsquared",
         "adj_r2": "rsquared_adj",
         "r2_within": "rsquared_within",
         "r2_between": "rsquared_between",
         "r2_overall": "rsquared_overall",
-
         # Information criteria / likelihood (if exposed)
         "aic": "aic",
         "bic": "bic",
         "ll": "loglik",
-
         # F-stat (when available)
         "fvalue": lambda m: getattr(getattr(m, "f_statistic", None), "stat", None),
         "f_pvalue": lambda m: getattr(getattr(m, "f_statistic", None), "pval", None),
-
         # Error scale / RMSE
         "rmse": lambda m: (
             getattr(m, "root_mean_squared_error", None)
             if hasattr(m, "root_mean_squared_error")
-            else (float(getattr(m, "s2")) ** 0.5 if hasattr(m, "s2") and getattr(m, "s2") is not None else None)
+            else (float(m.s2) ** 0.5 if hasattr(m, "s2") and m.s2 is not None else None)
         ),
-
         # IV diagnostics (if present on IV results)
         "j_stat": lambda m: getattr(getattr(m, "j_statistic", None), "stat", None),
         "j_pvalue": lambda m: getattr(getattr(m, "j_statistic", None), "pval", None),
         "first_stage_f": lambda m: (
             # take the first-stage F from the first endogenous if available
-            (lambda fs: getattr(next(iter(fs.values())), "f_statistic", None).stat if isinstance(fs, dict) and fs else None)
-            (getattr(m, "first_stage", None))
+            (
+                lambda fs: getattr(next(iter(fs.values())), "f_statistic", None).stat
+                if isinstance(fs, dict) and fs
+                else None
+            )(getattr(m, "first_stage", None))
         ),
     }
 
@@ -391,7 +416,9 @@ class LinearmodelsExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
-        return {k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None}
+        return {
+            k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
+        }
 
 
 # Register built-ins

@@ -1,8 +1,11 @@
+from typing import Optional
+
 import numpy as np
 import pandas as pd
-from typing import Optional
-from .mtable import MTable
+
 from .importdta import get_var_labels
+from .mtable import MTable
+
 
 class DTable(MTable):
     """
@@ -33,7 +36,7 @@ class DTable(MTable):
         Dictionary containing the labels for the statistics. The default is None.
     format_spec : dict, optional
         Dictionary specifying format for each statistic type. Keys should match statistic names,
-        values should be format specifiers (e.g., '.3f', '.2e', ',.0f'). 
+        values should be format specifiers (e.g., '.3f', '.2e', ',.0f').
         Example: {'mean': '.3f', 'std': '.2f', 'count': ',.0f'}
         If None, uses sensible defaults based on statistic type.
     digits : int, optional
@@ -63,17 +66,17 @@ class DTable(MTable):
 
     # Class defaults for formatting different statistics
     DEFAULT_FORMAT_SPECS = {
-        'mean': '.3f',
-        'std': '.3f', 
-        'count': ',.0f',
-        'median': '.3f',
-        'min': '.3f',
-        'max': '.3f',
-        'var': '.4f',
-        'quantile': '.3f',
-        'sum': ',.2f',
-        'mean_std': None,  # handled separately
-        'mean_newline_std': None,  # handled separately
+        "mean": ".3f",
+        "std": ".3f",
+        "count": ",.0f",
+        "median": ".3f",
+        "min": ".3f",
+        "max": ".3f",
+        "var": ".4f",
+        "quantile": ".3f",
+        "sum": ",.2f",
+        "mean_std": None,  # handled separately
+        "mean_newline_std": None,  # handled separately
     }
 
     def __init__(
@@ -102,19 +105,22 @@ class DTable(MTable):
         if format_spec is None:
             self.format_specs = dict(self.DEFAULT_FORMAT_SPECS)
             # Apply digits to statistics that use default .3f format
-            digit_format = f'.{digits}f'
-            for stat in ['mean', 'std', 'median', 'min', 'max']:
-                if self.format_specs[stat] == '.3f':
+            digit_format = f".{digits}f"
+            for stat in ["mean", "std", "median", "min", "max"]:
+                if self.format_specs[stat] == ".3f":
                     self.format_specs[stat] = digit_format
         else:
             # Start with defaults and update with user specifications
             self.format_specs = dict(self.DEFAULT_FORMAT_SPECS)
             self.format_specs.update(format_spec)
-            
+
             # For any stats the user specified that aren't in our defaults, use digits
-            digit_format = f'.{digits}f'
+            digit_format = f".{digits}f"
             for stat in stats:
-                if stat not in self.format_specs and stat not in ['mean_std', 'mean_newline_std']:
+                if stat not in self.format_specs and stat not in [
+                    "mean_std",
+                    "mean_newline_std",
+                ]:
                     self.format_specs[stat] = digit_format
 
         # Determine labels: prefer DataFrame attrs; fall back to MTable defaults
@@ -122,10 +128,7 @@ class DTable(MTable):
             df_labels = get_var_labels(df, include_defaults=True)
         except Exception:
             df_labels = dict(getattr(MTable, "DEFAULT_LABELS", {}))
-        if labels is None:
-            labels = df_labels
-        else:
-            labels = dict(labels)
+        labels = df_labels if labels is None else dict(labels)
 
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert all(pd.api.types.is_numeric_dtype(df[var]) for var in vars), (
@@ -161,13 +164,27 @@ class DTable(MTable):
                 stats = ["count"] + stats
 
         def mean_std(x):
-            return _format_mean_std(x, digits=digits, newline=False, type=type, format_specs=self.format_specs)
+            return _format_mean_std(
+                x,
+                digits=digits,
+                newline=False,
+                type=type,
+                format_specs=self.format_specs,
+            )
 
         def mean_newline_std(x):
-            return _format_mean_std(x, digits=digits, newline=True, type=type, format_specs=self.format_specs)
+            return _format_mean_std(
+                x,
+                digits=digits,
+                newline=True,
+                type=type,
+                format_specs=self.format_specs,
+            )
 
         custom_funcs = {"mean_std": mean_std, "mean_newline_std": mean_newline_std}
-        agg_funcs = {var: [custom_funcs.get(stat, stat) for stat in stats] for var in vars}
+        agg_funcs = {
+            var: [custom_funcs.get(stat, stat) for stat in stats] for var in vars
+        }
 
         # Calculate the desired statistics
         if (byrow is not None) and (bycol is not None):
@@ -201,14 +218,18 @@ class DTable(MTable):
 
             for col in res.columns:
                 # Skip formatting for combined statistics that are already formatted strings
-                if res[col].name in ['mean_std', 'mean_newline_std']:
+                if res[col].name in ["mean_std", "mean_newline_std"]:
                     continue  # These are already formatted by their custom functions
                 elif res[col].dtype == float or res[col].name in self.format_specs:
                     stat_name = res[col].name
-                    res[col] = res[col].apply(lambda x: format_statistic(x, stat_name))
+                    res[col] = res[col].apply(
+                        lambda x, sn=stat_name: format_statistic(x, sn)
+                    )
 
             if counts_row_below:
-                obs_row = [format_statistic(nobs, "count")] + [""] * (len(res.columns) - 1)
+                obs_row = [format_statistic(nobs, "count")] + [""] * (
+                    len(res.columns) - 1
+                )
                 res.loc[stats_dict["count"]] = obs_row
 
         else:
@@ -227,16 +248,15 @@ class DTable(MTable):
 
             for col in res.columns:
                 # Extract stat name from column multiindex
-                if isinstance(res.columns, pd.MultiIndex):
-                    stat_name = col[-1]  # last level is the statistic name
-                else:
-                    stat_name = col
-                
+                stat_name = col[-1] if isinstance(res.columns, pd.MultiIndex) else col
+
                 # Skip formatting for combined statistics that are already formatted strings
-                if stat_name in ['mean_std', 'mean_newline_std']:
+                if stat_name in ["mean_std", "mean_newline_std"]:
                     continue  # These are already formatted by their custom functions
                 elif res[col].dtype == float:
-                    res[col] = res[col].apply(lambda x: format_statistic(x, stat_name))
+                    res[col] = res[col].apply(
+                        lambda x, sn=stat_name: format_statistic(x, sn)
+                    )
 
             res = pd.DataFrame(res.stack(level=0, future_stack=True))
             res.columns.names = ["Statistics"]
@@ -272,34 +292,29 @@ class DTable(MTable):
         # --- End dtable logic ---
 
         # Call MTable constructor with processed table and metadata
-        super().__init__(
-            res,
-            notes=notes,
-            rgroup_display=rgroup_display,
-            **kwargs
-        )
+        super().__init__(res, notes=notes, rgroup_display=rgroup_display, **kwargs)
 
     def _format_statistic(self, value: float, stat_name: str) -> str:
         """Format a single statistic value according to its format specification."""
         if pd.isna(value) or (isinstance(value, float) and np.isnan(value)):
             return "-"
-            
-        format_spec = self.format_specs.get(stat_name, '.3f')
+
+        format_spec = self.format_specs.get(stat_name, ".3f")
         return self._format_number(value, format_spec)
-    
+
     def _format_number(self, x: float, format_spec: str = None) -> str:
         """Format a number with optional format specifier."""
         if pd.isna(x) or (isinstance(x, float) and np.isnan(x)):
             return "-"
-        
+
         if format_spec is None:
             # Sensible default formatting
             abs_x = abs(x)
-            
+
             if abs_x < 0.001 and abs_x > 0:
-                return f"{x:.6f}".rstrip('0').rstrip('.')
+                return f"{x:.6f}".rstrip("0").rstrip(".")
             elif abs_x < 1:
-                return f"{x:.3f}".rstrip('0').rstrip('.')
+                return f"{x:.3f}".rstrip("0").rstrip(".")
             elif abs_x < 1000:
                 return f"{x:.3f}"
             elif abs_x >= 1000:
@@ -309,9 +324,9 @@ class DTable(MTable):
                     return f"{x:,.2f}"
             else:
                 return f"{x:.3f}"
-        
+
         try:
-            if format_spec == 'd':
+            if format_spec == "d":
                 return f"{int(round(x)):d}"
             return f"{x:{format_spec}}"
         except (ValueError, TypeError):
@@ -343,9 +358,12 @@ def _relabel_index(index, labels=None, stats_labels=None):
     return index
 
 
-
 def _format_mean_std(
-    data: pd.Series, digits: int = 2, newline: bool = True, type=str, format_specs: dict = None
+    data: pd.Series,
+    digits: int = 2,
+    newline: bool = True,
+    type=str,
+    format_specs: dict = None,
 ) -> str:
     """
     Calculate the mean and standard deviation of a pandas Series and return as a string of the format "mean /n (std)".
@@ -371,18 +389,18 @@ def _format_mean_std(
     """
     mean = data.mean()
     std = data.std()
-    
+
     # Use format specifications if provided, otherwise fall back to digits
-    if format_specs and 'mean' in format_specs:
-        mean_str = _format_number_dtable(mean, format_specs['mean'])
+    if format_specs and "mean" in format_specs:
+        mean_str = _format_number_dtable(mean, format_specs["mean"])
     else:
         mean_str = f"{mean:.{digits}f}"
-        
-    if format_specs and 'std' in format_specs:
-        std_str = _format_number_dtable(std, format_specs['std'])
+
+    if format_specs and "std" in format_specs:
+        std_str = _format_number_dtable(std, format_specs["std"])
     else:
         std_str = f"{std:.{digits}f}"
-    
+
     if newline:
         return f"{mean_str}\n({std_str})"
     else:
@@ -392,7 +410,7 @@ def _format_mean_std(
 def _format_number_dtable(x: float, format_spec: str = None) -> str:
     """
     Format a number with optional format specifier for DTable.
-    
+
     Parameters
     ----------
     x : float
@@ -400,7 +418,7 @@ def _format_number_dtable(x: float, format_spec: str = None) -> str:
     format_spec : str, optional
         Format specifier (e.g., '.3f', '.2e', ',.0f', 'd').
         If None, uses sensible default formatting.
-        
+
     Returns
     -------
     str
@@ -408,15 +426,15 @@ def _format_number_dtable(x: float, format_spec: str = None) -> str:
     """
     if pd.isna(x) or (isinstance(x, float) and np.isnan(x)):
         return "-"
-    
+
     if format_spec is None:
         # Sensible default formatting
         abs_x = abs(x)
-        
+
         if abs_x < 0.001 and abs_x > 0:
-            return f"{x:.6f}".rstrip('0').rstrip('.')
+            return f"{x:.6f}".rstrip("0").rstrip(".")
         elif abs_x < 1:
-            return f"{x:.3f}".rstrip('0').rstrip('.')
+            return f"{x:.3f}".rstrip("0").rstrip(".")
         elif abs_x < 1000:
             return f"{x:.3f}"
         elif abs_x >= 1000:
@@ -426,9 +444,9 @@ def _format_number_dtable(x: float, format_spec: str = None) -> str:
                 return f"{x:,.2f}"
         else:
             return f"{x:.3f}"
-    
+
     try:
-        if format_spec == 'd':
+        if format_spec == "d":
             return f"{int(round(x)):d}"
         return f"{x:{format_spec}}"
     except (ValueError, TypeError):
@@ -442,5 +460,3 @@ def _format_number_dtable(x: float, format_spec: str = None) -> str:
     #     elif type == "docx":
     #         return f"{mean:.{digits}f}\n({std:.{digits}f})"
     # return f"{mean:.{digits}f} ({std:.{digits}f})"
-
-

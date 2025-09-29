@@ -45,7 +45,7 @@ jobs:
 
       - name: Render Quarto Project
         run: |
-          quarto render
+          quarto render --to html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
