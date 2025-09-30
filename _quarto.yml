@@ -17,6 +17,8 @@ website:
         text: Word Output
       - href: LatexTables.ipynb
         text: LaTeX Output
+      - href: WritingPapers.ipynb
+        text: Writing Papers
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables

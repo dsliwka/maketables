@@ -25,6 +25,64 @@ from IPython.display import display
 
 
 class MTable:
+    """
+    A table creation class supporting multiple output formats.
+
+    MTable provides a unified interface for creating tables that can be output
+    as HTML (via great-tables), LaTeX, or Word documents (DOCX). It supports
+    features like multi-level column headers, row grouping, and extensive
+    styling customization for each output format.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The data to display in the table.
+    notes : str, optional
+        Notes to display at the bottom of the table. Default is empty string.
+    caption : str, optional
+        Table caption. Default is None.
+    tab_label : str, optional
+        Label for the table (used in LaTeX \\label{}). Default is None.
+    rgroup_sep : str, optional
+        Row group separator style. "tb" for top+bottom lines, "t" for top only,
+        "b" for bottom only, "" for no lines. Default is "tb".
+    rgroup_display : bool, optional
+        Whether to display row group names. Default is True.
+    default_paths : str, dict, or None, optional
+        Default paths for saving files. Can be a string (used for all types)
+        or dict mapping output types to paths. Default is None.
+    tex_params : dict, optional
+        Parameters to apply when creating LaTeX output. Can include:
+        - first_col_width: str (e.g., "3cm", "1.2in", r"0.25\\linewidth")
+        - tab_width: str (e.g., "14cm", r"0.8\\textwidth", "linewidth")
+        - tex_style: dict with style overrides (see DEFAULT_TEX_STYLE)
+        - texlocation: str (placement specifier like "htbp")
+    docx_params : dict, optional
+        Parameters to apply when creating DOCX output. Can include:
+        - first_col_width: str (e.g., "2.5in", "6cm", "180pt")
+        - docx_style: dict with style overrides (see DEFAULT_DOCX_STYLE)
+    gt_params : dict, optional
+        Parameters to apply when creating GT/HTML output. Can include:
+        - full_width: bool (whether to use 100% table width)
+        - gt_style: dict with style overrides (see DEFAULT_GT_STYLE)
+
+    Examples
+    --------
+    Basic usage:
+
+    >>> df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
+    >>> table = MTable(df, caption="My Table")
+    >>> table  # Auto-displays in notebook
+
+    With output-specific parameters:
+
+    >>> table = MTable(
+    ...     df,
+    ...     tex_params={'first_col_width': '3cm'},
+    ...     docx_params={'first_col_width': '2in'},
+    ...     gt_params={'full_width': True}
+    ... )
+    """
     # Class attributes for default values
     DEFAULT_NOTES = ""
     DEFAULT_CAPTION = None
@@ -133,7 +191,11 @@ class MTable:
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
-        # No style/render defaults here; handled in output methods
+        # Output-specific parameter dictionaries (applied to auto-display in notebooks)
+        tex_params: Optional[Dict[str, object]] = None,
+        docx_params: Optional[Dict[str, object]] = None,
+        gt_params: Optional[Dict[str, object]] = None,
+        # No other style/render defaults here; handled in output methods
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -153,6 +215,15 @@ class MTable:
             self.default_paths = default_paths.copy()
         else:
             self.default_paths = {}
+
+        # Store output-specific parameter dictionaries for auto-display
+        # When displayed automatically (__repr__), tex_params and gt_params are merged
+        # since the default display shows both LaTeX (for Quarto) and HTML (for notebooks)
+        self._display_params = {
+            'tex_params': tex_params or {},
+            'docx_params': docx_params or {},
+            'gt_params': gt_params or {},
+        }
 
     def make(self, type: str = None, **kwargs):
         """
@@ -1135,7 +1206,43 @@ class MTable:
         str
             An empty string
         """
-        self.make()
+        # For dual output, we need to handle parameters differently
+        # Create dual output object for notebook/Quarto compatibility
+        class DualOutput:
+            """Display different outputs in notebook vs Quarto rendering."""
+
+            def __init__(self, notebook_html, quarto_latex):
+                self.notebook_html = notebook_html
+                self.quarto_latex = quarto_latex
+
+            def _repr_mimebundle_(self, include=None, exclude=None):
+                return {
+                    "text/html": self.notebook_html,
+                    "text/latex": self.quarto_latex,
+                }
+
+        # Generate both HTML and LaTeX outputs with their specific parameters
+        gt_params = self._display_params.get('gt_params', {})
+        tex_params = self._display_params.get('tex_params', {})
+
+        html_output = self._output_gt(**gt_params).as_raw_html()
+        tex_output = self._output_tex(**tex_params)
+
+        # Add CSS to remove zebra striping if desired
+        html_output = (
+            """
+        <style>
+        table tr:nth-child(even) {
+            background-color: transparent !important;
+        }
+        </style>
+        """
+            + html_output
+        )
+        # Create and display the dual output object
+        from IPython.display import display
+        dual_output = DualOutput(html_output, tex_output)
+        display(dual_output)
         return ""
 
     def __call__(self, type=None, **kwargs):

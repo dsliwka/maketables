@@ -1,0 +1,404 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  11pt,
+  a4paper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage[]{newpxtext}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+% definitions for citeproc citations
+\NewDocumentCommand\citeproctext{}{}
+\NewDocumentCommand\citeproc{mm}{%
+  \begingroup\def\citeproctext{#2}\cite{#1}\endgroup}
+\makeatletter
+ % allow citations to break across lines
+ \let\@cite@ofmt\@firstofone
+ % avoid brackets around text for \cite:
+ \def\@biblabel#1{}
+ \def\@cite#1#2{{#1\if@tempswa , #2\fi}}
+\makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newenvironment{CSLReferences}[2] % #1 hanging-indent, #2 entry-spacing
+ {\begin{list}{}{%
+  \setlength{\itemindent}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\parsep}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+   \setlength{\leftmargin}{\cslhangindent}
+   \setlength{\itemindent}{-1\cslhangindent}
+  \fi
+  % set entry spacing
+  \setlength{\itemsep}{#2\baselineskip}}}
+ {\end{list}}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{\hfill\break\parbox[t]{\linewidth}{\strut\ignorespaces#1\strut}}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{\strut#1\strut}}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{threeparttable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Quarto and MakeTables},
+  pdfauthor={Peter Pan},
+  colorlinks=true,
+  linkcolor={black},
+  filecolor={Maroon},
+  citecolor={black},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Quarto and MakeTables}
+\author{Peter Pan\footnote{University of Nowhere}}
+\date{May 1, 2025}
+\begin{document}
+\maketitle
+\begin{abstract}
+This document illustrates how to use MakeTables to write academic
+papers. Just write your paper in markdown in Jupyter Notebooks. Tables
+are displayed as HTML interactively when you work in the notebook on the
+screen. When you render the notebook as PDF with Quarto, MakeTable
+generates LaTeX code used by Quarto.
+
+\newpage
+\end{abstract}
+
+
+\onehalfspacing
+
+\section{Introduction}\label{introduction}
+
+A very convenient way to write academic papers which include the code
+for all reported analyses is to use Jupyter notebooks together with
+\href{https://quarto.org/}{Quarto}. Quarto is a scientific publishing
+system that allows you to combine text, code, and results in a single
+document. Quarto will render Jupyter notebooks to PDF using LaTeX. When
+you include tables created with MakeTables in your notebook, they will
+be rendered directly on the screen in the notebook (as HTML via
+\href{https://posit-dev.github.io/great-tables/articles/intro.html}{Great
+Tables}) but will be rendered as LaTeX tables in the final PDF document
+by Quarto.
+
+Here is simple example of how to use MakeTables in a notebook to write a
+paper. It generates tables, for instance based on regressions in either
+\href{https://py-econometrics.github.io/pyfixest/pyfixest.html}{pyfixest}
+or \href{https://www.statsmodels.org/stable/index.html}{statsmodels}.
+Just render this notebook with
+\texttt{quarto\ render\ quartoExample.ipynb} to create the PDF document.
+
+Note it is also very easy to include references and citations in your
+Quarto document (see for instance Wooldridge
+(\citeproc{ref-wooldridge2010econometric}{2010}) and Greene
+(\citeproc{ref-greene2018econometric}{2018})).
+
+\section{Some Tables}\label{some-tables}
+
+Table Table~\ref{tbl-1} shows some descriptive statistics.
+
+\begin{table}[H]
+
+\caption{\label{tbl-1}Automotive Data Summary}
+
+\centering{
+
+\renewcommand\cellalign{t}
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}p{3cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{3}{c}{Domestic} & \multicolumn{3}{c}{Foreign} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+ & N & Mean & Std. Dev. & N & Mean & Std. Dev. \\
+\midrule
+\addlinespace[0.5ex]
+Mileage (mpg) & 52 & 19.83 & 4.74 & 22 & 24.77 & 6.61 \\
+Weight (lbs.) & 52 & 3317.12 & 695.36 & 22 & 2315.91 & 433.00 \\
+Price & 52 & 6072.42 & 3097.10 & 22 & 6384.68 & 2621.92 \\
+\addlinespace
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+\end{minipage}
+
+\end{threeparttable}
+
+\begin{verbatim}
+\end{verbatim}
+
+}
+
+\end{table}%
+
+Table Table~\ref{tbl-2} shows regression results here estimated with the
+excellent \texttt{pyfixest} package.
+
+\begin{table}[H]
+
+\caption{\label{tbl-2}A Regression Table (PyFixest)}
+
+\centering{
+
+\renewcommand\cellalign{t}
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{2}{c}{Mileage (mpg)} \\
+\cmidrule(lr){2-3}
+ & (1) & (2) \\
+\midrule
+\addlinespace[0.5ex]
+Weight (lbs.) & \makecell{-0.006*** \\ (0.001)} & \makecell{-0.004* \\ (0.002)} \\
+Length (in.) &  & \makecell{-0.080 \\ (0.055)} \\
+Intercept & \makecell{39.440*** \\ (1.614)} & \makecell{47.885*** \\ (6.088)} \\
+\addlinespace
+\midrule
+\addlinespace
+Observations & 74.000 & 74.000 \\
+R² & 0.652 & 0.661 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)\end{minipage}
+
+\end{threeparttable}
+
+\begin{verbatim}
+\end{verbatim}
+
+}
+
+\end{table}%
+
+Table Table~\ref{tbl-3} uses \texttt{statsmodels} instead to estimate a
+probit model.
+
+\begin{table}[H]
+
+\caption{\label{tbl-3}A Probit Regression (Statmodels)}
+
+\centering{
+
+\renewcommand\cellalign{t}
+\begin{threeparttable}
+\begingroup
+\renewcommand\arraystretch{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+\toprule
+ & \multicolumn{2}{c}{Foreign (indicator)} \\
+\cmidrule(lr){2-3}
+ & \multicolumn{1}{c}{OLS} & \multicolumn{1}{c}{Probit} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-3}
+ & (1) & (2) \\
+\midrule
+\addlinespace[0.5ex]
+Weight (lbs.) & \makecell{-0.001*** \\ (0.000)} & \makecell{-0.004** \\ (0.002)} \\
+Length (in.) & \makecell{0.007 \\ (0.005)} & \makecell{0.033 \\ (0.045)} \\
+Price & \makecell{0.000*** \\ (0.000)} & \makecell{0.001*** \\ (0.000)} \\
+Intercept & \makecell{0.656 \\ (0.583)} & \makecell{1.327 \\ (4.992)} \\
+\addlinespace
+\midrule
+\addlinespace
+Observations & 74.000 & 74.000 \\
+R² & 0.552 & - \\
+Pseudo R² & - & 0.606 \\
+\bottomrule
+\end{tabularx}
+\endgroup
+\footnotesize 
+\noindent\begin{minipage}{\linewidth}\smallskip\footnotesize
+Significance levels: * p < 0.05, ** p < 0.01, *** p < 0.001. Format of coefficient cell: Coefficient   (Std. Error)\end{minipage}
+
+\end{threeparttable}
+
+\begin{verbatim}
+\end{verbatim}
+
+}
+
+\end{table}%
+
+\section{Conclusion}\label{conclusion}
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+mollit anim id est laborum.
+
+\newpage{}
+
+\section{References}\label{references}
+
+\phantomsection\label{refs}
+\begin{CSLReferences}{1}{0}
+\bibitem[\citeproctext]{ref-greene2018econometric}
+Greene, W. H. (2018). \emph{Econometric analysis} (8th ed.). Pearson.
+
+\bibitem[\citeproctext]{ref-wooldridge2010econometric}
+Wooldridge, J. M. (2010). \emph{Econometric analysis of cross section
+and panel data}.
+
+\end{CSLReferences}
+
+
+
+
+\end{document}
