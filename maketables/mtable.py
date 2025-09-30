@@ -83,6 +83,7 @@ class MTable:
     ...     gt_params={'full_width': True}
     ... )
     """
+
     # Class attributes for default values
     DEFAULT_NOTES = ""
     DEFAULT_CAPTION = None
@@ -220,9 +221,9 @@ class MTable:
         # When displayed automatically (__repr__), tex_params and gt_params are merged
         # since the default display shows both LaTeX (for Quarto) and HTML (for notebooks)
         self._display_params = {
-            'tex_params': tex_params or {},
-            'docx_params': docx_params or {},
-            'gt_params': gt_params or {},
+            "tex_params": tex_params or {},
+            "docx_params": docx_params or {},
+            "gt_params": gt_params or {},
         }
 
     def make(self, type: str = None, **kwargs):
@@ -500,7 +501,12 @@ class MTable:
         if show:
             return self._output_gt(**kwargs)
 
-    def _output_docx(self, first_col_width: Optional[str] = None, docx_style: Optional[Dict[str, object]] = None, **kwargs):
+    def _output_docx(
+        self,
+        first_col_width: Optional[str] = None,
+        docx_style: Optional[Dict[str, object]] = None,
+        **kwargs,
+    ):
         # Create a new Document
         document = Document()
         # Resolve DOCX style (per-call -> class default)
@@ -634,13 +640,13 @@ class MTable:
             first_col_width_str = str(s["first_col_width"]).strip().lower()
             try:
                 # Parse width specification
-                if first_col_width_str.endswith('in'):
+                if first_col_width_str.endswith("in"):
                     width_val = float(first_col_width_str[:-2])
                     width = Inches(width_val)
-                elif first_col_width_str.endswith('cm'):
+                elif first_col_width_str.endswith("cm"):
                     width_val = float(first_col_width_str[:-2])
                     width = Cm(width_val)
-                elif first_col_width_str.endswith('pt'):
+                elif first_col_width_str.endswith("pt"):
                     width_val = float(first_col_width_str[:-2])
                     width = Pt(width_val)
                 else:
@@ -1206,6 +1212,7 @@ class MTable:
         str
             An empty string
         """
+
         # For dual output, we need to handle parameters differently
         # Create dual output object for notebook/Quarto compatibility
         class DualOutput:
@@ -1222,8 +1229,8 @@ class MTable:
                 }
 
         # Generate both HTML and LaTeX outputs with their specific parameters
-        gt_params = self._display_params.get('gt_params', {})
-        tex_params = self._display_params.get('tex_params', {})
+        gt_params = self._display_params.get("gt_params", {})
+        tex_params = self._display_params.get("tex_params", {})
 
         html_output = self._output_gt(**gt_params).as_raw_html()
         tex_output = self._output_tex(**tex_params)
@@ -1241,6 +1248,7 @@ class MTable:
         )
         # Create and display the dual output object
         from IPython.display import display
+
         dual_output = DualOutput(html_output, tex_output)
         display(dual_output)
         return ""

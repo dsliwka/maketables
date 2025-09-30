@@ -28,7 +28,7 @@ format:
     code-copy: true
     code-fold: false
     html-table-processing: none
-  
+
 execute:
   freeze: auto
 

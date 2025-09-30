@@ -5,6 +5,6 @@ black>=22.0
 flake8>=5.0
 mypy>=1.0
 
-# Documentation dependencies  
+# Documentation dependencies
 sphinx>=5.0
 sphinx-rtd-theme>=1.0
