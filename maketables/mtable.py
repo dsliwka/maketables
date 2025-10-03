@@ -11,6 +11,8 @@ from docx.shared import Cm, Inches, Pt, RGBColor
 from great_tables import GT
 from IPython.display import display
 
+from .symbols import translate_symbols
+
 # Methods
 # -	make: Just return output object (gt, docx, tex, html) or display directly in notebook or as tex when rendered to pdf in Quarto
 # -	save: Save output object in new file to path (docx, tex, html) add parameter replace to replace existing file otherwise error message when file exists
@@ -224,6 +226,21 @@ class MTable:
             'docx_params': docx_params or {},
             'gt_params': gt_params or {},
         }
+
+    def _translate_symbols(self, text: str, output_format: str) -> str:
+        """
+        Translate special symbols in text for the specified output format.
+        
+        Args:
+            text: Text containing symbols to translate
+            output_format: Target format ('tex', 'html', 'docx', 'gt', 'plain')
+            
+        Returns:
+            Text with symbols translated to the target format
+        """
+        return translate_symbols(text, output_format)
+    
+
 
     def make(self, type: str = None, **kwargs):
         """
@@ -503,6 +520,7 @@ class MTable:
     def _output_docx(self, first_col_width: Optional[str] = None, docx_style: Optional[Dict[str, object]] = None, **kwargs):
         # Create a new Document
         document = Document()
+        
         # Resolve DOCX style (per-call -> class default)
         s = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
@@ -515,7 +533,9 @@ class MTable:
         # Add caption if specified
         if self.caption is not None:
             paragraph = document.add_paragraph("Table ", style="Caption")
-            self._build_docx_caption(self.caption, paragraph, s)
+            # Apply symbol translation to caption
+            translated_caption = self._translate_symbols(self.caption, 'docx')
+            self._build_docx_caption(translated_caption, paragraph, s)
 
         # Add table
         table = document.add_table(rows=0, cols=self.df.shape[1] + 1)
@@ -585,7 +605,7 @@ class MTable:
                 for i, col in enumerate(dfs.columns.get_level_values(level)):
                     cell_index = i + 1
                     if col != prev_col:
-                        hdr_cells[cell_index].text = str(col)
+                        hdr_cells[cell_index].text = self._translate_symbols(str(col), 'docx')
                         prev_col = col
                         prev_cell_index = cell_index
                     else:
@@ -595,7 +615,7 @@ class MTable:
         else:
             hdr_cells = table.add_row().cells
             for i, col in enumerate(dfs.columns):
-                hdr_cells[i + 1].text = str(col)
+                hdr_cells[i + 1].text = self._translate_symbols(str(col), 'docx')
 
         # Add row names and data
         row_group_rows = []
@@ -611,7 +631,7 @@ class MTable:
                         # Add a row for the group name
                         group_row_cells = table.add_row().cells
                         # add row group name
-                        group_row_cells[0].text = str(current_group)
+                        group_row_cells[0].text = self._translate_symbols(str(current_group), 'docx')
                         # make this cell slightly taller
                         for paragraph in group_row_cells[0].paragraphs:
                             paragraph.paragraph_format.space_after = Pt(3)
@@ -619,15 +639,15 @@ class MTable:
                         for cell in group_row_cells[1:]:
                             cell.text = ""
                 row_cells = table.add_row().cells
-                row_cells[0].text = str(idx[1])
+                row_cells[0].text = self._translate_symbols(str(idx[1]), 'docx')
                 for i, val in enumerate(row):
-                    row_cells[i + 1].text = str(val)
+                    row_cells[i + 1].text = self._translate_symbols(str(val), 'docx')
         else:
             for idx, row in dfs.iterrows():
                 row_cells = table.add_row().cells
-                row_cells[0].text = str(idx)
+                row_cells[0].text = self._translate_symbols(str(idx), 'docx')
                 for i, val in enumerate(row):
-                    row_cells[i + 1].text = str(val)
+                    row_cells[i + 1].text = self._translate_symbols(str(val), 'docx')
 
         # Set first column width if specified
         if s.get("first_col_width") is not None:
@@ -666,7 +686,7 @@ class MTable:
         # Add notes (Note: we alsways add notes, even if empty)
         # Add row to the table that consists only of one cell with the notes
         notes_row = table.add_row().cells
-        notes_row[0].text = self.notes
+        notes_row[0].text = self._translate_symbols(self.notes, 'docx')
         # Merge the cell with the notes
         table.cell(-1, 0).merge(table.cell(-1, ncols - 1))
         # Set alignment and font size for the notes
@@ -1065,6 +1085,9 @@ class MTable:
         # Top-align makecell content
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
+        # Apply symbol translation to the final LaTeX output
+        latex_res = self._translate_symbols(latex_res, 'tex')
+
         return latex_res
 
     def _output_gt(
@@ -1103,8 +1126,33 @@ class MTable:
         else:
             nlevels = 1
 
-        # store row indes and then reset to have the index as columns to be displayed in the table
+        # store row index and then reset to have the index as columns to be displayed in the table
         rowindex = dfs.index
+        
+        # Handle potential name conflicts when resetting index
+        # Find safe names for index columns that don't conflict with existing columns
+        if isinstance(rowindex, pd.MultiIndex):
+            index_names = []
+            for i, name in enumerate(rowindex.names):
+                if name is None or name in dfs.columns:
+                    # Use a safe default name
+                    safe_name = f"__index_level_{i}__"
+                    while safe_name in dfs.columns:
+                        safe_name = f"__index_level_{i}_{hash(safe_name) % 1000}__"
+                    index_names.append(safe_name)
+                else:
+                    index_names.append(name)
+            
+            # Temporarily rename index levels to avoid conflicts
+            dfs.index.names = index_names
+        else:
+            if rowindex.name is None or rowindex.name in dfs.columns:
+                # Use a safe default name
+                safe_name = "__index__"
+                while safe_name in dfs.columns:
+                    safe_name = f"__index_{hash(safe_name) % 1000}__"
+                dfs.index.name = safe_name
+        
         dfs.reset_index(inplace=True)
 
         # Specify the rowname_col and groupname_col
@@ -1190,6 +1238,15 @@ class MTable:
             gt = gt.tab_options(row_group_border_bottom_style="none")
         if not self.rgroup_display:
             gt = gt.tab_options(row_group_font_size="0px", row_group_padding="0px")
+
+        # Apply symbol translation to the final HTML output
+        html_output = gt.as_raw_html()
+        translated_html = self._translate_symbols(html_output, 'html')
+        
+        # Create a new GT object with the translated HTML
+        # Since GT doesn't have a direct way to modify HTML, we'll monkey-patch it
+        gt._repr_html_ = lambda: translated_html
+        gt.as_raw_html = lambda: translated_html
 
         return gt
 

@@ -502,7 +502,7 @@ class ETable(MTable):
         # relabel coefficient index
         if (labels != {}) or (cat_template != ""):
             res.index = res.index.to_series().apply(
-                lambda x: _relabel_expvar(x, labels or {}, " x ", cat_template)
+                lambda x: _relabel_expvar(x, labels or {}, " × ", cat_template)
             )
             res.index.name = "Coefficient"
 
