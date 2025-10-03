@@ -65,7 +65,7 @@ class MTable:
         - docx_style: dict with style overrides (see DEFAULT_DOCX_STYLE)
     gt_params : dict, optional
         Parameters to apply when creating GT/HTML output. Can include:
-        - full_width: bool (whether to use 100% table width)
+
         - gt_style: dict with style overrides (see DEFAULT_GT_STYLE)
 
     Examples
@@ -82,7 +82,7 @@ class MTable:
     ...     df,
     ...     tex_params={'first_col_width': '3cm'},
     ...     docx_params={'first_col_width': '2in'},
-    ...     gt_params={'full_width': True}
+    ...     gt_params={'table_width': '100%'}
     ... )
     """
     # Class attributes for default values
@@ -96,13 +96,14 @@ class MTable:
     DEFAULT_SAVE_TYPE = "html"
     ADMISSIBLE_TYPES = ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
-    DEFAULT_TEX_TAB_WIDTH: Optional[str] = r"\linewidth"
-    DEFAULT_TEX_FIRST_COL_WIDTH: Optional[str] = None
-    DEFAULT_GT_FULL_WIDTH: bool = False
+
 
     # Default TeX style (override globally via MTable.DEFAULT_TEX_STYLE.update({...})
     # or per-call via tex_style in make/save/_output_tex)
     DEFAULT_TEX_STYLE: Dict[str, object] = {
+        # Table dimensions
+        "tab_width": r"\linewidth",  # Target width for tabularx (None for normal tabular)
+        "first_col_width": None,  # LaTeX length for first column (None for flexible)
         # Row height and column separation (scoped to the table)
         "arraystretch": 1,  # float or str
         "tabcolsep": "3pt",  # TeX length
@@ -148,25 +149,32 @@ class MTable:
         # first column width (in inches, cm, pt, or None for auto)
         "first_col_width": None,  # e.g., "2.5in", "6cm", "180pt"
     }
-    # Default GT styling (override globally via MTable.DEFAULT_GT_STYLE.update({...})
-    # or per instance via MTable(..., gt_style={...}))
+    # Default GT styling - dictionary passed directly to GT.tab_options(**dict)
+    # This allows users to specify ANY GT styling parameter, not just predefined ones
+    # (override globally via MTable.DEFAULT_GT_STYLE.update({...}) or per instance via gt_style={...})
     DEFAULT_GT_STYLE: Dict[str, object] = {
-        "align": "center",  # left | center | right
-        "table_width": None,  # e.g., "100%" or None
-        "data_row_padding": "4px",
-        "column_labels_padding": "4px",
+        # Special parameters handled separately (not passed to tab_options)
+        "align": "center",  # left | center | right (used for cols_align)
+        "table_width": None,  # e.g., "100%" or None for auto-width
+        "table_font_size_all": "14px",  # Sets font size for all table elements except notes; individual font sizes override this
+        "source_notes_font_size": "10px",
+        # Standard tab_options parameters
+        "data_row_padding": "2px",
+        "column_labels_padding": "2px",
+        # Caption spacing (GT expects single values for padding, not CSS shorthand)
+        "heading_padding": "6px",  # Space between caption and table
         # Column label borders
         "column_labels_border_top_style": "solid",
         "column_labels_border_top_color": "black",
         "column_labels_border_top_width": "2px",  # Top rule (toprule) - thickest
         "column_labels_border_bottom_style": "solid",
         "column_labels_border_bottom_color": "black",
-        "column_labels_border_bottom_width": "0.5px",  # Header midrule - medium
+        "column_labels_border_bottom_width": "0.25px",  # Header midrule - medium
         "column_labels_vlines_color": "white",
         "column_labels_vlines_width": "0px",
         # Table body borders
         "table_body_border_top_style": "solid",
-        "table_body_border_top_width": "0px", # Avoid double top border by default 
+        "table_body_border_top_width": "0px",  # Avoid double top border by default
         "table_body_border_top_color": "black",
         "table_body_border_bottom_style": "solid",
         "table_body_border_bottom_width": "2px",  # Bottom rule (bottomrule) - thickest
@@ -176,10 +184,10 @@ class MTable:
         "table_body_vlines_width": "0px",
         # Row group borders
         "row_group_border_top_style": "solid",
-        "row_group_border_top_width": "0.5px",
+        "row_group_border_top_width": "0.25px",
         "row_group_border_top_color": "black",
         "row_group_border_bottom_style": "solid",
-        "row_group_border_bottom_width": "0.5px",
+        "row_group_border_bottom_width": "0.25px",
         "row_group_border_bottom_color": "black",
         "row_group_border_left_color": "white",
         "row_group_border_right_color": "white",
@@ -255,16 +263,10 @@ class MTable:
             The type of the output object ("gt", "tex", "docx", "html").
         **kwargs : Further arguments forwarded to the respective output method when type is specified.
             - For type="tex" (LaTeX):
-              - first_col_width: Optional[str] (default MTable.DEFAULT_TEX_FIRST_COL_WIDTH)
-                LaTeX length for the first column (e.g., "3cm", "1.2in", r"0.25\\linewidth").
-                Use None to keep first column flexible (X when tabularx is used, or 'l' otherwise).
-              - tab_width: Optional[str] (default MTable.DEFAULT_TEX_TAB_WIDTH)
-                Target width for tabularx, e.g., "14cm", r"0.8\\textwidth",
-                or the keywords "linewidth" or "textwidth".
-                If set (or default is set), tabularx is used; None keeps normal tabular.
+
               - tex_style: Dict[str, object] (default MTable.DEFAULT_TEX_STYLE)
                 Per-table overrides for TeX rendering, e.g.:
-                {arraystretch: 1.15, tabcolsep: "4pt", data_align: "c",
+                {first_col_width: "3cm", tab_width: r"0.8\\textwidth", arraystretch: 1.15, tabcolsep: "4pt", data_align: "c",
                  x_col_align: "left", cmidrule_trim: "lr",
                  first_row_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
                  group_header_format: r"\\bfseries %s", notes_fontsize_cmd: r"\\footnotesize"}
@@ -273,21 +275,21 @@ class MTable:
               Note: When tab_width is set, ensure your document loads
               the tabularx and array packages.
             - For type="gt" (HTML via great-tables):
-              - full_width: bool (default MTable.DEFAULT_GT_FULL_WIDTH)
-                If True, sets table_width to 100%.
+
               - gt_style: Dict[str, object]
-                Overrides keys from MTable.DEFAULT_GT_STYLE (e.g., align, table_width,
-                data_row_padding, column_labels_padding, and border styles/colors/widths).
+                Dictionary passed directly to GT.tab_options() plus special parameters:
+                'align' (for cols_align), 'table_width' (controls table width),
+                and 'table_font_size_all' (default font size for all elements except notes; individual settings override).
+                Supports ALL GT styling options - see GT documentation for complete list.
+                Common examples: table_font_size, column_labels_font_size, source_notes_font_size,
+                data_row_padding, column_labels_padding, border styles/colors/widths, etc.
             - For type="docx" (Word):
-              - first_col_width: Optional[str] (default None)
-                Width for the first column in Word units (e.g., "2.5in", "6cm", "180pt").
-                Use None for automatic column width.
+
               - docx_style: Dict[str, object]
                 Overrides keys from MTable.DEFAULT_DOCX_STYLE such as:
-                font_name, font_color_rgb, font_size_pt, notes_font_size_pt,
+                first_col_width, font_name, font_color_rgb, font_size_pt, notes_font_size_pt,
                 caption_font_name, caption_font_size_pt, caption_align, notes_align,
-                align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name,
-                first_col_width.
+                align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name.
 
         Returns
         -------
@@ -367,9 +369,9 @@ class MTable:
         replace : bool, optional
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
-            - type="tex": first_col_width, tab_width, tex_style, texlocation (see make()).
-            - type="docx": first_col_width, docx_style (see make()).
-            - type="html": gt options via _output_gt (e.g., full_width, gt_style).
+            - type="tex": tex_style, texlocation (see make()).
+            - type="docx": docx_style (see make()).
+            - type="html": gt options via _output_gt (e.g., gt_style with table_width).
 
         Returns
         -------
@@ -421,7 +423,6 @@ class MTable:
         file_name: str = None,
         tab_num: Optional[int] = None,
         show: bool = False,
-        first_col_width: Optional[str] = None,
         docx_style: Optional[Dict[str, object]] = None,
         **kwargs,
     ):
@@ -437,10 +438,9 @@ class MTable:
             1-based index of the table to replace. If None or out of range, appends a new table.
         show : bool, optional
             If True, also returns a GT object for display (HTML). Default False.
-        first_col_width : str, optional
-            Width for the first column in Word units (e.g., "2.5in", "6cm", "180pt").
         docx_style : Dict[str, object], optional
             Per-call overrides for MTable.DEFAULT_DOCX_STYLE (see make()).
+            Can include first_col_width for column width control.
         **kwargs : dict.
 
         Returns
@@ -454,9 +454,6 @@ class MTable:
         if docx_style:
             s.update(docx_style)
 
-        # Override first_col_width if provided as parameter
-        if first_col_width is not None:
-            s["first_col_width"] = first_col_width
         # check if file_name is an absolute path, if not add default path
         if self.default_paths.get("docx") is not None and not os.path.isabs(file_name):
             file_name = os.path.join(self.default_paths.get("docx", ""), file_name)
@@ -518,7 +515,7 @@ class MTable:
         if show:
             return self._output_gt(**kwargs)
 
-    def _output_docx(self, first_col_width: Optional[str] = None, docx_style: Optional[Dict[str, object]] = None, **kwargs):
+    def _output_docx(self, docx_style: Optional[Dict[str, object]] = None, **kwargs):
         # Create a new Document
         document = Document()
         
@@ -526,10 +523,6 @@ class MTable:
         s = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
             s.update(docx_style)
-
-        # Override first_col_width if provided as parameter
-        if first_col_width is not None:
-            s["first_col_width"] = first_col_width
 
         # Add caption if specified
         if self.caption is not None:
@@ -840,24 +833,19 @@ class MTable:
 
     def _output_tex(
         self,
-        first_col_width: Optional[str] = None,
-        tab_width: Optional[str] = None,
         tex_style: Optional[Dict[str, object]] = None,
         **kwargs,
     ):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
-        # Resolve TeX defaults
-        _fcw = (
-            self.DEFAULT_TEX_FIRST_COL_WIDTH
-            if first_col_width is None
-            else first_col_width
-        )
         # Resolve TeX style (per-call -> class default)
         s = dict(getattr(self, "DEFAULT_TEX_STYLE", {}))
         if tex_style:
             s.update(tex_style)
+
+        # Resolve TeX defaults from style dictionary
+        _fcw = s.get("first_col_width")
 
         # Normalize tab_width (only these two keywords are mapped)
         def _normalize_width(w: Optional[str]) -> Optional[str]:
@@ -871,9 +859,7 @@ class MTable:
                 return r"\textwidth"
             return v  # e.g., "4cm", r"0.5\textwidth"
 
-        _tw = _normalize_width(
-            tab_width if tab_width is not None else self.DEFAULT_TEX_TAB_WIDTH
-        )
+        _tw = _normalize_width(s.get("tab_width"))
         use_tabularx = _tw is not None
 
         # Replace newlines and wrap cells with makecell if needed
@@ -1113,14 +1099,12 @@ class MTable:
 
     def _output_gt(
         self,
-        full_width: Optional[bool] = None,
         gt_style: Optional[Dict[str, object]] = None,
         **kwargs,
     ):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
-        # Resolve GT defaults (per-call -> class)
-        _fw_gt = self.DEFAULT_GT_FULL_WIDTH if full_width is None else bool(full_width)
+        # Resolve GT style (per-call -> class default)
         s = dict(self.DEFAULT_GT_STYLE)
         if gt_style:
             s.update(gt_style)
@@ -1214,43 +1198,38 @@ class MTable:
         gt = gt.tab_source_note(self.notes).tab_stub(
             rowname_col=rowname_col, groupname_col=groupname_col
         )
-        gt = gt.tab_options(
-            table_border_bottom_style="hidden",
-            stub_border_style="hidden",
-            column_labels_border_top_style=s["column_labels_border_top_style"],
-            column_labels_border_top_color=s["column_labels_border_top_color"],
-            column_labels_border_top_width=s["column_labels_border_top_width"],
-            column_labels_border_bottom_style=s["column_labels_border_bottom_style"],
-            column_labels_border_bottom_color=s["column_labels_border_bottom_color"],
-            column_labels_border_bottom_width=s["column_labels_border_bottom_width"],
-            column_labels_vlines_color=s["column_labels_vlines_color"],
-            column_labels_vlines_width=s["column_labels_vlines_width"],
-            table_body_border_top_style=s["table_body_border_top_style"],
-            table_body_border_top_width=s["table_body_border_top_width"],
-            table_body_border_top_color=s["table_body_border_top_color"],
-            table_body_border_bottom_width=s["table_body_border_bottom_width"],
-            table_body_border_bottom_color=s["table_body_border_bottom_color"],
-            table_body_border_bottom_style=s["table_body_border_bottom_style"],
-            table_body_hlines_style=s["table_body_hlines_style"],
-            table_body_vlines_color=s["table_body_vlines_color"],
-            table_body_vlines_width=s["table_body_vlines_width"],
-            row_group_border_top_style=s["row_group_border_top_style"],
-            row_group_border_top_width=s["row_group_border_top_width"],
-            row_group_border_top_color=s["row_group_border_top_color"],
-            row_group_border_bottom_style=s["row_group_border_bottom_style"],
-            row_group_border_bottom_width=s["row_group_border_bottom_width"],
-            row_group_border_bottom_color=s["row_group_border_bottom_color"],
-            row_group_border_left_color=s["row_group_border_left_color"],
-            row_group_border_right_color=s["row_group_border_right_color"],
-            data_row_padding=s["data_row_padding"],
-            column_labels_padding=s["column_labels_padding"],
-        ).cols_align(align=s.get("align", "center"))
-
-        # Full page width
-        if _fw_gt:
-            gt = gt.tab_options(table_width="100%")
-        elif s.get("table_width"):
-            gt = gt.tab_options(table_width=str(s["table_width"]))
+        
+        # Handle table_font_size_all - applies to all font sizes except source_notes_font_size
+        # Individual font sizes override the all setting if explicitly provided
+        if s.get("table_font_size_all"):
+            font_size = s["table_font_size_all"]
+            font_params = {
+                "table_font_size": font_size,
+                "column_labels_font_size": font_size,
+                "row_group_font_size": font_size,
+                "stub_font_size": font_size,
+                "heading_title_font_size": font_size,
+            }
+            for param, default_value in font_params.items():
+                if param not in s:  # Only set if not already explicitly provided by user
+                    s[param] = default_value
+        
+        # Prepare style options, excluding special parameters handled separately
+        special_params = {"align", "table_width", "table_font_size_all"}
+        tab_options_dict = {k: v for k, v in s.items() if k not in special_params}
+        
+        # Add required defaults
+        tab_options_dict.update({
+            "table_border_bottom_style": "hidden",
+            "stub_border_style": "hidden",
+        })
+        
+        # Handle table width setting
+        if s.get("table_width"):
+            tab_options_dict["table_width"] = str(s["table_width"])
+        
+        # Apply all styling options at once
+        gt = gt.tab_options(**tab_options_dict).cols_align(align=s.get("align", "center"))
 
         # Customize row group display
         if "t" not in self.rgroup_sep:
