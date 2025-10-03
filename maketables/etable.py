@@ -731,6 +731,13 @@ def _format_number(x: float, format_spec: str = None) -> str:
         # Sensible default formatting without scientific notation
         abs_x = abs(x)
 
+        # Check if it's essentially an integer first
+        if abs(x - round(x)) < 1e-10:  # essentially an integer
+            if abs_x >= 1000:
+                return f"{int(round(x)):,}"  # Use comma separators for large integers
+            else:
+                return f"{int(round(x))}"    # No decimals for smaller integers
+
         # For very small numbers (close to zero), show more precision
         if abs_x < 0.001 and abs_x > 0:
             return f"{x:.6f}".rstrip("0").rstrip(".")
@@ -740,12 +747,9 @@ def _format_number(x: float, format_spec: str = None) -> str:
         # For medium numbers, use standard precision
         elif abs_x < 1000:
             return f"{x:.3f}"
-        # For large numbers, use comma separators but no decimals if integer-like
+        # For large numbers, use comma separators
         elif abs_x >= 1000:
-            if abs(x - round(x)) < 1e-10:  # essentially an integer
-                return f"{int(round(x)):,}"
-            else:
-                return f"{x:,.2f}"
+            return f"{x:,.2f}"
         else:
             return f"{x:.3f}"
 
