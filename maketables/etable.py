@@ -12,7 +12,6 @@ from pyfixest.estimation.feiv_ import Feiv
 from pyfixest.estimation.feols_ import Feols
 from pyfixest.estimation.fepois_ import Fepois
 from pyfixest.estimation.FixestMulti_ import FixestMulti
-from pyfixest.report.utils import _relabel_expvar
 
 from .extractors import ModelExtractor, get_extractor
 from .mtable import MTable
@@ -1030,3 +1029,99 @@ def _apply_digits_to_coef_fmt(coef_fmt: str, digits: int) -> str:
     updated_fmt = re.sub(r"\bp\b(?!:)", f"p:{format_spec}", updated_fmt)
 
     return updated_fmt
+
+
+
+def _relabel_expvar(
+    varname: str, labels: dict, interaction_symbol: str, cat_template=""
+):
+    """
+    Relabel a variable name using the labels dictionary
+    Also automatically relabel interaction terms using the labels of the individual variables
+    and categorical variables using the cat_template.
+
+    Parameters
+    ----------
+    varname: str
+        The varname in the regression.
+    labels: dict
+        A dictionary to relabel the variables. The keys are the original variable names and the values the new names.
+    interaction_symbol: str
+        The symbol to use for displaying the interaction term.
+    cat_template: str
+        Template to relabel categorical variables. When empty, the function will not relabel categorical variables.
+        You can use {variable}, {value}, or {value_int} placeholders.
+        e.g. "{variable}::{value_int}" if you want to force integer format when possible.
+
+    Returns
+    -------
+    str
+        The relabeled variable
+    """
+    # First split the variable name by the interaction symbol
+    # Note: will just be equal to varname when no interaction term
+    vars = varname.split(":")
+    # Loop over the variables and relabel them
+    for i in range(len(vars)):
+        # Check whether template for categorical variables is provided &
+        # whether the variable is a categorical variable
+        v = vars[i]
+        if cat_template != "" and ("C(" in v or "[" in v):
+            vars[i] = _rename_categorical(v, template=cat_template, labels=labels)
+        else:
+            vars[i] = labels.get(v, v)
+    # Finally join the variables using the interaction symbol
+    return interaction_symbol.join(vars)
+
+
+def _rename_categorical(
+    col_name, template="{variable}::{value}", labels: Optional[dict] = None
+):
+    """
+    Rename categorical variables, optionally converting floats to ints in the category label.
+
+    Parameters
+    ----------
+    col_name : str
+        A single coefficient string (e.g. "C(var)[T.1]").
+    template: str, optional
+        String template for formatting. You can use {variable}, {value}, or {value_int} placeholders.
+        e.g. "{variable}::{value_int}" if you want to force integer format when possible.
+    labels: dict, optional
+        Dictionary that replaces variable names with user-specified labels.
+
+    Returns
+    -------
+    str
+        The renamed categorical variable.
+    """
+    # Here two patterns are used to extract the variable and level
+    # Note the second pattern matches the notation when the variable is categorical at the outset
+    if col_name.startswith("C("):
+        pattern = r"C\(([^,]+)(?:,[^]]+)?\)\[(?:T\.)?([^]]+)\]"
+    else:
+        pattern = r"([^[]+)\[(?:T\.)?([^]]+)\]"
+
+    # Replace labels with empty dictionary if not provided
+    if labels is None:
+        labels = {}
+    # Apply the regex to extract the variable and value
+    match = re.search(pattern, col_name)
+    if match:
+        variable = match.group(1)
+        variable = labels.get(variable, variable)  # apply label if any
+        value_raw = match.group(2)
+
+        # Try parsing as float so that e.g. "2.0" can become "2"
+        value_int = value_raw
+        try:
+            numeric_val = float(value_raw)
+            value_int = int(numeric_val) if numeric_val.is_integer() else numeric_val
+        except ValueError:
+            # If not numeric at all, we'll leave it as-is
+            pass
+
+        return template.format(variable=variable, value=value_raw, value_int=value_int)
+    else:
+        return col_name
+
