@@ -53,20 +53,24 @@ class MTable:
     default_paths : str, dict, or None, optional
         Default paths for saving files. Can be a string (used for all types)
         or dict mapping output types to paths. Default is None.
-    tex_params : dict, optional
-        Parameters to apply when creating LaTeX output. Can include:
-        - first_col_width: str (e.g., "3cm", "1.2in", r"0.25\\linewidth")
-        - tab_width: str (e.g., "14cm", r"0.8\\textwidth", "linewidth")
-        - tex_style: dict with style overrides (see DEFAULT_TEX_STYLE)
-        - texlocation: str (placement specifier like "htbp")
-    docx_params : dict, optional
-        Parameters to apply when creating DOCX output. Can include:
-        - first_col_width: str (e.g., "2.5in", "6cm", "180pt")
-        - docx_style: dict with style overrides (see DEFAULT_DOCX_STYLE)
-    gt_params : dict, optional
-        Parameters to apply when creating GT/HTML output. Can include:
-
-        - gt_style: dict with style overrides (see DEFAULT_GT_STYLE)
+    tex_style : dict, optional
+        LaTeX style overrides for auto-display in notebooks. Can include any parameter
+        from DEFAULT_TEX_STYLE such as: first_col_width, tab_width, texlocation,
+        arraystretch, tabcolsep, data_align, x_col_align, cmidrule_trim,
+        first_row_addlinespace, data_addlinespace, rgroup_addlinespace,
+        group_header_format, notes_fontsize_cmd. See DEFAULT_TEX_STYLE for full options.
+    docx_style : dict, optional
+        DOCX style overrides for auto-display in notebooks. Can include any parameter
+        from DEFAULT_DOCX_STYLE such as: first_col_width, font_name, font_color_rgb,
+        font_size_pt, notes_font_size_pt, caption_font_name, caption_font_size_pt,
+        caption_align, notes_align, align_center_cells, border_*_rule_sz,
+        cell_margins_dxa, table_style_name. See DEFAULT_DOCX_STYLE for full options.
+    gt_style : dict, optional
+        GT/HTML style overrides for auto-display in notebooks. Can include any parameter
+        from DEFAULT_GT_STYLE plus all GT tab_options() parameters such as: align,
+        table_width, first_col_width, table_font_size_all, source_notes_font_size,
+        data_row_padding, column_labels_padding, border styles/colors/widths, etc.
+        See DEFAULT_GT_STYLE for full options.
 
     Examples
     --------
@@ -76,13 +80,13 @@ class MTable:
     >>> table = MTable(df, caption="My Table")
     >>> table  # Auto-displays in notebook
 
-    With output-specific parameters:
+    With style overrides for auto-display:
 
     >>> table = MTable(
     ...     df,
-    ...     tex_params={'first_col_width': '3cm'},
-    ...     docx_params={'first_col_width': '2in'},
-    ...     gt_params={'table_width': '100%'}
+    ...     tex_style={'first_col_width': '3cm'},
+    ...     docx_style={'first_col_width': '2in'},
+    ...     gt_style={'table_width': '100%'}
     ... )
     """
     # Class attributes for default values
@@ -104,6 +108,8 @@ class MTable:
         # Table dimensions
         "tab_width": r"\linewidth",  # Target width for tabularx (None for normal tabular)
         "first_col_width": None,  # LaTeX length for first column (None for flexible)
+        # Table placement
+        "texlocation": "htbp",  # LaTeX float placement specifier
         # Row height and column separation (scoped to the table)
         "arraystretch": 1,  # float or str
         "tabcolsep": "3pt",  # TeX length
@@ -156,7 +162,8 @@ class MTable:
         # Special parameters handled separately (not passed to tab_options)
         "align": "center",  # left | center | right (used for cols_align)
         "table_width": None,  # e.g., "100%" or None for auto-width
-        "table_font_size_all": "14px",  # Sets font size for all table elements except notes; individual font sizes override this
+        "first_col_width": None,  # e.g., "150px", "3cm", "20%" or None for auto-width
+        "table_font_size_all": "16px",  # Sets font size for all table elements except notes; individual font sizes override this
         "source_notes_font_size": "10px",
         # Standard tab_options parameters
         "data_row_padding": "2px",
@@ -202,11 +209,12 @@ class MTable:
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
         default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
-        # Output-specific parameter dictionaries (applied to auto-display in notebooks)
-        tex_params: Optional[Dict[str, object]] = None,
-        docx_params: Optional[Dict[str, object]] = None,
-        gt_params: Optional[Dict[str, object]] = None,
+        # Style parameters for auto-display in notebooks (applied when no type is specified)
+        tex_style: Optional[Dict[str, object]] = None,
+        docx_style: Optional[Dict[str, object]] = None,
+        gt_style: Optional[Dict[str, object]] = None,
         # No other style/render defaults here; handled in output methods
+        **kwargs,
     ):
         assert isinstance(df, pd.DataFrame), "df must be a pandas DataFrame."
         assert not isinstance(df.index, pd.MultiIndex) or df.index.nlevels <= 2, (
@@ -227,13 +235,13 @@ class MTable:
         else:
             self.default_paths = {}
 
-        # Store output-specific parameter dictionaries for auto-display
-        # When displayed automatically (__repr__), tex_params and gt_params are merged
+        # Store style parameters for auto-display
+        # When displayed automatically (__repr__), styles are used directly
         # since the default display shows both LaTeX (for Quarto) and HTML (for notebooks)
-        self._display_params = {
-            'tex_params': tex_params or {},
-            'docx_params': docx_params or {},
-            'gt_params': gt_params or {},
+        self._display_styles = {
+            'tex_style': tex_style or {},
+            'docx_style': docx_style or {},
+            'gt_style': gt_style or {},
         }
 
     def _translate_symbols(self, text: str, output_format: str) -> str:
@@ -266,12 +274,10 @@ class MTable:
 
               - tex_style: Dict[str, object] (default MTable.DEFAULT_TEX_STYLE)
                 Per-table overrides for TeX rendering, e.g.:
-                {first_col_width: "3cm", tab_width: r"0.8\\textwidth", arraystretch: 1.15, tabcolsep: "4pt", data_align: "c",
-                 x_col_align: "left", cmidrule_trim: "lr",
-                 first_row_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
+                {first_col_width: "3cm", tab_width: r"0.8\\textwidth", texlocation: "htbp",
+                 arraystretch: 1.15, tabcolsep: "4pt", data_align: "c", x_col_align: "left",
+                 cmidrule_trim: "lr", first_row_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
                  group_header_format: r"\\bfseries %s", notes_fontsize_cmd: r"\\footnotesize"}
-              - texlocation: str (default "htbp")
-                Placement specifier for the table environment.
               Note: When tab_width is set, ensure your document loads
               the tabularx and array packages.
             - For type="gt" (HTML via great-tables):
@@ -279,6 +285,7 @@ class MTable:
               - gt_style: Dict[str, object]
                 Dictionary passed directly to GT.tab_options() plus special parameters:
                 'align' (for cols_align), 'table_width' (controls table width),
+                'first_col_width' (width for first column, e.g., "150px", "3cm", "20%"),
                 and 'table_font_size_all' (default font size for all elements except notes; individual settings override).
                 Supports ALL GT styling options - see GT documentation for complete list.
                 Common examples: table_font_size, column_labels_font_size, source_notes_font_size,
@@ -369,9 +376,9 @@ class MTable:
         replace : bool, optional
             If False and file exists, raises unless DEFAULT_REPLACE or replace=True.
         **kwargs : Arguments forwarded to the respective output method:
-            - type="tex": tex_style, texlocation (see make()).
+            - type="tex": tex_style (see make()).
             - type="docx": docx_style (see make()).
-            - type="html": gt options via _output_gt (e.g., gt_style with table_width).
+            - type="html": gt_style via _output_gt (e.g., gt_style with table_width).
 
         Returns
         -------
@@ -1071,7 +1078,7 @@ class MTable:
         if (self.caption is not None) or (self.tab_label is not None):
             latex_res = (
                 "\\begin{table}["
-                + kwargs.get("texlocation", "htbp")
+                + str(s.get("texlocation", "htbp"))
                 + "]\n"
                 + "\\centering\n"
                 + (
@@ -1215,7 +1222,7 @@ class MTable:
                     s[param] = default_value
         
         # Prepare style options, excluding special parameters handled separately
-        special_params = {"align", "table_width", "table_font_size_all"}
+        special_params = {"align", "table_width", "first_col_width", "table_font_size_all"}
         tab_options_dict = {k: v for k, v in s.items() if k not in special_params}
         
         # Add required defaults
@@ -1230,6 +1237,11 @@ class MTable:
         
         # Apply all styling options at once
         gt = gt.tab_options(**tab_options_dict).cols_align(align=s.get("align", "center"))
+
+        # Handle first column width setting
+        if s.get("first_col_width"):
+            # Apply width to the first column (stub column)
+            gt = gt.cols_width(cases={rowname_col: str(s["first_col_width"])})
 
         # Customize row group display
         if "t" not in self.rgroup_sep:
@@ -1278,12 +1290,12 @@ class MTable:
                     "text/latex": self.quarto_latex,
                 }
 
-        # Generate both HTML and LaTeX outputs with their specific parameters
-        gt_params = self._display_params.get('gt_params', {})
-        tex_params = self._display_params.get('tex_params', {})
+        # Generate both HTML and LaTeX outputs with their specific styles
+        gt_style = self._display_styles.get('gt_style', {})
+        tex_style = self._display_styles.get('tex_style', {})
 
-        html_output = self._output_gt(**gt_params).as_raw_html()
-        tex_output = self._output_tex(**tex_params)
+        html_output = self._output_gt(gt_style=gt_style).as_raw_html()
+        tex_output = self._output_tex(tex_style=tex_style)
 
         # Add CSS to remove zebra striping if desired
         html_output = (
