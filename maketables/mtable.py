@@ -158,18 +158,18 @@ class MTable:
         # Column label borders
         "column_labels_border_top_style": "solid",
         "column_labels_border_top_color": "black",
-        "column_labels_border_top_width": "1px",
+        "column_labels_border_top_width": "2px",  # Top rule (toprule) - thickest
         "column_labels_border_bottom_style": "solid",
         "column_labels_border_bottom_color": "black",
-        "column_labels_border_bottom_width": "0.5px",
+        "column_labels_border_bottom_width": "0.5px",  # Header midrule - medium
         "column_labels_vlines_color": "white",
         "column_labels_vlines_width": "0px",
         # Table body borders
         "table_body_border_top_style": "solid",
-        "table_body_border_top_width": "0.5px",
+        "table_body_border_top_width": "0px", # Avoid double top border by default 
         "table_body_border_top_color": "black",
         "table_body_border_bottom_style": "solid",
-        "table_body_border_bottom_width": "1px",
+        "table_body_border_bottom_width": "2px",  # Bottom rule (bottomrule) - thickest
         "table_body_border_bottom_color": "black",
         "table_body_hlines_style": "none",
         "table_body_vlines_color": "white",
