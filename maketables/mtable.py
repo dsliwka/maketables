@@ -104,15 +104,16 @@ class MTable:
     # or per-call via tex_style in make/save/_output_tex)
     DEFAULT_TEX_STYLE: Dict[str, object] = {
         # Row height and column separation (scoped to the table)
-        "arraystretch": 1.1,  # float or str
-        "tabcolsep": "6pt",  # TeX length
+        "arraystretch": 1,  # float or str
+        "tabcolsep": "3pt",  # TeX length
         # Alignment
         "data_align": "c",  # l|c|r for non-tabularx data columns
         "x_col_align": "center",  # left|center|right for tabularx X columns
         # Rules/spacing
         "cmidrule_trim": "lr",  # "", "l", "r", "lr"
-        "header_addlinespace": "0.5ex",  # spacing after header midrule
-        "data_addlinespace": None,  # e.g., "0.25ex" between data rows; None disables
+        "first_row_addlinespace": "1ex",  # spacing before first row of each row group; None disables
+        "data_addlinespace": "0.5ex",  # spacing before and after data rows; None disables
+        "rgroup_addlinespace": None,  # spacing between row groups (independent of rgroup_sep); None disables
         # Row-group header formatting
         "group_header_format": r"\emph{%s}",
         # Notes font size command used in notes minipage
@@ -265,7 +266,7 @@ class MTable:
                 Per-table overrides for TeX rendering, e.g.:
                 {arraystretch: 1.15, tabcolsep: "4pt", data_align: "c",
                  x_col_align: "left", cmidrule_trim: "lr",
-                 header_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
+                 first_row_addlinespace: "0.75ex", data_addlinespace: "0.25ex",
                  group_header_format: r"\\bfseries %s", notes_fontsize_cmd: r"\\footnotesize"}
               - texlocation: str (default "htbp")
                 Placement specifier for the table environment.
@@ -985,41 +986,63 @@ class MTable:
         # Build body rows
         body_lines = []
 
-        def _maybe_add_data_space(target: list):
-            sp = s.get("data_addlinespace")
-            if isinstance(sp, str) and sp.strip():
-                target.append(rf"\addlinespace[{sp}]")
-
         if row_groups_present:
             start = 0
             for gi, (gname, glen) in enumerate(zip(row_groups, row_groups_len)):
                 if self.rgroup_display:
                     fmt = str(s.get("group_header_format", r"\emph{%s}"))
                     body_lines.append((fmt % str(gname)) + r" \\")
-                    body_lines.append(r"\addlinespace")
+                    # Only add space after group header if data_addlinespace is set
+                    if s.get("data_addlinespace") is not None:
+                        body_lines.append(rf"\addlinespace[{s['data_addlinespace']}]")
+                # Add first_row_addlinespace before the first data row of this group
+                if s.get("first_row_addlinespace") is not None:
+                    body_lines.append(rf"\addlinespace[{s['first_row_addlinespace']}]")
                 # Rows for this group
                 end = start + glen
                 for ridx in range(start, end):
+                    # Add space before data row (except for the very first row of the group)
+                    if s.get("data_addlinespace") is not None and ridx > start:
+                        body_lines.append(rf"\addlinespace[{s['data_addlinespace']}]")
+
                     row_label = str(dfs.index[ridx])
                     vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
                     row_parts = [row_label] + [str(v) for v in vals]
                     body_lines.append(" & ".join(row_parts) + r" \\")
-                    _maybe_add_data_space(body_lines)
-                # Group separator if requested and not last group
-                if (self.rgroup_sep != "") and (gi < len(row_groups) - 1):
-                    body_lines.append(r"\addlinespace")
-                    body_lines.append(r"\midrule")
-                    body_lines.append(r"\addlinespace")
+
+                    # Add space after data row
+                    if s.get("data_addlinespace") is not None:
+                        body_lines.append(rf"\addlinespace[{s['data_addlinespace']}]")
+                # Group separator - always add spacing if set, optionally add midrule
+                if gi < len(row_groups) - 1:
+                    rg_space = s.get("rgroup_addlinespace")
+                    if rg_space is not None:
+                        body_lines.append(rf"\addlinespace[{rg_space}]")
+
+                    # Only add midrule if rgroup_sep is not empty
+                    if self.rgroup_sep != "":
+                        body_lines.append(r"\midrule")
+                        if rg_space is not None:
+                            body_lines.append(rf"\addlinespace[{rg_space}]")
                 start = end
         else:
             for ridx in range(dfs.shape[0]):
+                # Add first_row_addlinespace before the very first row
+                if s.get("first_row_addlinespace") is not None and ridx == 0:
+                    body_lines.append(rf"\addlinespace[{s['first_row_addlinespace']}]")
+                # Add space before data row (except for the very first row)
+                elif s.get("data_addlinespace") is not None and ridx > 0:
+                    body_lines.append(rf"\addlinespace[{s['data_addlinespace']}]")
+
                 row_label = str(dfs.index[ridx])
                 vals = [dfs.iloc[ridx, j] for j in range(data_cols)]
                 row_parts = [row_label] + [str(v) for v in vals]
                 body_lines.append(" & ".join(row_parts) + r" \\")
-                _maybe_add_data_space(body_lines)
-            if s.get("data_addlinespace") is None:
-                body_lines.append(r"\addlinespace")
+
+                # Add space after data row
+                if s.get("data_addlinespace") is not None:
+                    body_lines.append(rf"\addlinespace[{s['data_addlinespace']}]")
+            # Spacing now controlled symmetrically by data_addlinespace setting
 
         # Assemble tabular/tabularx content
         tab_env = "tabularx" if use_tabularx else "tabular"
@@ -1035,8 +1058,6 @@ class MTable:
         lines.append(r"\toprule")
         lines.extend(header_lines)
         lines.append(r"\midrule")
-        if s.get("header_addlinespace"):
-            lines.append(rf"\addlinespace[{s['header_addlinespace']}]")
         lines.extend(body_lines)
         lines.append(r"\bottomrule")
         lines.append(rf"\end{{{tab_env}}}")
