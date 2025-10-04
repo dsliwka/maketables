@@ -176,3 +176,8 @@ mystuff/
 _site/
 .quarto/
 /.quarto/
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+**/*.quarto_ipynb

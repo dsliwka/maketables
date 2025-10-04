@@ -6,34 +6,22 @@ build-backend = "setuptools.build_meta"
 name = "maketables"
 version = "0.1.0"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Dirk Sliwka", email = "dirks_email@uni.de"},
 ]
 description = "A Python package for creating publication-ready tables from statistical models and descriptive statistics"
 readme = "README.md"
 requires-python = ">=3.8"
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Information Analysis",
-]
+license = { text = "MIT" }
+
 dependencies = [
     "numpy>=1.20.0",
     "pandas>=1.3.0",
     "great-tables>=0.2.0",
     "tabulate>=0.9.0",
-    "pyfixest>=0.13.0",
     "python-docx>=0.8.11",
     "ipython>=7.0.0",
 ]
+
 
 [project.optional-dependencies]
 dev = [
@@ -46,75 +34,29 @@ dev = [
 docs = [
     "sphinx>=5.0",
     "sphinx-rtd-theme>=1.0",
+    "pyfixest>=0.13.0",
+    "statsmodels>=0.13.0",
+    "ipykernel>=6.0.0,<7",
+    "nbconvert>=7.0.0",
+    "pylatex>=1.4.2,<2",
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/yourusername/maketables"
-"Bug Reports" = "https://github.com/yourusername/maketables/issues"
-"Source" = "https://github.com/yourusername/maketables"
+[tool.pixi.feature.dev.dependencies]
+quarto = ">=1.8.25,<2"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["maketables*"]
-exclude = ["tests*"]
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "osx-64", "win-64"]
 
-[tool.setuptools.package-data]
-maketables = ["*.txt", "*.md"]
+[tool.pixi.pypi-dependencies]
+maketables = { path = ".", editable = true }
 
-[tool.black]
-line-length = 88
-target-version = ['py38']
+[tool.pixi.environments]
+default = { solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
 
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-
-# Ruff configuration
-[tool.ruff]
-# Set the maximum line length to 88 (Black's default)
-line-length = 88
-target-version = "py38"
-
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "N",   # pep8-naming
-    "UP",  # pyupgrade
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "SIM", # flake8-simplify
-]
-
-ignore = [
-    "E501",  # Line too long (handled by formatter)
-    "N806",  # Variable in function should be lowercase (pandas style)
-]
-
-fixable = ["ALL"]
-unfixable = []
-
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".ruff_cache",
-    ".venv",
-    "__pycache__",
-    "build",
-    "dist",
-    "venv",
-]
-
-[tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["E402", "F401"]  # Allow imports in init files
-"test_*.py" = ["S101"]            # Allow assert in tests
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
+[tool.pixi.feature.docs.tasks]
+run-all-notebooks = "jupyter nbconvert --execute --to notebook --inplace DTable.ipynb ETable.ipynb DocxTables.ipynb LatexTables.ipynb WritingPapers.ipynb getting-started.ipynb"
+docs-preview = "quarto preview"
+docs-install-tex = "quarto install tinytex"
