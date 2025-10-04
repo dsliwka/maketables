@@ -258,7 +258,7 @@ class MTable:
         return translate_symbols(text, output_format)
 
     def make(self, type: str = None, **kwargs):
-        """
+        r"""
         Create the output object of the table (either gt, tex, docx, or html).
         If type is None, displays both HTML and LaTeX outputs for compatibility
         with both notebook viewing and Quarto rendering.
