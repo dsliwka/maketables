@@ -1137,7 +1137,7 @@ class MTable:
             # Store the mapping of column numbers to column names
             col_dict = dict(zip(col_numbers, col_names, strict=False))
             # Modify the last elements in each tuple in dfcols
-            dfcols = [(t[:-1] + (col_numbers[i],)) for i, t in enumerate(dfcols)]
+            dfcols = [(*t[:-1], col_numbers[i]) for i, t in enumerate(dfcols)]
         else:
             nlevels = 1
 
