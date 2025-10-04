@@ -4,7 +4,7 @@ import re
 import warnings
 from collections import Counter
 from collections.abc import ValuesView
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
@@ -16,9 +16,7 @@ from pyfixest.estimation.FixestMulti_ import FixestMulti
 from .extractors import ModelExtractor, get_extractor
 from .mtable import MTable
 
-ModelInputType = Union[
-    FixestMulti, Feols, Fepois, Feiv, list[Union[Feols, Fepois, Feiv]]
-]
+ModelInputType = FixestMulti|Feols|Fepois|Feiv|list[Feols | Fepois | Feiv]
 
 
 class ETable(MTable):
@@ -129,7 +127,7 @@ class ETable(MTable):
     DEFAULT_COEF_FMT = "b:.3f \n (se:.3f)"
     DEFAULT_MODEL_STATS = ["N", "r2"]
     # Canonical stat key -> printable label (used if model_stats_labels is None)
-    DEFAULT_STAT_LABELS: Dict[str, str] = {
+    DEFAULT_STAT_LABELS: dict[str, str] = {
         "N": "Observations",
         "se_type": "S.E. type",
         "r2": "R²",
@@ -154,7 +152,7 @@ class ETable(MTable):
     DEFAULT_SHOW_SE_TYPE = True
     DEFAULT_SHOW_FE = True
     DEFAULT_HEAD_ORDER = "dh"
-    DEFAULT_FELABELS: Dict[str, str] = {}
+    DEFAULT_FELABELS: dict[str, str] = {}
     DEFAULT_CAT_TEMPLATE = "{variable}={value}"
     DEFAULT_LINEBREAK = "\n"
 
@@ -162,25 +160,25 @@ class ETable(MTable):
         self,
         models: ModelInputType,
         *,
-        signif_code: Optional[list] = None,
-        coef_fmt: Optional[str] = None,
-        model_stats: Optional[list[str]] = None,
-        model_stats_labels: Optional[dict[str, str]] = None,
-        custom_stats: Optional[dict] = None,
-        custom_model_stats: Optional[dict] = None,
-        keep: Optional[Union[list, str]] = None,
-        drop: Optional[Union[list, str]] = None,
-        exact_match: Optional[bool] = False,
-        labels: Optional[dict] = None,
-        cat_template: Optional[str] = None,
-        show_fe: Optional[bool] = None,
-        felabels: Optional[dict] = None,
+        signif_code: list | None = None,
+        coef_fmt: str | None = None,
+        model_stats: list[str] | None = None,
+        model_stats_labels: dict[str, str] | None = None,
+        custom_stats: dict | None = None,
+        custom_model_stats: dict | None = None,
+        keep: list | str | None = None,
+        drop: list | str | None = None,
+        exact_match: bool | None = False,
+        labels: dict | None = None,
+        cat_template: str | None = None,
+        show_fe: bool | None = None,
+        felabels: dict | None = None,
         notes: str = "",
-        model_heads: Optional[list] = None,
-        head_order: Optional[str] = None,
-        caption: Optional[str] = None,
-        tab_label: Optional[str] = None,
-        digits: Optional[int] = None,
+        model_heads: list | None = None,
+        head_order: str | None = None,
+        caption: str | None = None,
+        tab_label: str | None = None,
+        digits: int | None = None,
         **kwargs,
     ):
         # --- defaults from class attributes ---
@@ -319,7 +317,7 @@ class ETable(MTable):
 
     # ---------- Dispatch helpers (package detection) ----------
 
-    def _normalize_models(self, models: Any) -> List[Any]:
+    def _normalize_models(self, models: Any) -> list[Any]:
         # Expand FixestMulti if present, otherwise wrap single model into a list
         if isinstance(models, FixestMulti):
             return models.to_list()
@@ -337,10 +335,10 @@ class ETable(MTable):
     def _extract_depvar(self, model: Any) -> str:
         return self._get_extractor(model).depvar(model)
 
-    def _extract_fixef_string(self, model: Any) -> Optional[str]:
+    def _extract_fixef_string(self, model: Any) -> str | None:
         return self._get_extractor(model).fixef_string(model)
 
-    def _extract_vcov_info(self, model: Any) -> Dict[str, Any]:
+    def _extract_vcov_info(self, model: Any) -> dict[str, Any]:
         return self._get_extractor(model).vcov_info(model)
 
     def _extract_tidy_df(self, model: Any) -> pd.DataFrame:
@@ -363,12 +361,12 @@ class ETable(MTable):
             return "-" if math.isnan(raw) else _format_number(float(raw))
         return str(raw)
 
-    def _collect_labels_from_models(self, models: List[Any]) -> Dict[str, str]:
+    def _collect_labels_from_models(self, models: list[Any]) -> dict[str, str]:
         """
         Gather variable labels from each model via its extractor, merging across
         models (first seen wins), then fill missing entries from MTable.DEFAULT_LABELS.
         """
-        merged: Dict[str, str] = {}
+        merged: dict[str, str] = {}
         for m in models:
             try:
                 extractor = self._get_extractor(m)
@@ -392,10 +390,10 @@ class ETable(MTable):
             pass
         return merged
 
-    def _collect_fixef_list(self, models: List[Any], show_fe: bool) -> List[str]:
+    def _collect_fixef_list(self, models: list[Any], show_fe: bool) -> list[str]:
         if not show_fe:
             return []
-        fixef_list: List[str] = []
+        fixef_list: list[str] = []
         for m in models:
             fx = self._extract_fixef_string(m)
             if fx and fx != "0":
@@ -403,7 +401,7 @@ class ETable(MTable):
         fixef_list = [x for x in fixef_list if x]
         return sorted(set(fixef_list))
 
-    def _compute_stars(self, p: pd.Series, signif_code: List[float]) -> pd.Series:
+    def _compute_stars(self, p: pd.Series, signif_code: list[float]) -> pd.Series:
         if not signif_code:
             return pd.Series([""] * len(p), index=p.index)
         s = pd.Series("", index=p.index, dtype=object)
@@ -416,14 +414,14 @@ class ETable(MTable):
 
     def _build_coef_table(
         self,
-        models: List[Any],
+        models: list[Any],
         coef_fmt: str,
-        signif_code: List[float],
-        custom_stats: Dict[str, List[list]],
-        keep: List[str],
-        drop: List[str],
+        signif_code: list[float],
+        custom_stats: dict[str, list[list]],
+        keep: list[str],
+        drop: list[str],
         exact_match: bool,
-        labels: Dict[str, str],
+        labels: dict[str, str],
         cat_template: str,
     ) -> tuple[pd.DataFrame, str]:
         lbcode = self.DEFAULT_LINEBREAK
@@ -510,11 +508,11 @@ class ETable(MTable):
 
     def _build_fe_df(
         self,
-        models: List[Any],
-        fixef_list: List[str],
+        models: list[Any],
+        fixef_list: list[str],
         show_fe: bool,
-        labels: Dict[str, str],
-        felabels: Optional[Dict[str, str]],
+        labels: dict[str, str],
+        felabels: dict[str, str] | None,
         like_columns: pd.Index,
     ) -> pd.DataFrame:
         if not (show_fe and fixef_list):
@@ -542,10 +540,10 @@ class ETable(MTable):
 
     def _build_model_stats(
         self,
-        models: List[Any],
-        stat_keys: List[str],
-        stat_labels: Optional[Dict[str, str]],
-        custom_model_stats: Optional[Dict[str, list]],
+        models: list[Any],
+        stat_keys: list[str],
+        stat_labels: dict[str, str] | None,
+        custom_model_stats: dict[str, list] | None,
         like_index: pd.Index,
         like_columns: pd.Index,
     ) -> pd.DataFrame:
@@ -585,11 +583,11 @@ class ETable(MTable):
 
     def _build_header_columns(
         self,
-        dep_var_list: List[str],
-        model_heads: Optional[List[str]],
+        dep_var_list: list[str],
+        model_heads: list[str] | None,
         head_order: str,
         n_models: int,
-    ) -> Union[List[str], pd.MultiIndex]:
+    ) -> list[str] | pd.MultiIndex:
         id_dep = dep_var_list
         id_num = [f"({s})" for s in range(1, n_models + 1)]
 
@@ -602,7 +600,7 @@ class ETable(MTable):
         if head_order == "":
             return id_num
 
-        header_levels: List[List[str]] = []
+        header_levels: list[list[str]] = []
         for c in head_order:
             if c == "h" and id_head is not None:
                 header_levels.append(id_head)
@@ -611,7 +609,7 @@ class ETable(MTable):
         header_levels.append(id_num)
 
         # filter out fully empty levels
-        def non_empty(arr: List[str]) -> bool:
+        def non_empty(arr: list[str]) -> bool:
             return any((v is not None and str(v) != "") for v in arr)
 
         header_levels = [lvl for lvl in header_levels if non_empty(lvl)]
@@ -624,8 +622,8 @@ class ETable(MTable):
 def _post_processing_input_checks(
     models: ModelInputType,
     check_duplicate_model_names: bool = False,
-    rename_models: Optional[dict[str, str]] = None,
-) -> list[Union[Feols, Fepois, Feiv]]:
+    rename_models: dict[str, str] | None = None,
+) -> list[Feols | Fepois | Feiv]:
     """
     Perform input checks for post-processing models.
 
@@ -653,7 +651,7 @@ def _post_processing_input_checks(
         TypeError: If the models argument is not of the expected type.
 
     """
-    models_list: list[Union[Feols, Fepois, Feiv]] = []
+    models_list: list[Feols | Fepois | Feiv] = []
 
     if isinstance(models, (Feols, Fepois, Feiv)):
         models_list = [models]
@@ -735,7 +733,7 @@ def _format_number(x: float, format_spec: str = None) -> str:
             if abs_x >= 1000:
                 return f"{int(round(x)):,}"  # Use comma separators for large integers
             else:
-                return f"{int(round(x))}"    # No decimals for smaller integers
+                return f"{int(round(x))}"  # No decimals for smaller integers
 
         # For very small numbers (close to zero), show more precision
         if abs_x < 0.001 and abs_x > 0:
@@ -899,9 +897,9 @@ def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
 
 def _select_order_coefs(
     coefs: list,
-    keep: Optional[Union[list, str]] = None,
-    drop: Optional[Union[list, str]] = None,
-    exact_match: Optional[bool] = False,
+    keep: list | str | None = None,
+    drop: list | str | None = None,
+    exact_match: bool | None = False,
 ):
     r"""
     Select and order the coefficients based on the pattern.
@@ -1031,7 +1029,6 @@ def _apply_digits_to_coef_fmt(coef_fmt: str, digits: int) -> str:
     return updated_fmt
 
 
-
 def _relabel_expvar(
     varname: str, labels: dict, interaction_symbol: str, cat_template=""
 ):
@@ -1075,7 +1072,7 @@ def _relabel_expvar(
 
 
 def _rename_categorical(
-    col_name, template="{variable}::{value}", labels: Optional[dict] = None
+    col_name, template="{variable}::{value}", labels: dict | None = None
 ):
     """
     Rename categorical variables, optionally converting floats to ints in the category label.
@@ -1124,4 +1121,3 @@ def _rename_categorical(
         return template.format(variable=variable, value=value_raw, value_int=value_int)
     else:
         return col_name
-

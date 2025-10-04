@@ -6,15 +6,15 @@ from .importdta import export_dta, get_var_labels, import_dta, set_var_labels
 from .mtable import MTable
 
 __all__ = [
-    "MTable",
     "BTable",
     "DTable",
     "ETable",
-    "register_extractor",
-    "clear_extractors",
+    "MTable",
     "ModelExtractor",
-    "import_dta",
+    "clear_extractors",
     "export_dta",
     "get_var_labels",
+    "import_dta",
+    "register_extractor",
     "set_var_labels",
 ]

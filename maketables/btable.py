@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional, Union
-
 import numpy as np
 import pandas as pd
 import pyfixest as pf
@@ -52,16 +50,16 @@ class BTable(DTable):
     def __init__(
         self,
         df: pd.DataFrame,
-        vars: List[str],
+        vars: list[str],
         group: str,
         *,
-        labels: Optional[Dict[str, str]] = None,
+        labels: dict[str, str] | None = None,
         digits: int = 2,
         pdigits: int = 3,
-        vcov: Union[str, Dict[str, str]] = "iid",
-        fixed_effects: Optional[List[str]] = None,
-        stats: Optional[List[str]] = None,
-        stats_labels: Optional[Dict[str, str]] = None,
+        vcov: str | dict[str, str] = "iid",
+        fixed_effects: list[str] | None = None,
+        stats: list[str] | None = None,
+        stats_labels: dict[str, str] | None = None,
         hide_stats: bool = False,
         counts_row_below: bool = False,
         observed: bool = False,

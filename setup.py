@@ -1,14 +1,15 @@
-from setuptools import setup, find_packages
-
 # Read the contents of README file
 from pathlib import Path
+
+from setuptools import find_packages, setup
+
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text(encoding='utf-8')
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="maketables",
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=["setuptools_scm"],
     author="Your Name",
     author_email="your.email@example.com",
     description="A Python package for creating publication-ready tables from statistical models and descriptive statistics",

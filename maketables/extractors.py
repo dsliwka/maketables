@@ -6,7 +6,7 @@ from various Python statistical modeling packages (statsmodels, pyfixest, linear
 The extractor system uses a Protocol-based design for type safety and extensibility.
 """
 
-from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
 import pandas as pd
@@ -32,88 +32,94 @@ except Exception:
 class ModelExtractor(Protocol):
     """
     Protocol defining the interface for statistical model extractors.
-    
+
     This protocol ensures that all extractor implementations provide a consistent
     interface for extracting coefficients, statistics, and metadata from statistical models.
     The @runtime_checkable decorator allows isinstance() checks at runtime.
     """
-    
+
     def can_handle(self, model: Any) -> bool:
         """Check if this extractor can handle the given model type."""
         ...
-        
+
     def coef_table(self, model: Any) -> pd.DataFrame:
         """
         Extract coefficient table with columns: Estimate, Std. Error, Pr(>|t|), and t value.
-        
-        Returns:
+
+        Returns
+        -------
             DataFrame with coefficient estimates, standard errors, p-values, and t-statistics.
         """
         ...
-        
+
     def depvar(self, model: Any) -> str:
         """Extract the dependent variable name from the model."""
         ...
-        
+
     def fixef_string(self, model: Any) -> str | None:
         """
         Extract fixed effects specification as a string.
-        
-        Returns:
+
+        Returns
+        -------
             String describing fixed effects (e.g., "entity+time") or None if no fixed effects.
         """
         ...
-        
+
     def stat(self, model: Any, key: str) -> Any:
         """
         Extract a specific statistic from the model.
-        
+
         Args:
             model: Statistical model object
             key: Statistic key (e.g., "N", "r2", "adj_r2", "fvalue")
-            
-        Returns:
+
+        Returns
+        -------
             The requested statistic value or None if not available.
         """
         ...
-        
-    def vcov_info(self, model: Any) -> Dict[str, Any]:
+
+    def vcov_info(self, model: Any) -> dict[str, Any]:
         """
         Extract variance-covariance matrix information.
-        
-        Returns:
+
+        Returns
+        -------
             Dictionary with vcov_type and clustervar information.
         """
         ...
-        
-    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+
+    def var_labels(self, model: Any) -> dict[str, str] | None:
         """
         Extract variable labels from the model's data. Note: this allows to access maketables'
         variable labeling system if the model retains a reference to the original DataFrame and
         checks whether the DataFrame has variable labels (attribute `var_labels`).
-        
-        Returns:
+
+        Returns
+        -------
             Dictionary mapping variable names to descriptive labels, or None if unavailable.
         """
         ...
-        
+
     def supported_stats(self, model: Any) -> set[str]:
         """
         Get the set of statistics this extractor can provide for the given model.
-        
-        Returns:
+
+        Returns
+        -------
             Set of statistic keys that are available for this model.
         """
         ...
 
 
-_EXTRACTOR_REGISTRY: List[ModelExtractor] = []
+_EXTRACTOR_REGISTRY: list[ModelExtractor] = []
 
 
 def register_extractor(extractor: ModelExtractor) -> None:
     """
     Register a model extractor in the global registry.
-    
+
     Args:
         extractor: ModelExtractor instance to register.
     """
@@ -128,17 +134,19 @@ def clear_extractors() -> None:
 def get_extractor(model: Any) -> ModelExtractor:
     """
     Find and return the appropriate extractor for a given model.
-    
+
     Iterates through registered extractors and returns the first one that
     can handle the given model type.
-    
+
     Args:
         model: Statistical model object to find an extractor for.
-        
-    Returns:
+
+    Returns
+    -------
         ModelExtractor instance that can handle the model.
-        
-    Raises:
+
+    Raises
+    ------
         TypeError: If no registered extractor can handle the model type.
     """
     for ex in _EXTRACTOR_REGISTRY:
@@ -153,17 +161,18 @@ def get_extractor(model: Any) -> ModelExtractor:
 # ---------- small helpers ----------
 
 
-def _follow(obj: Any, chain: List[str]) -> Any:
+def _follow(obj: Any, chain: list[str]) -> Any:
     """
     Follow a chain of attribute names to extract nested values.
-    
+
     Args:
         obj: Starting object to traverse from.
         chain: List of attribute names to follow sequentially.
-        
-    Returns:
+
+    Returns
+    -------
         The final nested attribute value, or None if any attribute in the chain doesn't exist.
-        
+
     Example:
         _follow(model, ["model", "endog", "name"]) returns model.model.endog.name
     """
@@ -179,21 +188,23 @@ def _follow(obj: Any, chain: List[str]) -> Any:
 def _get_attr(model: Any, spec: Any) -> Any:
     """
     Resolve a STAT_MAP specification against a model object.
-    
+
     This function provides a unified way to extract attributes from statistical models
     using different specification formats:
-    
+
     Args:
         model: Statistical model object to extract from.
         spec: Specification for how to extract the value, can be:
             - str: Direct attribute name ("attr") -> tries model.attr, then model.model.attr
             - tuple/list: Nested attribute path ("a","b","c") -> model.a.b.c via _follow()
             - callable: Function to compute value -> spec(model)
-            
-    Returns:
+
+    Returns
+    -------
         The extracted value, or None if the specification cannot be resolved.
-        
-    Examples:
+
+    Examples
+    --------
         _get_attr(model, "nobs")  # Returns model.nobs or model.model.nobs
         _get_attr(model, ("model", "endog", "name"))  # Returns model.model.endog.name
         _get_attr(model, lambda m: m.s2 ** 0.5)  # Returns computed RMSE
@@ -216,12 +227,12 @@ def _get_attr(model: Any, spec: Any) -> Any:
 class PyFixestExtractor:
     """
     Extractor for pyfixest models (Feols, Fepois, Feiv).
-    
+
     Handles models from the pyfixest package, providing access to
     coefficients, statistics, and metadata. Supports clustered standard errors
     and fixed effects specifications.
     """
-    
+
     def can_handle(self, model: Any) -> bool:
         """Check if model is a pyfixest model type."""
         try:
@@ -232,10 +243,11 @@ class PyFixestExtractor:
     def coef_table(self, model: Any) -> pd.DataFrame:
         """
         Extract coefficient table from pyfixest model using tidy() method.
-        
+
         Standardizes column names and ensures required columns are present.
-        
-        Returns:
+
+        Returns
+        -------
             DataFrame with columns: Estimate, Std. Error, Pr(>|t|), and t value.
         """
         df = model.tidy()
@@ -244,9 +256,7 @@ class PyFixestExtractor:
                 "PyFixestExtractor: tidy() must contain 'Estimate' and 'Std. Error'."
             )
         if "Pr(>|t|)" not in df.columns:
-            raise ValueError(
-                "PyFixestExtractor: tidy() must contain 'Pr(>|t|)'."
-            )
+            raise ValueError("PyFixestExtractor: tidy() must contain 'Pr(>|t|)'.")
         keep = ["Estimate", "Std. Error", "Pr(>|t|)"]
         if "t value" in df.columns:
             keep.insert(2, "t value")
@@ -261,7 +271,7 @@ class PyFixestExtractor:
         return getattr(model, "_fixef", None)
 
     # Build a clean map of unified stat keys -> pyfixest attributes/callables
-    STAT_MAP: Dict[str, Any] = {
+    STAT_MAP: dict[str, Any] = {
         "N": "_N",
         "se_type": lambda m: (
             "by: " + "+".join(getattr(m, "_clustervar", []))
@@ -289,12 +299,13 @@ class PyFixestExtractor:
     def stat(self, model: Any, key: str) -> Any:
         """
         Extract a statistic from the pyfixest model using STAT_MAP.
-        
+
         Args:
             model: Pyfixest model object.
             key: Statistic key (e.g., "N", "r2", "se_type").
-            
-        Returns:
+
+        Returns
+        -------
             The requested statistic value, with special handling for sample size (N).
         """
         spec = self.STAT_MAP.get(key)
@@ -308,14 +319,14 @@ class PyFixestExtractor:
                 return val
         return val
 
-    def vcov_info(self, model: Any) -> Dict[str, Any]:
+    def vcov_info(self, model: Any) -> dict[str, Any]:
         """Extract variance-covariance matrix type and clustering information."""
         return {
             "vcov_type": getattr(model, "_vcov_type", None),
             "clustervar": getattr(model, "_clustervar", None),
         }
 
-    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+    def var_labels(self, model: Any) -> dict[str, str] | None:
         """Extract variable labels from the model's data DataFrame when available."""
         df = getattr(model, "_data", None)
         if isinstance(df, pd.DataFrame):
@@ -335,12 +346,12 @@ class PyFixestExtractor:
 class StatsmodelsExtractor:
     """
     Extractor for statsmodels regression results.
-    
+
     Handles most statsmodels result objects that have the standard interface
     with params, bse (standard errors), and pvalues attributes. Supports
     various regression types including OLS, GLM, and others.
     """
-    
+
     def can_handle(self, model: Any) -> bool:
         """Check if model has the standard statsmodels result interface."""
         return all(hasattr(model, a) for a in ("params", "bse", "pvalues"))
@@ -348,11 +359,12 @@ class StatsmodelsExtractor:
     def coef_table(self, model: Any) -> pd.DataFrame:
         """
         Extract coefficient table from statsmodels result.
-        
+
         Constructs standardized DataFrame from params, bse, pvalues, and
         optionally tvalues attributes of the statsmodels result.
-        
-        Returns:
+
+        Returns
+        -------
             DataFrame with columns: Estimate, Std. Error, Pr(>|t|), and optionally t value.
         """
         params = pd.Series(model.params)
@@ -379,11 +391,12 @@ class StatsmodelsExtractor:
     def depvar(self, model: Any) -> str:
         """
         Extract dependent variable name from statsmodels result.
-        
+
         Tries multiple common locations for the dependent variable name
         in statsmodels results objects.
-        
-        Returns:
+
+        Returns
+        -------
             Dependent variable name or "y" if not found.
         """
         for chain in [
@@ -408,7 +421,7 @@ class StatsmodelsExtractor:
         return None
 
     # Unified stat keys -> statsmodels attributes/callables
-    STAT_MAP: Dict[str, Any] = {
+    STAT_MAP: dict[str, Any] = {
         "N": "nobs",
         "se_type": "cov_type",
         "r2": "rsquared",
@@ -438,10 +451,10 @@ class StatsmodelsExtractor:
                 return val
         return val
 
-    def vcov_info(self, model: Any) -> Dict[str, Any]:
+    def vcov_info(self, model: Any) -> dict[str, Any]:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
-    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+    def var_labels(self, model: Any) -> dict[str, str] | None:
         # Try common statsmodels formula-api locations for the original DataFrame
         candidates = [
             ("model", "model", "data", "frame"),
@@ -526,7 +539,7 @@ class LinearmodelsExtractor:
         return "+".join(parts) if parts else None
 
     # Unified stat keys -> linearmodels attributes/callables
-    STAT_MAP: Dict[str, Any] = {
+    STAT_MAP: dict[str, Any] = {
         # Sizes / DoF
         "N": "nobs",
         "df_model": "df_model",
@@ -577,10 +590,10 @@ class LinearmodelsExtractor:
                 return val
         return val
 
-    def vcov_info(self, model: Any) -> Dict[str, Any]:
+    def vcov_info(self, model: Any) -> dict[str, Any]:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
-    def var_labels(self, model: Any) -> Optional[Dict[str, str]]:
+    def var_labels(self, model: Any) -> dict[str, str] | None:
         # Try to locate original DataFrame
         candidates = [
             ("model", "data", "frame"),

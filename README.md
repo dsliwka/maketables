@@ -6,7 +6,7 @@ A Python package for creating publication-ready tables from statistical models a
 
 MakeTables provides a unified interface for generating tables from:
 - Regression results (from [statsmodels](https://www.statsmodels.org/stable/index.html), [pyfixest](https://py-econometrics.github.io/pyfixest/pyfixest.html), or (still more experimental) [linearmodels](https://bashtage.github.io/linearmodels/))
-- Descriptive statistics 
+- Descriptive statistics
 - Custom data tables
 
 The package supports multiple output formats including:
@@ -75,7 +75,7 @@ import statsmodels.formula.api as smf
 df["foreign_i"] = (df["foreign"] == "Foreign")*1
 mt.set_var_labels(df, {"foreign_i": "Foreign (indicator)"})
 
-# Fit your models 
+# Fit your models
 est1 = smf.ols("foreign_i ~ weight + length + price", data=df).fit()
 est2 = smf.probit("foreign_i ~ weight + length + price", data=df).fit(disp=0)
 
@@ -103,7 +103,7 @@ Extends MTable for descriptive statistics:
 
 ### `ETable`
 Extends MTable for econometric model results:
-- Support for statsmodels, pyfixest, and (more experimental) linearmodels 
+- Support for statsmodels, pyfixest, and (more experimental) linearmodels
 - Many layout options (relabelling of variables, keep/drop, choice of reported statistics, column headings,...)
 
 ### `BTable`

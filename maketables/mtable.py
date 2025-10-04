@@ -1,5 +1,4 @@
 import os
-from typing import Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -76,7 +75,7 @@ class MTable:
     --------
     Basic usage:
 
-    >>> df = pd.DataFrame({'A': [1, 2], 'B': ['x', 'y']})
+    >>> df = pd.DataFrame({"A": [1, 2], "B": ["x", "y"]})
     >>> table = MTable(df, caption="My Table")
     >>> table  # Auto-displays in notebook
 
@@ -84,11 +83,12 @@ class MTable:
 
     >>> table = MTable(
     ...     df,
-    ...     tex_style={'first_col_width': '3cm'},
-    ...     docx_style={'first_col_width': '2in'},
-    ...     gt_style={'table_width': '100%'}
+    ...     tex_style={"first_col_width": "3cm"},
+    ...     docx_style={"first_col_width": "2in"},
+    ...     gt_style={"table_width": "100%"},
     ... )
     """
+
     # Class attributes for default values
     DEFAULT_NOTES = ""
     DEFAULT_CAPTION = None
@@ -101,10 +101,9 @@ class MTable:
     ADMISSIBLE_TYPES = ["gt", "tex", "docx", "html"]
     ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
 
-
     # Default TeX style (override globally via MTable.DEFAULT_TEX_STYLE.update({...})
     # or per-call via tex_style in make/save/_output_tex)
-    DEFAULT_TEX_STYLE: Dict[str, object] = {
+    DEFAULT_TEX_STYLE: dict[str, object] = {
         # Table dimensions
         "tab_width": r"\linewidth",  # Target width for tabularx (None for normal tabular)
         "first_col_width": None,  # LaTeX length for first column (None for flexible)
@@ -128,9 +127,9 @@ class MTable:
     }
 
     # Shared defaults (override per subclass if needed)
-    DEFAULT_LABELS: Dict[str, str] = {}
+    DEFAULT_LABELS: dict[str, str] = {}
     # Simple default DOCX styling. Users can tweak this globally or per instance.
-    DEFAULT_DOCX_STYLE: Dict[str, object] = {
+    DEFAULT_DOCX_STYLE: dict[str, object] = {
         "font_name": "Times New Roman",
         "font_color_rgb": (0, 0, 0),
         "font_size_pt": 11,  # body and header
@@ -158,7 +157,7 @@ class MTable:
     # Default GT styling - dictionary passed directly to GT.tab_options(**dict)
     # This allows users to specify ANY GT styling parameter, not just predefined ones
     # (override globally via MTable.DEFAULT_GT_STYLE.update({...}) or per instance via gt_style={...})
-    DEFAULT_GT_STYLE: Dict[str, object] = {
+    DEFAULT_GT_STYLE: dict[str, object] = {
         # Special parameters handled separately (not passed to tab_options)
         "align": "center",  # left | center | right (used for cols_align)
         "table_width": None,  # e.g., "100%" or None for auto-width
@@ -204,15 +203,15 @@ class MTable:
         self,
         df: pd.DataFrame,
         notes: str = DEFAULT_NOTES,
-        caption: Optional[str] = DEFAULT_CAPTION,
-        tab_label: Optional[str] = DEFAULT_TAB_LABEL,
+        caption: str | None = DEFAULT_CAPTION,
+        tab_label: str | None = DEFAULT_TAB_LABEL,
         rgroup_sep: str = DEFAULT_RGROUP_SEP,
         rgroup_display: bool = DEFAULT_RGROUP_DISPLAY,
-        default_paths: Union[None, str, dict] = DEFAULT_SAVE_PATH,
+        default_paths: None | str | dict = DEFAULT_SAVE_PATH,
         # Style parameters for auto-display in notebooks (applied when no type is specified)
-        tex_style: Optional[Dict[str, object]] = None,
-        docx_style: Optional[Dict[str, object]] = None,
-        gt_style: Optional[Dict[str, object]] = None,
+        tex_style: dict[str, object] | None = None,
+        docx_style: dict[str, object] | None = None,
+        gt_style: dict[str, object] | None = None,
         # No other style/render defaults here; handled in output methods
         **kwargs,
     ):
@@ -239,25 +238,24 @@ class MTable:
         # When displayed automatically (__repr__), styles are used directly
         # since the default display shows both LaTeX (for Quarto) and HTML (for notebooks)
         self._display_styles = {
-            'tex_style': tex_style or {},
-            'docx_style': docx_style or {},
-            'gt_style': gt_style or {},
+            "tex_style": tex_style or {},
+            "docx_style": docx_style or {},
+            "gt_style": gt_style or {},
         }
 
     def _translate_symbols(self, text: str, output_format: str) -> str:
         """
         Translate special symbols in text for the specified output format.
-        
+
         Args:
             text: Text containing symbols to translate
             output_format: Target format ('tex', 'html', 'docx', 'gt', 'plain')
-            
-        Returns:
+
+        Returns
+        -------
             Text with symbols translated to the target format
         """
         return translate_symbols(text, output_format)
-    
-
 
     def make(self, type: str = None, **kwargs):
         """
@@ -304,7 +302,6 @@ class MTable:
             - If type is specified: returns the backend output object.
             - If type is None: displays dual output in notebooks (HTML + LaTeX) and returns None.
         """
-
         if type is None:
             # If no type is specified, directly display dual output
             # Create dual output object for notebook/Quarto compatibility
@@ -428,9 +425,9 @@ class MTable:
     def update_docx(
         self,
         file_name: str = None,
-        tab_num: Optional[int] = None,
+        tab_num: int | None = None,
         show: bool = False,
-        docx_style: Optional[Dict[str, object]] = None,
+        docx_style: dict[str, object] | None = None,
         **kwargs,
     ):
         """
@@ -522,10 +519,10 @@ class MTable:
         if show:
             return self._output_gt(**kwargs)
 
-    def _output_docx(self, docx_style: Optional[Dict[str, object]] = None, **kwargs):
+    def _output_docx(self, docx_style: dict[str, object] | None = None, **kwargs):
         # Create a new Document
         document = Document()
-        
+
         # Resolve DOCX style (per-call -> class default)
         s = dict(self.DEFAULT_DOCX_STYLE)
         if docx_style:
@@ -535,7 +532,7 @@ class MTable:
         if self.caption is not None:
             paragraph = document.add_paragraph("Table ", style="Caption")
             # Apply symbol translation to caption
-            translated_caption = self._translate_symbols(self.caption, 'docx')
+            translated_caption = self._translate_symbols(self.caption, "docx")
             self._build_docx_caption(translated_caption, paragraph, s)
 
         # Add table
@@ -545,7 +542,7 @@ class MTable:
 
         return document
 
-    def _build_docx_caption(self, caption: str, paragraph, s: Dict[str, object]):
+    def _build_docx_caption(self, caption: str, paragraph, s: dict[str, object]):
         run = paragraph.add_run()
         r = run._r
         fldChar = OxmlElement("w:fldChar")
@@ -585,7 +582,7 @@ class MTable:
             keepNext = OxmlElement("w:keepNext")
             pPr.append(keepNext)
 
-    def _build_docx_table(self, table, s: Dict[str, object]):
+    def _build_docx_table(self, table, s: dict[str, object]):
         # Make a copy of the DataFrame to avoid modifying the original
         dfs = self.df.copy()
 
@@ -606,7 +603,9 @@ class MTable:
                 for i, col in enumerate(dfs.columns.get_level_values(level)):
                     cell_index = i + 1
                     if col != prev_col:
-                        hdr_cells[cell_index].text = self._translate_symbols(str(col), 'docx')
+                        hdr_cells[cell_index].text = self._translate_symbols(
+                            str(col), "docx"
+                        )
                         prev_col = col
                         prev_cell_index = cell_index
                     else:
@@ -616,7 +615,7 @@ class MTable:
         else:
             hdr_cells = table.add_row().cells
             for i, col in enumerate(dfs.columns):
-                hdr_cells[i + 1].text = self._translate_symbols(str(col), 'docx')
+                hdr_cells[i + 1].text = self._translate_symbols(str(col), "docx")
 
         # Add row names and data
         row_group_rows = []
@@ -632,7 +631,9 @@ class MTable:
                         # Add a row for the group name
                         group_row_cells = table.add_row().cells
                         # add row group name
-                        group_row_cells[0].text = self._translate_symbols(str(current_group), 'docx')
+                        group_row_cells[0].text = self._translate_symbols(
+                            str(current_group), "docx"
+                        )
                         # make this cell slightly taller
                         for paragraph in group_row_cells[0].paragraphs:
                             paragraph.paragraph_format.space_after = Pt(3)
@@ -640,28 +641,28 @@ class MTable:
                         for cell in group_row_cells[1:]:
                             cell.text = ""
                 row_cells = table.add_row().cells
-                row_cells[0].text = self._translate_symbols(str(idx[1]), 'docx')
+                row_cells[0].text = self._translate_symbols(str(idx[1]), "docx")
                 for i, val in enumerate(row):
-                    row_cells[i + 1].text = self._translate_symbols(str(val), 'docx')
+                    row_cells[i + 1].text = self._translate_symbols(str(val), "docx")
         else:
             for idx, row in dfs.iterrows():
                 row_cells = table.add_row().cells
-                row_cells[0].text = self._translate_symbols(str(idx), 'docx')
+                row_cells[0].text = self._translate_symbols(str(idx), "docx")
                 for i, val in enumerate(row):
-                    row_cells[i + 1].text = self._translate_symbols(str(val), 'docx')
+                    row_cells[i + 1].text = self._translate_symbols(str(val), "docx")
 
         # Set first column width if specified
         if s.get("first_col_width") is not None:
             first_col_width_str = str(s["first_col_width"]).strip().lower()
             try:
                 # Parse width specification
-                if first_col_width_str.endswith('in'):
+                if first_col_width_str.endswith("in"):
                     width_val = float(first_col_width_str[:-2])
                     width = Inches(width_val)
-                elif first_col_width_str.endswith('cm'):
+                elif first_col_width_str.endswith("cm"):
                     width_val = float(first_col_width_str[:-2])
                     width = Cm(width_val)
-                elif first_col_width_str.endswith('pt'):
+                elif first_col_width_str.endswith("pt"):
                     width_val = float(first_col_width_str[:-2])
                     width = Pt(width_val)
                 else:
@@ -687,7 +688,7 @@ class MTable:
         # Add notes (Note: we alsways add notes, even if empty)
         # Add row to the table that consists only of one cell with the notes
         notes_row = table.add_row().cells
-        notes_row[0].text = self._translate_symbols(self.notes, 'docx')
+        notes_row[0].text = self._translate_symbols(self.notes, "docx")
         # Merge the cell with the notes
         table.cell(-1, 0).merge(table.cell(-1, ncols - 1))
         # Set alignment and font size for the notes
@@ -840,7 +841,7 @@ class MTable:
 
     def _output_tex(
         self,
-        tex_style: Optional[Dict[str, object]] = None,
+        tex_style: dict[str, object] | None = None,
         **kwargs,
     ):
         # Make a copy of the DataFrame to avoid modifying the original
@@ -855,7 +856,7 @@ class MTable:
         _fcw = s.get("first_col_width")
 
         # Normalize tab_width (only these two keywords are mapped)
-        def _normalize_width(w: Optional[str]) -> Optional[str]:
+        def _normalize_width(w: str | None) -> str | None:
             if w is None:
                 return None
             v = str(w).strip()
@@ -953,7 +954,7 @@ class MTable:
                 parts = [""] * stub_cols
                 cmid_ranges = []
                 left = stub_cols + 1
-                for cell, span in zip(row_cells, row_spans):
+                for cell, span in zip(row_cells, row_spans, strict=False):
                     parts.append(f"\\multicolumn{{{span}}}{{c}}{{{cell}}}")
                     cmid_ranges.append((left, left + span - 1))
                     left += span
@@ -981,7 +982,9 @@ class MTable:
 
         if row_groups_present:
             start = 0
-            for gi, (gname, glen) in enumerate(zip(row_groups, row_groups_len)):
+            for gi, (gname, glen) in enumerate(
+                zip(row_groups, row_groups_len, strict=False)
+            ):
                 if self.rgroup_display:
                     fmt = str(s.get("group_header_format", r"\emph{%s}"))
                     body_lines.append((fmt % str(gname)) + r" \\")
@@ -1100,13 +1103,13 @@ class MTable:
         latex_res = "\\renewcommand\\cellalign{t}\n" + latex_res
 
         # Apply symbol translation to the final LaTeX output
-        latex_res = self._translate_symbols(latex_res, 'tex')
+        latex_res = self._translate_symbols(latex_res, "tex")
 
         return latex_res
 
     def _output_gt(
         self,
-        gt_style: Optional[Dict[str, object]] = None,
+        gt_style: dict[str, object] | None = None,
         **kwargs,
     ):
         # Make a copy of the DataFrame to avoid modifying the original
@@ -1132,7 +1135,7 @@ class MTable:
             # Flatten the column index just numbering the columns
             dfs.columns = pd.Index(col_numbers)
             # Store the mapping of column numbers to column names
-            col_dict = dict(zip(col_numbers, col_names))
+            col_dict = dict(zip(col_numbers, col_names, strict=False))
             # Modify the last elements in each tuple in dfcols
             dfcols = [(t[:-1] + (col_numbers[i],)) for i, t in enumerate(dfcols)]
         else:
@@ -1140,7 +1143,7 @@ class MTable:
 
         # store row index and then reset to have the index as columns to be displayed in the table
         rowindex = dfs.index
-        
+
         # Handle potential name conflicts when resetting index
         # Find safe names for index columns that don't conflict with existing columns
         if isinstance(rowindex, pd.MultiIndex):
@@ -1154,7 +1157,7 @@ class MTable:
                     index_names.append(safe_name)
                 else:
                     index_names.append(name)
-            
+
             # Temporarily rename index levels to avoid conflicts
             dfs.index.names = index_names
         else:
@@ -1164,7 +1167,7 @@ class MTable:
                 while safe_name in dfs.columns:
                     safe_name = f"__index_{hash(safe_name) % 1000}__"
                 dfs.index.name = safe_name
-        
+
         dfs.reset_index(inplace=True)
 
         # Specify the rowname_col and groupname_col
@@ -1205,7 +1208,7 @@ class MTable:
         gt = gt.tab_source_note(self.notes).tab_stub(
             rowname_col=rowname_col, groupname_col=groupname_col
         )
-        
+
         # Handle table_font_size_all - applies to all font sizes except source_notes_font_size
         # Individual font sizes override the all setting if explicitly provided
         if s.get("table_font_size_all"):
@@ -1218,25 +1221,36 @@ class MTable:
                 "heading_title_font_size": font_size,
             }
             for param, default_value in font_params.items():
-                if param not in s:  # Only set if not already explicitly provided by user
+                if (
+                    param not in s
+                ):  # Only set if not already explicitly provided by user
                     s[param] = default_value
-        
+
         # Prepare style options, excluding special parameters handled separately
-        special_params = {"align", "table_width", "first_col_width", "table_font_size_all"}
+        special_params = {
+            "align",
+            "table_width",
+            "first_col_width",
+            "table_font_size_all",
+        }
         tab_options_dict = {k: v for k, v in s.items() if k not in special_params}
-        
+
         # Add required defaults
-        tab_options_dict.update({
-            "table_border_bottom_style": "hidden",
-            "stub_border_style": "hidden",
-        })
-        
+        tab_options_dict.update(
+            {
+                "table_border_bottom_style": "hidden",
+                "stub_border_style": "hidden",
+            }
+        )
+
         # Handle table width setting
         if s.get("table_width"):
             tab_options_dict["table_width"] = str(s["table_width"])
-        
+
         # Apply all styling options at once
-        gt = gt.tab_options(**tab_options_dict).cols_align(align=s.get("align", "center"))
+        gt = gt.tab_options(**tab_options_dict).cols_align(
+            align=s.get("align", "center")
+        )
 
         # Handle first column width setting
         if s.get("first_col_width"):
@@ -1253,8 +1267,8 @@ class MTable:
 
         # Apply symbol translation to the final HTML output
         html_output = gt.as_raw_html()
-        translated_html = self._translate_symbols(html_output, 'html')
-        
+        translated_html = self._translate_symbols(html_output, "html")
+
         # Create a new GT object with the translated HTML
         # Since GT doesn't have a direct way to modify HTML, we'll monkey-patch it
         gt._repr_html_ = lambda: translated_html
@@ -1275,6 +1289,7 @@ class MTable:
         str
             An empty string
         """
+
         # For dual output, we need to handle parameters differently
         # Create dual output object for notebook/Quarto compatibility
         class DualOutput:
@@ -1291,8 +1306,8 @@ class MTable:
                 }
 
         # Generate both HTML and LaTeX outputs with their specific styles
-        gt_style = self._display_styles.get('gt_style', {})
-        tex_style = self._display_styles.get('tex_style', {})
+        gt_style = self._display_styles.get("gt_style", {})
+        tex_style = self._display_styles.get("tex_style", {})
 
         html_output = self._output_gt(gt_style=gt_style).as_raw_html()
         tex_output = self._output_tex(tex_style=tex_style)
@@ -1310,6 +1325,7 @@ class MTable:
         )
         # Create and display the dual output object
         from IPython.display import display
+
         dual_output = DualOutput(html_output, tex_output)
         display(dual_output)
         return ""

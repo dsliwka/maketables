@@ -2817,7 +2817,7 @@ packages:
 - pypi: ./
   name: maketables
   version: 0.1.0
-  sha256: 625fb9afe5b1cce2fd0dc8734ae3a97458da362153a7e0b6c6fa27f0668bfd2e
+  sha256: c1bef3cbb072fc0c92e8257ae5af00a6ab3a1304f2ef484222e593d8079913e4
   requires_dist:
   - numpy>=1.20.0
   - pandas>=1.3.0

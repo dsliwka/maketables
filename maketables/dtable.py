@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 
@@ -83,13 +81,13 @@ class DTable(MTable):
         self,
         df: pd.DataFrame,
         vars: list,
-        stats: Optional[list] = None,
-        bycol: Optional[list[str]] = None,
-        byrow: Optional[str] = None,
+        stats: list | None = None,
+        bycol: list[str] | None = None,
+        byrow: str | None = None,
         type: str = "gt",
         labels: dict | None = None,
         stats_labels: dict | None = None,
-        format_spec: Optional[dict] = None,
+        format_spec: dict | None = None,
         digits: int = 2,
         notes: str = "",
         counts_row_below: bool = False,
