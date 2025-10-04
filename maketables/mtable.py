@@ -257,7 +257,7 @@ class MTable:
         """
         return translate_symbols(text, output_format)
 
-    def make(self, type: str = None, **kwargs):
+    def make(self, type: Optional[str] = None, **kwargs):
         r"""
         Create the output object of the table (either gt, tex, docx, or html).
         If type is None, displays both HTML and LaTeX outputs for compatibility
