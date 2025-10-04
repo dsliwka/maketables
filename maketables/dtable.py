@@ -326,7 +326,8 @@ class DTable(MTable):
         try:
             if format_spec == "d":
                 return f"{int(round(x)):d}"
-            return f"{x:{format_spec}}"
+            else: 
+                return f"{x:{format_spec}}"
         except (ValueError, TypeError):
             return self._format_number(x, None)
 
@@ -405,7 +406,7 @@ def _format_mean_std(
         return f"{mean_str} ({std_str})"
 
 
-def _format_number_dtable(x: float, format_spec: str = None) -> str:
+def _format_number_dtable(x: float, format_spec: Optional[str] = None) -> str:
     """
     Format a number with optional format specifier for DTable.
 
