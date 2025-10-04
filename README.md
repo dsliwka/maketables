@@ -1,12 +1,13 @@
 # MakeTables
 
-A Python package for creating publication-ready tables from statistical models and descriptive statistics. To get started, check out the [Getting Started Notebook](getting-started.ipynb).
+A Python package for creating publication-ready tables from regression results (statsmodels, pyfixest, linearmodels), descriptive statistics, and balance tables with output to LaTeX, Word, and HTML via Great Tables. To get started, check out the [Getting Started Notebook](getting-started.ipynb).
 
 ## Overview
 
 MakeTables provides a unified interface for generating tables from:
 - Regression results (from [statsmodels](https://www.statsmodels.org/stable/index.html), [pyfixest](https://py-econometrics.github.io/pyfixest/pyfixest.html), or (still more experimental) [linearmodels](https://bashtage.github.io/linearmodels/))
 - Descriptive statistics 
+- Balance tables
 - Custom data tables
 
 The package supports multiple output formats including:
@@ -17,8 +18,6 @@ The package supports multiple output formats including:
 ## Origin
 
 MakeTables originated as the table output functionality within the [pyfixest](https://github.com/py-econometrics/pyfixest) package and has been moved to this standalone package to provide broader table creation capabilities also supporting other statistical packages.
-
-
 
 ## Installation
 

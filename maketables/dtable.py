@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import ClassVar
 
 import numpy as np
 import pandas as pd
@@ -65,7 +65,7 @@ class DTable(MTable):
     """
 
     # Class defaults for formatting different statistics
-    DEFAULT_FORMAT_SPECS = {
+    DEFAULT_FORMAT_SPECS: ClassVar[dict[str, str]] = {
         "mean": ".3f",
         "std": ".3f",
         "count": ",.0f",
@@ -83,13 +83,13 @@ class DTable(MTable):
         self,
         df: pd.DataFrame,
         vars: list,
-        stats: Optional[list] = None,
-        bycol: Optional[list[str]] = None,
-        byrow: Optional[str] = None,
+        stats: list | None = None,
+        bycol: list[str] | None = None,
+        byrow: str | None = None,
         type: str = "gt",
         labels: dict | None = None,
         stats_labels: dict | None = None,
-        format_spec: Optional[dict] = None,
+        format_spec: dict | None = None,
         digits: int = 2,
         notes: str = "",
         counts_row_below: bool = False,
@@ -302,7 +302,7 @@ class DTable(MTable):
         format_spec = self.format_specs.get(stat_name, ".3f")
         return self._format_number(value, format_spec)
 
-    def _format_number(self, x: float, format_spec: str = None) -> str:
+    def _format_number(self, x: float, format_spec: str | None = None) -> str:
         """Format a number with optional format specifier."""
         if pd.isna(x) or (isinstance(x, float) and np.isnan(x)):
             return "-"
@@ -363,7 +363,7 @@ def _format_mean_std(
     digits: int = 2,
     newline: bool = True,
     type=str,
-    format_specs: dict = None,
+    format_specs: dict | None = None,
 ) -> str:
     """
     Calculate the mean and standard deviation of a pandas Series and return as a string of the format "mean /n (std)".
@@ -407,7 +407,7 @@ def _format_mean_std(
         return f"{mean_str} ({std_str})"
 
 
-def _format_number_dtable(x: float, format_spec: str = None) -> str:
+def _format_number_dtable(x: float, format_spec: str | None = None) -> str:
     """
     Format a number with optional format specifier for DTable.
 

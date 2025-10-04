@@ -6,9 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "maketables"
 version = "0.1.0"
 authors = [
-    {name = "Dirk Sliwka", email = "dirks_email@uni.de"},
+    {name = "Alexander Fischer", email = "alexander-fischer1801@t-online.de"},
+    {name = "Dirk Sliwka", email = "dirk.sliwka@uni-koeln.de"},
 ]
-description = "A Python package for creating publication-ready tables from statistical models and descriptive statistics"
+description = "A Python package for creating publication-ready tables from regression results (statsmodels, pyfixest, linearmodels), descriptive statistics, and balance tables with output to LaTeX, Word, and HTML/Great Tables"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
