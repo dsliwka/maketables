@@ -39,7 +39,7 @@ class ModelExtractor(Protocol):
     """
 
     def can_handle(self, model: Any) -> bool:
-        """Check if this extractor can handle the given model type."""
+        "Check if this extractor can handle the given model type."
         ...
 
     def coef_table(self, model: Any) -> pd.DataFrame:
@@ -127,7 +127,7 @@ def register_extractor(extractor: ModelExtractor) -> None:
 
 
 def clear_extractors() -> None:
-    """Clear all registered extractors from the registry."""
+    "Clear all registered extractors from the registry."
     _EXTRACTOR_REGISTRY.clear()
 
 
@@ -320,14 +320,14 @@ class PyFixestExtractor:
         return val
 
     def vcov_info(self, model: Any) -> dict[str, Any]:
-        """Extract variance-covariance matrix type and clustering information."""
+        "Extract variance-covariance matrix type and clustering information."
         return {
             "vcov_type": getattr(model, "_vcov_type", None),
             "clustervar": getattr(model, "_clustervar", None),
         }
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
-        """Extract variable labels from the model's data DataFrame when available."""
+        "Extract variable labels from the model's data DataFrame when available."
         df = getattr(model, "_data", None)
         if isinstance(df, pd.DataFrame):
             try:
@@ -337,7 +337,7 @@ class PyFixestExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
-        """Return set of statistics available for the given pyfixest model."""
+        "Return set of statistics available for the given pyfixest model."
         return {
             k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
         }
@@ -353,7 +353,7 @@ class StatsmodelsExtractor:
     """
 
     def can_handle(self, model: Any) -> bool:
-        """Check if model has the standard statsmodels result interface."""
+        "Check if model has the standard statsmodels result interface."
         return all(hasattr(model, a) for a in ("params", "bse", "pvalues"))
 
     def coef_table(self, model: Any) -> pd.DataFrame:
@@ -417,7 +417,7 @@ class StatsmodelsExtractor:
         return "y"
 
     def fixef_string(self, model: Any) -> str | None:
-        """Statsmodels doesn't typically have fixed effects notation."""
+        "Statsmodels doesn't typically have fixed effects notation."
         return None
 
     # Unified stat keys -> statsmodels attributes/callables
@@ -440,6 +440,7 @@ class StatsmodelsExtractor:
     }
 
     def stat(self, model: Any, key: str) -> Any:
+        "Extract statistics."
         spec = self.STAT_MAP.get(key)
         if spec is None:
             return None
@@ -477,6 +478,7 @@ class StatsmodelsExtractor:
 
 class LinearmodelsExtractor:
     def can_handle(self, model: Any) -> bool:
+        "Check if model is a linearmodels model."
         mod = type(model).__module__ or ""
         if mod.startswith("linearmodels."):
             # Core results interface in linearmodels
@@ -489,6 +491,7 @@ class LinearmodelsExtractor:
         return False
 
     def coef_table(self, model: Any) -> pd.DataFrame:
+        "Extract coefficient table from linearmodels model."
         params = pd.Series(model.params)
         se = pd.Series(getattr(model, "std_errors", np.nan), index=params.index)
         pvalues = pd.Series(getattr(model, "pvalues", np.nan), index=params.index)
@@ -510,6 +513,7 @@ class LinearmodelsExtractor:
         return df
 
     def depvar(self, model: Any) -> str:
+        "Extract dependent variable name from linearmodels model."
         # Try common locations
         for chain in [
             ("model", "formula"),  # 'y ~ x1 + x2'
@@ -525,6 +529,7 @@ class LinearmodelsExtractor:
         return "y"
 
     def fixef_string(self, model: Any) -> str | None:
+        "Extract fixed effects specification string from linearmodels model."
         mdl = getattr(model, "model", None)
         if mdl is None:
             return None
@@ -579,6 +584,7 @@ class LinearmodelsExtractor:
     }
 
     def stat(self, model: Any, key: str) -> Any:
+        "Extract statistics."
         spec = self.STAT_MAP.get(key)
         if spec is None:
             return None
@@ -591,6 +597,7 @@ class LinearmodelsExtractor:
         return val
 
     def vcov_info(self, model: Any) -> dict[str, Any]:
+        "Extract variance-covariance matrix type and clustering information."
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:

@@ -9,7 +9,6 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor
 from great_tables import GT
 from IPython.display import display
-from typing import Optional
 
 from .symbols import translate_symbols
 
@@ -27,7 +26,7 @@ from .symbols import translate_symbols
 
 
 class MTable:
-    """
+    r"""
     A table creation class supporting multiple output formats.
 
     MTable provides a unified interface for creating tables that can be output
@@ -258,7 +257,7 @@ class MTable:
         """
         return translate_symbols(text, output_format)
 
-    def make(self, type: Optional[str] = None, **kwargs):
+    def make(self, type: str | None = None, **kwargs):
         r"""
         Create the output object of the table (either gt, tex, docx, or html).
         If type is None, displays both HTML and LaTeX outputs for compatibility
