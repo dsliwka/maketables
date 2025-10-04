@@ -456,6 +456,7 @@ class StatsmodelsExtractor:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
+        "Extract variable labels from the model's data DataFrame when available."
         # Try common statsmodels formula-api locations for the original DataFrame
         candidates = [
             ("model", "model", "data", "frame"),
@@ -601,6 +602,7 @@ class LinearmodelsExtractor:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
+        
         # Try to locate original DataFrame
         candidates = [
             ("model", "data", "frame"),
