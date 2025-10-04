@@ -9,6 +9,7 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Inches, Pt, RGBColor
 from great_tables import GT
 from IPython.display import display
+from typing import Optional
 
 from .symbols import translate_symbols
 
