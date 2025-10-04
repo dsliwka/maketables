@@ -250,19 +250,23 @@ Table Table~\ref{tbl-1} shows some descriptive statistics.
 \renewcommand\cellalign{t}
 \begin{threeparttable}
 \begingroup
-\renewcommand\arraystretch{1.1}
-\setlength{\tabcolsep}{6pt}
+\renewcommand\arraystretch{1}
+\setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\linewidth}{@{}p{3cm}>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{3}{c}{Domestic} & \multicolumn{3}{c}{Foreign} \\
 \cmidrule(lr){2-4} \cmidrule(lr){5-7}
  & N & Mean & Std. Dev. & N & Mean & Std. Dev. \\
 \midrule
-\addlinespace[0.5ex]
+\addlinespace[1ex]
 Mileage (mpg) & 52 & 19.83 & 4.74 & 22 & 24.77 & 6.61 \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Weight (lbs.) & 52 & 3317.12 & 695.36 & 22 & 2315.91 & 433.00 \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Price & 52 & 6072.42 & 3097.10 & 22 & 6384.68 & 2621.92 \\
-\addlinespace
+\addlinespace[0.5ex]
 \bottomrule
 \end{tabularx}
 \endgroup
@@ -291,23 +295,30 @@ excellent \texttt{pyfixest} package.
 \renewcommand\cellalign{t}
 \begin{threeparttable}
 \begingroup
-\renewcommand\arraystretch{1.1}
-\setlength{\tabcolsep}{6pt}
+\renewcommand\arraystretch{1}
+\setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{Mileage (mpg)} \\
 \cmidrule(lr){2-3}
  & (1) & (2) \\
 \midrule
-\addlinespace[0.5ex]
+\addlinespace[1ex]
 Weight (lbs.) & \makecell{-0.006*** \\ (0.001)} & \makecell{-0.004* \\ (0.002)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Length (in.) &  & \makecell{-0.080 \\ (0.055)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Intercept & \makecell{39.440*** \\ (1.614)} & \makecell{47.885*** \\ (6.088)} \\
-\addlinespace
+\addlinespace[0.5ex]
 \midrule
-\addlinespace
-Observations & 74.000 & 74.000 \\
-R² & 0.652 & 0.661 \\
+\addlinespace[1ex]
+Observations & 74 & 74 \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+$R^2$ & 0.652 & 0.661 \\
+\addlinespace[0.5ex]
 \bottomrule
 \end{tabularx}
 \endgroup
@@ -329,15 +340,15 @@ probit model.
 
 \begin{table}[H]
 
-\caption{\label{tbl-3}A Probit Regression (Statmodels)}
+\caption{\label{tbl-3}A Regression Table (Statsmodels)}
 
 \centering{
 
 \renewcommand\cellalign{t}
 \begin{threeparttable}
 \begingroup
-\renewcommand\arraystretch{1.1}
-\setlength{\tabcolsep}{6pt}
+\renewcommand\arraystretch{1}
+\setlength{\tabcolsep}{3pt}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 \toprule
  & \multicolumn{2}{c}{Foreign (indicator)} \\
@@ -346,17 +357,28 @@ probit model.
 \cmidrule(lr){2-2} \cmidrule(lr){3-3}
  & (1) & (2) \\
 \midrule
-\addlinespace[0.5ex]
+\addlinespace[1ex]
 Weight (lbs.) & \makecell{-0.001*** \\ (0.000)} & \makecell{-0.004** \\ (0.002)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Length (in.) & \makecell{0.007 \\ (0.005)} & \makecell{0.033 \\ (0.045)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Price & \makecell{0.000*** \\ (0.000)} & \makecell{0.001*** \\ (0.000)} \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
 Intercept & \makecell{0.656 \\ (0.583)} & \makecell{1.327 \\ (4.992)} \\
-\addlinespace
+\addlinespace[0.5ex]
 \midrule
-\addlinespace
-Observations & 74.000 & 74.000 \\
-R² & 0.552 & - \\
-Pseudo R² & - & 0.606 \\
+\addlinespace[1ex]
+Observations & 74 & 74 \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+$R^2$ & 0.552 & - \\
+\addlinespace[0.5ex]
+\addlinespace[0.5ex]
+Pseudo $R^2$ & - & 0.606 \\
+\addlinespace[0.5ex]
 \bottomrule
 \end{tabularx}
 \endgroup
