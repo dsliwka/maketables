@@ -1,0 +1,12 @@
+{
+  "hash": "e49ae7cfafb828e662a1998b4d6a30c8",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"MakeTables\"\n\n---\n\nA Python package for creating publication-ready tables from statistical models and descriptive statistics.\n\n## Overview\n\nMakeTables provides a unified interface for generating tables from:\n- Regression results (from [Statsmodels](https://www.statsmodels.org/stable/index.html), [PyFixest](https://py-econometrics.github.io/pyfixest/pyfixest.html), or (still more experimental) [Linearmodels](https://bashtage.github.io/linearmodels/))\n- Descriptive statistics \n- Custom data tables\n\nThe package supports multiple output formats including:\n- Great Tables (HTML)\n- LaTeX\n- Microsoft Word (docx) documents\n\n::: {.callout-note}\n## Development Status\nMakeTables is in early stage development. Bug reports through [GitHub Issues](https://github.com/dsliwka/maketables/issues) are highly welcome.\n:::\n\n## Origin\n\nMakeTables originated as the table output functionality within the [PyFixest](https://github.com/py-econometrics/pyfixest) package and has been moved to this standalone package to provide broader table creation capabilities and support other statistical packages.\n\n## Installation\n\n### From PyPI (once published)\n```bash\npip install maketables\n```\n\n### Development Installation\n```bash\ngit clone https://github.com/dsliwka/maketables.git\ncd maketables\npip install -e .\n```\n\n## Quick Example\n\n::: {#37bf7afa .cell execution_count=1}\n``` {.python .cell-code}\nimport pandas as pd\nimport maketables as mt\nimport pyfixest as pf\n\n# Load your data (here using a sample Stata dataset with the import_dta function that also stores variable labels)\ndf = mt.import_dta(\"https://www.stata-press.com/data/r18/auto.dta\")\n\n# Create descriptive statistics table\nmt.DTable(df, vars=[\"mpg\",\"weight\",\"length\"], bycol=[\"foreign\"])\n\n# Fit your models (here using pyfixest)\nest1 = pf.feols(\"mpg ~ weight\", data=df)\nest2 = pf.feols(\"mpg ~ weight + length\", data=df)\n\n# Make a regression table\nmt.ETable([est1, est2])\n```\n:::\n\n\n## Get Started\n\n- [Getting Started Guide](getting-started.ipynb) - Interactive examples from the README\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
