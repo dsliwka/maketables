@@ -70,7 +70,7 @@ SYMBOLS = {
 
 
 def translate_symbols(text: str, output_format: str) -> str:
-    """
+    r"""
     Translate symbols in text to the specified output format.
 
     Args:

@@ -107,6 +107,7 @@ ignore = [
   "TRY003", # Avoid specifying long messages outside the exception class
   "D205",   # 1 blank line required between summary line and description
   "W505",   # Doc line too long
+  "RUF001", # Ambiguous greek letter
   "RUF002", # Docstring contains greek letters
 ]
 
