@@ -181,3 +181,4 @@ _site/
 !.pixi/config.toml
 
 **/*.quarto_ipynb
+_freeze/
