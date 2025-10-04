@@ -1,4 +1,5 @@
 import os
+from typing import ClassVar
 
 import numpy as np
 import pandas as pd
@@ -98,12 +99,12 @@ class MTable:
     DEFAULT_SAVE_PATH = None  # can be string or dict
     DEFAULT_REPLACE = False
     DEFAULT_SAVE_TYPE = "html"
-    ADMISSIBLE_TYPES = ["gt", "tex", "docx", "html"]
-    ADMISSIBLE_SAVE_TYPES = ["tex", "docx", "html"]
+    ADMISSIBLE_TYPES: ClassVar[list[str]] = ["gt", "tex", "docx", "html"]
+    ADMISSIBLE_SAVE_TYPES: ClassVar[list[str]] = ["tex", "docx", "html"]
 
     # Default TeX style (override globally via MTable.DEFAULT_TEX_STYLE.update({...})
     # or per-call via tex_style in make/save/_output_tex)
-    DEFAULT_TEX_STYLE: dict[str, object] = {
+    DEFAULT_TEX_STYLE: ClassVar[dict[str, object]] = {
         # Table dimensions
         "tab_width": r"\linewidth",  # Target width for tabularx (None for normal tabular)
         "first_col_width": None,  # LaTeX length for first column (None for flexible)
@@ -127,9 +128,9 @@ class MTable:
     }
 
     # Shared defaults (override per subclass if needed)
-    DEFAULT_LABELS: dict[str, str] = {}
+    DEFAULT_LABELS: ClassVar[dict[str, str]] = {}
     # Simple default DOCX styling. Users can tweak this globally or per instance.
-    DEFAULT_DOCX_STYLE: dict[str, object] = {
+    DEFAULT_DOCX_STYLE: ClassVar[dict[str, object]] = {
         "font_name": "Times New Roman",
         "font_color_rgb": (0, 0, 0),
         "font_size_pt": 11,  # body and header
@@ -157,7 +158,7 @@ class MTable:
     # Default GT styling - dictionary passed directly to GT.tab_options(**dict)
     # This allows users to specify ANY GT styling parameter, not just predefined ones
     # (override globally via MTable.DEFAULT_GT_STYLE.update({...}) or per instance via gt_style={...})
-    DEFAULT_GT_STYLE: dict[str, object] = {
+    DEFAULT_GT_STYLE: ClassVar[dict[str, object]] = {
         # Special parameters handled separately (not passed to tab_options)
         "align": "center",  # left | center | right (used for cols_align)
         "table_width": None,  # e.g., "100%" or None for auto-width

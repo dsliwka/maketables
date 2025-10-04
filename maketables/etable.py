@@ -4,7 +4,7 @@ import re
 import warnings
 from collections import Counter
 from collections.abc import ValuesView
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ ModelInputType = FixestMulti | Feols | Fepois | Feiv | list[Feols | Fepois | Fei
 
 
 class ETable(MTable):
-    """
+    r"""
     Regression table builder on top of MTable.
 
     ETable extracts coefficients and model statistics from supported model
@@ -123,11 +123,11 @@ class ETable(MTable):
     """
 
     # ---- Class defaults ----
-    DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05]
+    DEFAULT_SIGNIF_CODE: ClassVar[list[float]] = [0.001, 0.01, 0.05]
     DEFAULT_COEF_FMT = "b:.3f \n (se:.3f)"
-    DEFAULT_MODEL_STATS = ["N", "r2"]
+    DEFAULT_MODEL_STATS: ClassVar[list[str]] = ["N", "r2"]
     # Canonical stat key -> printable label (used if model_stats_labels is None)
-    DEFAULT_STAT_LABELS: dict[str, str] = {
+    DEFAULT_STAT_LABELS: ClassVar[dict[str, str]] = {
         "N": "Observations",
         "se_type": "S.E. type",
         "r2": "R²",
@@ -152,7 +152,7 @@ class ETable(MTable):
     DEFAULT_SHOW_SE_TYPE = True
     DEFAULT_SHOW_FE = True
     DEFAULT_HEAD_ORDER = "dh"
-    DEFAULT_FELABELS: dict[str, str] = {}
+    DEFAULT_FELABELS: dict[str, str] = ClassVar({})
     DEFAULT_CAT_TEMPLATE = "{variable}={value}"
     DEFAULT_LINEBREAK = "\n"
 
@@ -704,7 +704,7 @@ def _post_processing_input_checks(
     return models_list
 
 
-def _format_number(x: float, format_spec: Optional[str] = None) -> str:
+def _format_number(x: float, format_spec: str | None = None) -> str:
     """
     Format a number with optional format specifier.
 
@@ -731,9 +731,9 @@ def _format_number(x: float, format_spec: Optional[str] = None) -> str:
         # Check if it's essentially an integer first
         if abs(x - round(x)) < 1e-10:  # essentially an integer
             if abs_x >= 1000:
-                return f"{int(round(x)):,}"  # Use comma separators for large integers
+                return f"{round(x):,}"  # Use comma separators for large integers
             else:
-                return f"{int(round(x))}"  # No decimals for smaller integers
+                return f"{round(x)}"  # No decimals for smaller integers
 
         # For very small numbers (close to zero), show more precision
         if abs_x < 0.001 and abs_x > 0:
@@ -753,10 +753,11 @@ def _format_number(x: float, format_spec: Optional[str] = None) -> str:
     try:
         # Handle integer formatting
         if format_spec == "d":
-            return f"{int(round(x)):d}"
+            return f"{round(x):d}"
 
         # Use Python's format specification
-        return f"{x:{format_spec}}"
+        else:
+            return f"{x:{format_spec}}"
     except (ValueError, TypeError):
         # Fallback to default formatting if format_spec is invalid
         return _format_number(x, None)
@@ -821,7 +822,7 @@ def _parse_coef_fmt(coef_fmt: str, custom_stats: dict):
     }
 
     # All possible tokens (base + custom)
-    all_tokens = ["b", "se", "t", "p"] + custom_elements
+    all_tokens = ["b", "se", "t", "p", *custom_elements]
 
     coef_fmt_elements = []
     title_parts = []

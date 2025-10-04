@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 import numpy as np
 import pandas as pd
 
@@ -63,7 +65,7 @@ class DTable(MTable):
     """
 
     # Class defaults for formatting different statistics
-    DEFAULT_FORMAT_SPECS = {
+    DEFAULT_FORMAT_SPECS: ClassVar[dict[str, str]] = {
         "mean": ".3f",
         "std": ".3f",
         "count": ",.0f",
@@ -159,7 +161,7 @@ class DTable(MTable):
             if byrow is not None:
                 counts_row_below = False
             elif "count" not in stats:
-                stats = ["count"] + stats
+                stats = ["count", *stats]
 
         def mean_std(x):
             return _format_mean_std(
@@ -300,7 +302,7 @@ class DTable(MTable):
         format_spec = self.format_specs.get(stat_name, ".3f")
         return self._format_number(value, format_spec)
 
-    def _format_number(self, x: float, format_spec: str = None) -> str:
+    def _format_number(self, x: float, format_spec: str | None = None) -> str:
         """Format a number with optional format specifier."""
         if pd.isna(x) or (isinstance(x, float) and np.isnan(x)):
             return "-"
@@ -317,7 +319,7 @@ class DTable(MTable):
                 return f"{x:.3f}"
             elif abs_x >= 1000:
                 if abs(x - round(x)) < 1e-10:  # essentially an integer
-                    return f"{int(round(x)):,}"
+                    return f"{round(x):,}"
                 else:
                     return f"{x:,.2f}"
             else:
@@ -325,7 +327,7 @@ class DTable(MTable):
 
         try:
             if format_spec == "d":
-                return f"{int(round(x)):d}"
+                return f"{round(x):d}"
             else:
                 return f"{x:{format_spec}}"
         except (ValueError, TypeError):
@@ -362,7 +364,7 @@ def _format_mean_std(
     digits: int = 2,
     newline: bool = True,
     type=str,
-    format_specs: dict = None,
+    format_specs: dict | None = None,
 ) -> str:
     """
     Calculate the mean and standard deviation of a pandas Series and return as a string of the format "mean /n (std)".
@@ -406,7 +408,7 @@ def _format_mean_std(
         return f"{mean_str} ({std_str})"
 
 
-def _format_number_dtable(x: float, format_spec: Optional[str] = None) -> str:
+def _format_number_dtable(x: float, format_spec: str | None = None) -> str:
     """
     Format a number with optional format specifier for DTable.
 
@@ -438,7 +440,7 @@ def _format_number_dtable(x: float, format_spec: Optional[str] = None) -> str:
             return f"{x:.3f}"
         elif abs_x >= 1000:
             if abs(x - round(x)) < 1e-10:  # essentially an integer
-                return f"{int(round(x)):,}"
+                return f"{round(x):,}"
             else:
                 return f"{x:,.2f}"
         else:
@@ -446,8 +448,9 @@ def _format_number_dtable(x: float, format_spec: Optional[str] = None) -> str:
 
     try:
         if format_spec == "d":
-            return f"{int(round(x)):d}"
-        return f"{x:{format_spec}}"
+            return f"{round(x):d}"
+        else:
+            return f"{x:{format_spec}}"
     except (ValueError, TypeError):
         return _format_number_dtable(x, None)
     #     if type == "gt":

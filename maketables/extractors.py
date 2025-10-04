@@ -1,12 +1,12 @@
 """
-Statistical Model Extractor System for MakeTables
+Statistical Model Extractor System for MakeTables.
 
 This module provides a unified interface for extracting statistical information
 from various Python statistical modeling packages (statsmodels, pyfixest, linearmodels).
 The extractor system uses a Protocol-based design for type safety and extensibility.
 """
 
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, ClassVar, Protocol, runtime_checkable
 
 import numpy as np
 import pandas as pd
@@ -271,7 +271,7 @@ class PyFixestExtractor:
         return getattr(model, "_fixef", None)
 
     # Build a clean map of unified stat keys -> pyfixest attributes/callables
-    STAT_MAP: dict[str, Any] = {
+    STAT_MAP: ClassVar[dict[str, Any]] = {
         "N": "_N",
         "se_type": lambda m: (
             "by: " + "+".join(getattr(m, "_clustervar", []))
@@ -421,7 +421,7 @@ class StatsmodelsExtractor:
         return None
 
     # Unified stat keys -> statsmodels attributes/callables
-    STAT_MAP: dict[str, Any] = {
+    STAT_MAP: ClassVar[dict[str, Any]] = {
         "N": "nobs",
         "se_type": "cov_type",
         "r2": "rsquared",
@@ -480,6 +480,8 @@ class StatsmodelsExtractor:
 
 
 class LinearmodelsExtractor:
+    "Extractor for linearmodels models."
+
     def can_handle(self, model: Any) -> bool:
         "Check if model is a linearmodels model."
         mod = type(model).__module__ or ""
@@ -547,7 +549,7 @@ class LinearmodelsExtractor:
         return "+".join(parts) if parts else None
 
     # Unified stat keys -> linearmodels attributes/callables
-    STAT_MAP: dict[str, Any] = {
+    STAT_MAP: ClassVar[dict[str, Any]] = {
         # Sizes / DoF
         "N": "nobs",
         "df_model": "df_model",
