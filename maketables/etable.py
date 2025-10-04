@@ -4,7 +4,7 @@ import re
 import warnings
 from collections import Counter
 from collections.abc import ValuesView
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -16,7 +16,7 @@ from pyfixest.estimation.FixestMulti_ import FixestMulti
 from .extractors import ModelExtractor, get_extractor
 from .mtable import MTable
 
-ModelInputType = FixestMulti|Feols|Fepois|Feiv|list[Feols | Fepois | Feiv]
+ModelInputType = FixestMulti | Feols | Fepois | Feiv | list[Feols | Fepois | Feiv]
 
 
 class ETable(MTable):

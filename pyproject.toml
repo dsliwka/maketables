@@ -107,14 +107,8 @@ ignore = [
   "TRY003", # Avoid specifying long messages outside the exception class
   "D205",   # 1 blank line required between summary line and description
   "W505",   # Doc line too long
+  "RUF002", # Docstring contains greek letters
 ]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["D100", "D103"]
-"pyfixest/multcomp.py" = ["D103"]
-"pyfixest/summarize.py" = ["D103"]
-"pyfixest/visualize.py" = ["D103"]
-"scripts/*.py" = ["D103"]
 
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 88

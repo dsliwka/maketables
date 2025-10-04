@@ -1,5 +1,6 @@
 # run a regression with statsmodels, then create ETable
 import statsmodels.formula.api as smf
+
 import maketables as mt
 
 # Load sample dataset
