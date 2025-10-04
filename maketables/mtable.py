@@ -354,7 +354,7 @@ class MTable:
     def save(
         self,
         type: str = DEFAULT_SAVE_TYPE,
-        file_name: str = None,
+        file_name: str | None = None,
         show: bool = True,
         replace: bool = DEFAULT_REPLACE,
         **kwargs,
@@ -424,7 +424,7 @@ class MTable:
 
     def update_docx(
         self,
-        file_name: str = None,
+        file_name: str | None = None,
         tab_num: int | None = None,
         show: bool = False,
         docx_style: dict[str, object] | None = None,
