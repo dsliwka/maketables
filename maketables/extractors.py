@@ -472,6 +472,7 @@ class StatsmodelsExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
+        "Return set of statistics available for the given statsmodels model."
         return {
             k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
         }
@@ -602,7 +603,6 @@ class LinearmodelsExtractor:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
-        
         # Try to locate original DataFrame
         candidates = [
             ("model", "data", "frame"),
@@ -618,6 +618,7 @@ class LinearmodelsExtractor:
         return None
 
     def supported_stats(self, model: Any) -> set[str]:
+        "Return set of statistics available for the given linearmodels model."
         return {
             k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
         }
