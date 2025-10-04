@@ -453,6 +453,7 @@ class StatsmodelsExtractor:
         return val
 
     def vcov_info(self, model: Any) -> dict[str, Any]:
+        "Extract variance-covariance matrix type and clustering information."
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
@@ -603,6 +604,7 @@ class LinearmodelsExtractor:
         return {"vcov_type": getattr(model, "cov_type", None), "clustervar": None}
 
     def var_labels(self, model: Any) -> dict[str, str] | None:
+        "Extract variable labels from the model's data DataFrame when available."
         # Try to locate original DataFrame
         candidates = [
             ("model", "data", "frame"),

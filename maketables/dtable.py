@@ -326,7 +326,7 @@ class DTable(MTable):
         try:
             if format_spec == "d":
                 return f"{int(round(x)):d}"
-            else: 
+            else:
                 return f"{x:{format_spec}}"
         except (ValueError, TypeError):
             return self._format_number(x, None)

@@ -704,7 +704,7 @@ def _post_processing_input_checks(
     return models_list
 
 
-def _format_number(x: float, format_spec: str = None) -> str:
+def _format_number(x: float, format_spec: Optional[str] = None) -> str:
     """
     Format a number with optional format specifier.
 
