@@ -19,6 +19,11 @@ website:
         text: LaTeX Output
       - href: WritingPapers.ipynb
         text: Writing Papers
+      - text: Further Resources
+        menu:
+          - href: PyStataIntegration.ipynb
+            text: "Stata Integration"
+
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables

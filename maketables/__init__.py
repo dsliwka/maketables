@@ -18,3 +18,15 @@ __all__ = [
     "get_var_labels",
     "set_var_labels",
 ]
+
+# Conditionally import PyStata integration if available
+try:
+    from .pystata_extractor import (
+        StataResultWrapper,
+        rstata,
+        extract_current_stata_results,
+        PYSTATA_AVAILABLE
+    )
+except ImportError:
+    # PyStata not available, these functions won't be accessible
+    PYSTATA_AVAILABLE = False

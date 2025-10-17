@@ -43,6 +43,10 @@ docs = [
     "pylatex>=1.4.2,<2",
     "pyyaml>=6.0.0,<7",
 ]
+pystata = [
+    "pystata>=0.0.1",
+    "stata-setup>=0.1.0",
+]
 
 [tool.pixi.feature.dev.dependencies]
 quarto = ">=1.8.25,<2"
@@ -58,6 +62,7 @@ maketables = { path = ".", editable = true }
 default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
+pystata = { features = ["pystata", "docs"], solve-group = "default" }
 
 [tool.pixi.feature.dev.tasks]
 check = "pre-commit run --all-files"
@@ -144,3 +149,8 @@ module = [
   "tqdm.*",
 ]
 ignore_missing_imports = true
+
+[tool.setuptools.packages.find]
+where = [""]
+include = ["maketables*"]
+exclude = ["data*", "mystuff*", "latex_output*", "README_files*", "tests*"]
