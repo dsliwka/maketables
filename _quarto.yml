@@ -10,18 +10,18 @@ website:
       - href: getting-started.ipynb
         text: Getting Started
       - href: ETable.ipynb
-        text: Regression Tables
+        text: Regressions
       - href: DTable.ipynb
-        text: Descriptive Statistics
+        text: Descriptives
       - href: DocxTables.ipynb
-        text: Word Output
+        text: Word
       - href: LatexTables.ipynb
-        text: LaTeX Output
+        text: LaTeX
       - href: WritingPapers.ipynb
         text: Writing Papers
-      - text: Further Resources
+      - text: Resources
         menu:
-          - href: PyStataIntegration.ipynb
+          - href: pystataIntegration.ipynb
             text: "Stata Integration"
 
     right:
