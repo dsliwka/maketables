@@ -72,10 +72,8 @@ class BTable(DTable):
         for v in vars:
             assert v in df.columns, f"Variable '{v}' not in DataFrame."
 
-        labels = {} if labels is None else dict(labels)
         stats = ["mean", "std"] if stats is None else list(stats)
-        stats_labels = {} if stats_labels is None else dict(stats_labels)
-
+    
         # Build the descriptive stats table via DTable
         super().__init__(
             df=df,
