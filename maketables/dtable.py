@@ -89,6 +89,21 @@ class DTable(MTable):
         # Use user-provided format_spec or empty dict
         self.format_specs = format_spec if format_spec is not None else {}
 
+        def get_format_spec(var, stat):
+            # normalize to plain python strings for reliable lookup
+            var = str(var) if var is not None else None
+            stat = str(stat) if stat is not None else None
+            #print("FORMAT_LOOKUP:", repr(var), repr(stat))
+            if isinstance(self.format_specs, dict):
+                # most specific first
+                if (var, stat) in self.format_specs:
+                    return self.format_specs[(var, stat)]
+                if var in self.format_specs and not isinstance(self.format_specs[var], dict):
+                    return self.format_specs[var]
+                if stat in self.format_specs and not isinstance(self.format_specs[stat], dict):
+                    return self.format_specs[stat]
+            return None
+
         # Determine labels: prefer DataFrame attrs; fall back to MTable defaults
         try:
             df_labels = get_var_labels(df, include_defaults=True)
@@ -130,20 +145,28 @@ class DTable(MTable):
                 stats = ["count"] + stats
 
         def mean_std(x):
+            # Use get_format_spec for mean and std
+            var_name = x.name if hasattr(x, "name") else None
+            mean_fmt = get_format_spec(var_name, "mean")
+            std_fmt = get_format_spec(var_name, "std")
             return _format_mean_std(
                 x,
                 digits=digits,
                 newline=False,
-                format_specs=self.format_specs,
+                format_specs={"mean": mean_fmt, "std": std_fmt},
                 format_number_func=self._format_number,
             )
 
         def mean_newline_std(x):
+            # Use get_format_spec for mean and std
+            var_name = x.name if hasattr(x, "name") else None
+            mean_fmt = get_format_spec(var_name, "mean")
+            std_fmt = get_format_spec(var_name, "std")
             return _format_mean_std(
                 x,
                 digits=digits,
                 newline=True,
-                format_specs=self.format_specs,
+                format_specs={"mean": mean_fmt, "std": std_fmt},
                 format_number_func=self._format_number,
             )
 
@@ -179,19 +202,28 @@ class DTable(MTable):
             res = res.transpose(copy=True)
 
             for col in res.columns:
+                # stat_name comes from the column (the statistic)
+                stat_name = res[col].name if hasattr(res[col], "name") else col
                 # Skip formatting for combined statistics that are already formatted strings
-                if res[col].name in ["mean_std", "mean_newline_std"]:
+                if stat_name in ["mean_std", "mean_newline_std"]:
                     continue
-                elif res[col].dtype == float or res[col].name in self.format_specs:
-                    stat_name = res[col].name
-                    res[col] = res[col].apply(
-                        lambda x, sn=stat_name: self._format_number(x, self.format_specs.get(sn, None), digits=digits)
-                    )
+                # Only format numeric columns or when a format_spec exists for this stat or any var
+                if not (res[col].dtype == float or stat_name in self.format_specs or any(str(v) in self.format_specs for v in res.index)):
+                    continue
+                # Format each cell using the row index as the variable name
+                formatted = []
+                for var_label, val in zip(res.index, res[col]):
+                    var_name = str(var_label) if var_label is not None else None
+                    fmt = get_format_spec(var_name, stat_name)
+                    formatted.append(self._format_number(val, fmt, digits=digits))
+                res[col] = formatted
 
             if counts_row_below:
-                obs_row = [self._format_number(nobs, self.format_specs.get("count", None), digits=digits)] + [""] * (
-                    len(res.columns) - 1
-                )
+                obs_row = [
+                    self._format_number(
+                        nobs, get_format_spec(None, "count"), digits=digits
+                    )
+                ] + [""] * (len(res.columns) - 1)
                 res.loc[stats_dict["count"]] = obs_row
 
         else:
@@ -209,12 +241,15 @@ class DTable(MTable):
                     counts_row_below = False
 
             for col in res.columns:
-                stat_name = col[-1] if isinstance(res.columns, pd.MultiIndex) else col
+                stat_name = col[-1] if isinstance(res.columns, pd.MultiIndex) else (res[col].name if hasattr(res[col], "name") else col)
+                var_name = col[0] if isinstance(res.columns, pd.MultiIndex) else col
                 if stat_name in ["mean_std", "mean_newline_std"]:
                     continue
-                elif res[col].dtype == float:
+                elif res[col].dtype == float or stat_name in self.format_specs or var_name in self.format_specs:
                     res[col] = res[col].apply(
-                        lambda x, sn=stat_name: self._format_number(x, self.format_specs.get(sn, None), digits=digits)
+                        lambda x, sn=stat_name, vn=var_name: self._format_number(
+                            x, get_format_spec(vn, sn), digits=digits
+                        )
                     )
 
             res = pd.DataFrame(res.stack(level=0, future_stack=True))
