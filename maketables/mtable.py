@@ -1200,9 +1200,10 @@ class MTable:
                         col_spanners[key] = []
                     col_spanners[key].append(c[-1])
                 for label, columns in col_spanners.items():
-                    gt = gt.tab_spanner(
-                        label=label, columns=columns, level=nlevels - 1 - i
-                    )
+                    if label != "":
+                        gt = gt.tab_spanner(
+                            label=label, columns=columns, level=nlevels - 1 - i
+                        )
                 # Restore column names
                 gt = gt.cols_label(**col_dict)
 
