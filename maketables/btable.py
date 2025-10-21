@@ -12,8 +12,10 @@ class BTable(DTable):
     Balancing table: descriptive stats by group + per-variable p-values from group tests.
 
     Inherits DTable to build the stats table, then adds a 'p-value' column:
-    - For 2 groups: p-value of the single group indicator (t/z test).
+    - For 2 groups: p-value of the single group indicator (t test).
     - For >2 groups: joint Wald test that all group indicators are zero.
+    You can add fixed_effects and specify the `vcov` option, for instance 
+    to implement clustering (see pyfixest documentation).
 
     Parameters
     ----------
@@ -62,6 +64,7 @@ class BTable(DTable):
         fixed_effects: Optional[List[str]] = None,
         stats: Optional[List[str]] = None,
         stats_labels: Optional[Dict[str, str]] = None,
+        format_spec: Optional[Dict[Union[str, tuple], str]] = None,
         hide_stats: bool = False,
         counts_row_below: bool = False,
         observed: bool = False,
@@ -83,6 +86,7 @@ class BTable(DTable):
             byrow=None,
             labels=labels,
             stats_labels=stats_labels,
+            format_spec=format_spec,
             digits=digits,
             notes="",
             counts_row_below=counts_row_below,
@@ -93,7 +97,7 @@ class BTable(DTable):
 
         # Compute p-values per variable from a group-effects regression
         n_groups = df[group].nunique()
-        pvals = pd.Series(index=self.df.index, dtype=float)
+        pvals = pd.Series(index=self.df.index, dtype=str)
 
         fe_suffix = ""
         if fixed_effects:
@@ -115,11 +119,11 @@ class BTable(DTable):
                 q = np.zeros(k - 1)
                 pval = float(model.wald_test(R, q, distribution="chi2").pvalue)
 
-            pvals.iloc[i] = round(pval, pdigits)
+            pvals.iloc[i] = f"{pval:.{pdigits}f}"
 
-        # Append the p-value column; handle MultiIndex columns gracefully
+        # Append the p-value column; handle MultiIndex columns
         if isinstance(self.df.columns, pd.MultiIndex):
-            new_key = tuple(["p-value"] + [""] * (self.df.columns.nlevels - 1))
+            new_key = tuple([""] * (self.df.columns.nlevels - 1) + ["p-value"])
             self.df[new_key] = pvals
         else:
             self.df["p-value"] = pvals
@@ -138,7 +142,8 @@ class BTable(DTable):
                 "var": "Variance",
                 "median": "Median",
             }
-            sdict.update(stats_labels)
+            if stats_labels is not None:
+                sdict.update(stats_labels)
 
             chunks = []
             if hide_stats:

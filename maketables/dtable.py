@@ -35,10 +35,16 @@ class DTable(MTable):
     stats_labels : dict, optional
         Dictionary containing the labels for the statistics. The default is None.
     format_spec : dict, optional
-        Dictionary specifying format for each statistic type. Keys should match statistic names,
-        values should be format specifiers (e.g., '.3f', '.2e', ',.0f').
-        Example: {'mean': '.3f', 'std': '.2f', 'count': ',.0f'}
-        If None, uses sensible defaults.
+        Dictionary specifying format for numbers. Keys can be:
+          - a statistic name (e.g. 'mean', 'std') — applies to that stat for all variables,
+          - a variable name (e.g. 'wage') — applies to all stats for that variable,
+          - a tuple (var, stat) (e.g. ('age','mean')) — most specific, applies only to that variable/stat pair.
+        Values should be Python format specifiers (e.g. '.3f', '.2e', ',.0f') or the special
+        string 'd' to format integers. Keys are normalized to plain Python strings internally
+        (and tuple elements are normalized), so lookups are robust against non-string index types.
+        Lookup priority (applied in this order): (var, stat) → var → stat → fallback (use `digits` / sensible default).
+        If None, sensible defaults are used. Examples:
+            {'mean': '.3f', 'wage': ',.2f', ('age','mean'): '.1f'}
     digits : int, optional
         Number of decimal places for statistics display. This parameter is only
         applied when format_spec is None or when specific statistics are not
