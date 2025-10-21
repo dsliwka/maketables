@@ -129,6 +129,7 @@ class MTable:
 
     # Shared defaults (override per subclass if needed)
     DEFAULT_LABELS: ClassVar[dict[str, str]] = {}
+    
     # Simple default DOCX styling. Users can tweak this globally or per instance.
     DEFAULT_DOCX_STYLE: ClassVar[dict[str, object]] = {
         "font_name": "Times New Roman",

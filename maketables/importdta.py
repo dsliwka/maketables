@@ -281,10 +281,6 @@ def set_var_labels(
         If True, merge the resulting labels dict into MTable.DEFAULT_LABELS
         (respecting the overwrite policy).
 
-    Returns
-    -------
-    dict
-        The updated df.attrs['variable_labels'] mapping.
 
     Examples
     --------
@@ -316,4 +312,3 @@ def set_var_labels(
                     merged[k] = v
             MTable.DEFAULT_LABELS = merged
 
-    return current
