@@ -214,7 +214,7 @@ class DTable(MTable):
                 if stat_name in ["mean_std", "mean_newline_std"]:
                     continue
                 # Only format numeric columns or when a format_spec exists for this stat or any var
-                if not (res[col].dtype == float or stat_name in self.format_specs or any(str(v) in self.format_specs for v in res.index)):
+                if not (pd.api.types.is_numeric_dtype(res[col]) or stat_name in self.format_specs or any(str(v) in self.format_specs for v in res.index)):
                     continue
                 # Format each cell using the row index as the variable name
                 formatted = []
@@ -251,7 +251,7 @@ class DTable(MTable):
                 var_name = col[0] if isinstance(res.columns, pd.MultiIndex) else col
                 if stat_name in ["mean_std", "mean_newline_std"]:
                     continue
-                elif res[col].dtype == float or stat_name in self.format_specs or var_name in self.format_specs:
+                elif (pd.api.types.is_numeric_dtype(res[col])) or stat_name in self.format_specs or var_name in self.format_specs:
                     res[col] = res[col].apply(
                         lambda x, sn=stat_name, vn=var_name: self._format_number(
                             x, get_format_spec(vn, sn), digits=digits
@@ -307,7 +307,7 @@ class DTable(MTable):
             if abs_x < 0.001 and abs_x > 0:
                 return f"{x:.6f}".rstrip("0").rstrip(".")
             elif abs_x < 1:
-                return f"{x:.{digits}f}".rstrip("0").rstrip(".")
+                return f"{x:.{digits}f}"
             elif abs_x < 1000:
                 return f"{x:.{digits}f}"
             elif abs_x >= 10000:
