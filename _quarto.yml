@@ -23,10 +23,36 @@ website:
         menu:
           - href: pystataIntegration.ipynb
             text: "Stata Integration"
+      - text: "API Reference"
+        file: reference/index.qmd
+
 
     right:
       - icon: github
         href: https://github.com/dsliwka/maketables
+
+
+
+quartodoc:
+  style: pkgdown
+  dir: reference
+  package: maketables
+  sections:
+    - title: "Table Classes"
+      desc: "Main table creation classes"
+      contents:
+        - MTable
+        - DTable
+        - BTable
+        - ETable
+    - title: "Utilities"
+      desc: "Helper functions"
+      contents:
+        - importdta.get_var_labels
+        - importdta.set_var_labels
+        - importdta.import_dta
+        - importdta.export_dta
+
 
 format:
   html:

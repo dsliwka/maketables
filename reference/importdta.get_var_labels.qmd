@@ -1,0 +1,30 @@
+# importdta.get_var_labels { #maketables.importdta.get_var_labels }
+
+```python
+importdta.get_var_labels(df, *, include_defaults=False)
+```
+
+Get variable labels for a DataFrame.
+
+Reads df.attrs['variable_labels'] and optionally fills missing labels from
+MTable.DEFAULT_LABELS.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type             | Description                                                                 | Default    |
+|------------------|------------------|-----------------------------------------------------------------------------|------------|
+| df               | pandas.DataFrame | DataFrame to inspect.                                                       | _required_ |
+| include_defaults | bool             | If True, add labels from MTable.DEFAULT_LABELS for columns missing a label. | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                   |
+|--------|--------|-------------------------------|
+|        | dict   | Mapping {column_name: label}. |
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> get_var_labels(df)
+>>> get_var_labels(df, include_defaults=True)
+```

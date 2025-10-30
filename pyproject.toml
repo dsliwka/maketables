@@ -32,6 +32,7 @@ dev = [
     "flake8>=5.0",
     "mypy>=1.0",
     "pre-commit>=4.3.0,<5",
+    "quartodoc>=0.7.0",
 ]
 docs = [
     "sphinx>=5.0",

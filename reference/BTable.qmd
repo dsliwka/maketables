@@ -1,0 +1,51 @@
+# BTable { #maketables.BTable }
+
+```python
+BTable(
+    df,
+    vars,
+    group,
+    *,
+    labels=None,
+    digits=2,
+    pdigits=3,
+    vcov='iid',
+    fixed_effects=None,
+    stats=None,
+    stats_labels=None,
+    format_spec=None,
+    hide_stats=False,
+    counts_row_below=False,
+    observed=False,
+    notes='',
+    **kwargs,
+)
+```
+
+Balancing table: descriptive stats by group + per-variable p-values from group tests.
+
+Inherits DTable to build the stats table, then adds a 'p-value' column:
+- For 2 groups: p-value of the single group indicator (t test).
+- For >2 groups: joint Wald test that all group indicators are zero.
+You can add fixed_effects and specify the `vcov` option, for instance 
+to implement clustering (see pyfixest documentation).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name             | Type                     | Description                                                                                              | Default    |
+|------------------|--------------------------|----------------------------------------------------------------------------------------------------------|------------|
+| df               | pd.DataFrame             | Source data.                                                                                             | _required_ |
+| vars             | list\[str\]              | Variables to include.                                                                                    | _required_ |
+| group            | str                      | Grouping column in df.                                                                                   | _required_ |
+| labels           | dict                     | Variable labels (used for display and in notes).                                                         | `None`     |
+| digits           | int                      | Rounding for stats in the DTable. Default 2.                                                             | `2`        |
+| pdigits          | int                      | Rounding for p-values. Default 3.                                                                        | `3`        |
+| vcov             | str \| dict              | VCV for the p-value models ("iid", "hetero", "HC1", "HC2", "HC3" or {"CRV1": "cluster"}). Default "iid". | `'iid'`    |
+| fixed_effects    | list\[str\] \| None      | Optional fixed effects for the p-value models (cosmetic in notes). Default None.                         | `None`     |
+| stats            | list\[str\] \| None      | Stats for DTable (default ["mean", "std"]).                                                              | `None`     |
+| stats_labels     | dict\[str, str\] \| None | Custom labels for stats (used in header/notes).                                                          | `None`     |
+| hide_stats       | bool                     | Hide stats names in the header (list them in notes instead). Default False.                              | `False`    |
+| counts_row_below | bool                     | If True and balanced N, show a single counts row at bottom. Default False.                               | `False`    |
+| observed         | bool                     | Only consider observed categories when grouping. Default False.                                          | `False`    |
+| notes            | str                      | Custom notes. If "", a default is generated mentioning stats/SE/FE.                                      | `''`       |
+| kwargs           | dict                     | Passed through to DTable/MTable (e.g., caption, tab_label, rgroup_display).                              | `{}`       |

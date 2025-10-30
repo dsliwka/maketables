@@ -1,0 +1,23 @@
+# Function reference {.doc .doc-index}
+
+## Table Classes
+
+Main table creation classes
+
+| | |
+| --- | --- |
+| [MTable](MTable.qmd#maketables.MTable) | A table creation class supporting multiple output formats. |
+| [DTable](DTable.qmd#maketables.DTable) | DTable extends MTable to provide descriptive statistics table functionality. |
+| [BTable](BTable.qmd#maketables.BTable) | Balancing table: descriptive stats by group + per-variable p-values from group tests. |
+| [ETable](ETable.qmd#maketables.ETable) | Regression table builder on top of MTable. |
+
+## Utilities
+
+Helper functions
+
+| | |
+| --- | --- |
+| [importdta.get_var_labels](importdta.get_var_labels.qmd#maketables.importdta.get_var_labels) | Get variable labels for a DataFrame. |
+| [importdta.set_var_labels](importdta.set_var_labels.qmd#maketables.importdta.set_var_labels) | Set variable labels on a DataFrame and optionally sync them to MTable.DEFAULT_LABELS. |
+| [importdta.import_dta](importdta.import_dta.qmd#maketables.importdta.import_dta) | Import a Stata .dta into a pandas DataFrame. |
+| [importdta.export_dta](importdta.export_dta.qmd#maketables.importdta.export_dta) | Export a DataFrame to a Stata .dta file, writing variable labels. |

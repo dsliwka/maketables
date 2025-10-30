@@ -1,0 +1,53 @@
+# importdta.import_dta { #maketables.importdta.import_dta }
+
+```python
+importdta.import_dta(
+    path,
+    *,
+    convert_categoricals=True,
+    store_in_attrs=True,
+    update_mtable_defaults=False,
+    override=False,
+    return_labels=False,
+)
+```
+
+Import a Stata .dta into a pandas DataFrame.
+
+Behavior
+- Preserves Stata value labels by reading labeled variables as pandas.Categorical
+  when convert_categoricals=True.
+- Extracts variable (column) labels from the file.
+- Stores variable labels in df.attrs['variable_labels'] by default (store_in_attrs=True).
+- Optionally merges labels into MTable.DEFAULT_LABELS for package-wide defaults.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                   | Type               | Description                                                                                                                                                              | Default    |
+|------------------------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| path                   | str \| os.PathLike | Local filesystem path to a .dta file.                                                                                                                                    | _required_ |
+| convert_categoricals   | bool               | Convert Stata value labels to pandas.Categorical (recommended to preserve value labels).                                                                                 | `True`     |
+| store_in_attrs         | bool               | If True, save extracted variable labels under df.attrs['variable_labels'].                                                                                               | `True`     |
+| update_mtable_defaults | bool               | If True, merge extracted labels into MTable.DEFAULT_LABELS.                                                                                                              | `False`    |
+| override               | bool               | Controls merging into MTable.DEFAULT_LABELS when update_mtable_defaults=True: - True: overwrite existing keys with new labels. - False: only fill keys that are missing. | `False`    |
+| return_labels          | bool               | If True, also return the labels dict in addition to the DataFrame.                                                                                                       | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                           | Description                                                                                                          |
+|--------|--------------------------------|----------------------------------------------------------------------------------------------------------------------|
+|        | DataFrame or (DataFrame, dict) | - If return_labels=False: the DataFrame. - If return_labels=True: (df, labels) where labels is {column_name: label}. |
+
+## Notes {.doc-section .doc-section-notes}
+
+- pandas handles Stata encodings from the file header.
+- API works across pandas versions; if StataReader constructor does not support
+  convert_categoricals, it falls back and applies it at read time if needed.
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> df = import_dta("data/auto.dta")
+>>> df.attrs["variable_labels"]["price"]
+>>> df, labels = import_dta("data/auto.dta", update_mtable_defaults=True, return_labels=True)
+```

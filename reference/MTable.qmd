@@ -1,0 +1,151 @@
+# MTable { #maketables.MTable }
+
+```python
+MTable(
+    df,
+    notes=DEFAULT_NOTES,
+    caption=DEFAULT_CAPTION,
+    tab_label=DEFAULT_TAB_LABEL,
+    rgroup_sep=DEFAULT_RGROUP_SEP,
+    rgroup_display=DEFAULT_RGROUP_DISPLAY,
+    default_paths=DEFAULT_SAVE_PATH,
+    tex_style=None,
+    docx_style=None,
+    gt_style=None,
+    **kwargs,
+)
+```
+
+A table creation class supporting multiple output formats.
+
+MTable provides a unified interface for creating tables that can be output
+as HTML (via great-tables), LaTeX, or Word documents (DOCX). It supports
+features like multi-level column headers, row grouping, and extensive
+styling customization for each output format.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type               | Description                                                                                                                                                                                                                                                                                                                                                                          | Default                  |
+|----------------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| df             | pd.DataFrame       | The data to display in the table.                                                                                                                                                                                                                                                                                                                                                    | _required_               |
+| notes          | str                | Notes to display at the bottom of the table. Default is empty string.                                                                                                                                                                                                                                                                                                                | `DEFAULT_NOTES`          |
+| caption        | str                | Table caption. Default is None.                                                                                                                                                                                                                                                                                                                                                      | `DEFAULT_CAPTION`        |
+| tab_label      | str                | Label for the table (used in LaTeX \\label{}). Default is None.                                                                                                                                                                                                                                                                                                                      | `DEFAULT_TAB_LABEL`      |
+| rgroup_sep     | str                | Row group separator style. "tb" for top+bottom lines, "t" for top only, "b" for bottom only, "" for no lines. Default is "tb".                                                                                                                                                                                                                                                       | `DEFAULT_RGROUP_SEP`     |
+| rgroup_display | bool               | Whether to display row group names. Default is True.                                                                                                                                                                                                                                                                                                                                 | `DEFAULT_RGROUP_DISPLAY` |
+| default_paths  | str, dict, or None | Default paths for saving files. Can be a string (used for all types) or dict mapping output types to paths. Default is None.                                                                                                                                                                                                                                                         | `DEFAULT_SAVE_PATH`      |
+| tex_style      | dict               | LaTeX style overrides for auto-display in notebooks. Can include any parameter from DEFAULT_TEX_STYLE such as: first_col_width, tab_width, texlocation, arraystretch, tabcolsep, data_align, x_col_align, cmidrule_trim, first_row_addlinespace, data_addlinespace, rgroup_addlinespace, group_header_format, notes_fontsize_cmd. See DEFAULT_TEX_STYLE for full options.            | `None`                   |
+| docx_style     | dict               | DOCX style overrides for auto-display in notebooks. Can include any parameter from DEFAULT_DOCX_STYLE such as: first_col_width, font_name, font_color_rgb, font_size_pt, notes_font_size_pt, caption_font_name, caption_font_size_pt, caption_align, notes_align, align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name. See DEFAULT_DOCX_STYLE for full options. | `None`                   |
+| gt_style       | dict               | GT/HTML style overrides for auto-display in notebooks. Can include any parameter from DEFAULT_GT_STYLE plus all GT tab_options() parameters such as: align, table_width, first_col_width, table_font_size_all, source_notes_font_size, data_row_padding, column_labels_padding, border styles/colors/widths, etc. See DEFAULT_GT_STYLE for full options.                             | `None`                   |
+
+## Examples {.doc-section .doc-section-examples}
+
+Basic usage:
+
+```python
+>>> df = pd.DataFrame({"A": [1, 2], "B": ["x", "y"]})
+>>> table = MTable(df, caption="My Table")
+>>> table  # Auto-displays in notebook
+```
+
+With style overrides for auto-display:
+
+```python
+>>> table = MTable(
+...     df,
+...     tex_style={"first_col_width": "3cm"},
+...     docx_style={"first_col_width": "2in"},
+...     gt_style={"table_width": "100%"},
+... )
+```
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [make](#maketables.MTable.make) | Create the output object of the table (either gt, tex, docx, or html). |
+| [save](#maketables.MTable.save) | Save the output object of the table to a file. |
+| [update_docx](#maketables.MTable.update_docx) | Update an existing DOCX file with the output object of the table. |
+
+### make { #maketables.MTable.make }
+
+```python
+MTable.make(type=None, **kwargs)
+```
+
+Create the output object of the table (either gt, tex, docx, or html).
+If type is None, displays both HTML and LaTeX outputs for compatibility
+with both notebook viewing and Quarto rendering.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Default   |
+|----------|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| type     | str                                                                                 | The type of the output object ("gt", "tex", "docx", "html").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `None`    |
+| **kwargs | Further arguments forwarded to the respective output method when type is specified. | - For type="tex" (LaTeX):    - tex_style: Dict[str, object] (default MTable.DEFAULT_TEX_STYLE)     Per-table overrides for TeX rendering, e.g.:     {first_col_width: "3cm", tab_width: r"0.8\\textwidth", texlocation: "htbp",      arraystretch: 1.15, tabcolsep: "4pt", data_align: "c", x_col_align: "left",      cmidrule_trim: "lr", first_row_addlinespace: "0.75ex", data_addlinespace: "0.25ex",      group_header_format: r"\\bfseries %s", notes_fontsize_cmd: r"\\footnotesize"}   Note: When tab_width is set, ensure your document loads   the tabularx and array packages. - For type="gt" (HTML via great-tables):    - gt_style: Dict[str, object]     Dictionary passed directly to GT.tab_options() plus special parameters:     'align' (for cols_align), 'table_width' (controls table width),     'first_col_width' (width for first column, e.g., "150px", "3cm", "20%"),     and 'table_font_size_all' (default font size for all elements except notes; individual settings override).     Supports ALL GT styling options - see GT documentation for complete list.     Common examples: table_font_size, column_labels_font_size, source_notes_font_size,     data_row_padding, column_labels_padding, border styles/colors/widths, etc. - For type="docx" (Word):    - docx_style: Dict[str, object]     Overrides keys from MTable.DEFAULT_DOCX_STYLE such as:     first_col_width, font_name, font_color_rgb, font_size_pt, notes_font_size_pt,     caption_font_name, caption_font_size_pt, caption_align, notes_align,     align_center_cells, border_*_rule_sz, cell_margins_dxa, table_style_name. | `{}`      |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type           | Description                                                                                                                                      |
+|--------|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| output | object or None | - If type is specified: returns the backend output object. - If type is None: displays dual output in notebooks (HTML + LaTeX) and returns None. |
+
+### save { #maketables.MTable.save }
+
+```python
+MTable.save(
+    type=DEFAULT_SAVE_TYPE,
+    file_name=None,
+    show=True,
+    replace=DEFAULT_REPLACE,
+    **kwargs,
+)
+```
+
+Save the output object of the table to a file.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name      | Type                                                 | Description                                                                                                                                             | Default             |
+|-----------|------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| type      | str                                                  | Output type to save ("tex", "docx", "html"). Default is 'html'.                                                                                         | `DEFAULT_SAVE_TYPE` |
+| file_name | str                                                  | Path to save the file. If None, uses DEFAULT_SAVE_PATH[type] + tab_label.                                                                               | `None`              |
+| show      | bool                                                 | If True, also returns the table as a GT object for display. Default True.                                                                               | `True`              |
+| replace   | bool                                                 | If False and file exists, raises unless DEFAULT_REPLACE or replace=True.                                                                                | `DEFAULT_REPLACE`   |
+| **kwargs  | Arguments forwarded to the respective output method: | - type="tex": tex_style (see make()). - type="docx": docx_style (see make()). - type="html": gt_style via _output_gt (e.g., gt_style with table_width). | `{}`                |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                             |
+|--------|--------|---------------------------------------------------------|
+| output | GT     | When show=True, returns a GT object for display (HTML). |
+
+### update_docx { #maketables.MTable.update_docx }
+
+```python
+MTable.update_docx(
+    file_name=None,
+    tab_num=None,
+    show=False,
+    docx_style=None,
+    **kwargs,
+)
+```
+
+Update an existing DOCX file with the output object of the table.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                | Description                                                                                                                                            | Default   |
+|------------|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| file_name  | str                 | Path to the DOCX file. If relative and DEFAULT_SAVE_PATH['docx'] is set, that path is prepended. Must end with .docx (or no extension to auto-append). | `None`    |
+| tab_num    | int                 | 1-based index of the table to replace. If None or out of range, appends a new table.                                                                   | `None`    |
+| show       | bool                | If True, also returns a GT object for display (HTML). Default False.                                                                                   | `False`   |
+| docx_style | Dict\[str, object\] | Per-call overrides for MTable.DEFAULT_DOCX_STYLE (see make()). Can include first_col_width for column width control.                                   | `None`    |
+| **kwargs   | dict.               |                                                                                                                                                        | `{}`      |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                             |
+|--------|--------|---------------------------------------------------------|
+| output | GT     | When show=True, returns a GT object for display (HTML). |

@@ -1,0 +1,64 @@
+# importdta.export_dta { #maketables.importdta.export_dta }
+
+```python
+importdta.export_dta(
+    df,
+    path,
+    *,
+    labels=None,
+    use_defaults=True,
+    use_df_attrs=True,
+    overwrite=False,
+    data_label=None,
+    version=118,
+    write_index=False,
+    compression='infer',
+    time_stamp=None,
+)
+```
+
+Export a DataFrame to a Stata .dta file, writing variable labels.
+
+Variable label sources (later wins on key conflicts):
+  1) MTable.DEFAULT_LABELS (if use_defaults=True)
+  2) df.attrs['variable_labels'] (if use_df_attrs=True)
+  3) labels argument (highest priority)
+
+Stata value labels
+- pandas writes Categorical columns with their categories as Stata value labels.
+  Ensure columns that should carry value labels are dtype 'category'.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type                                                           | Description                                                           | Default                                      |
+|--------------|----------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------|
+| df           | pandas.DataFrame                                               | Data to export.                                                       | _required_                                   |
+| path         | str \| os.PathLike                                             | Output .dta path. Existing file is preserved unless overwrite=True.   | _required_                                   |
+| labels       | dict                                                           | Explicit variable labels {column: label} to apply (highest priority). | `None`                                       |
+| use_defaults | bool                                                           | Include labels from MTable.DEFAULT_LABELS.                            | `True`                                       |
+| use_df_attrs | bool                                                           | Include labels from df.attrs['variable_labels'] if present.           | `True`                                       |
+| overwrite    | bool                                                           | If False and file exists, raise FileExistsError.                      | `False`                                      |
+| data_label   | str                                                            | Stata dataset label.                                                  | `None`                                       |
+| version      | int                                                            | Stata file version (118 recommended; 117 is Stata 13).                | `118`                                        |
+| write_index  | bool                                                           | Whether to write the index as a Stata variable.                       | `False`                                      |
+| compression  | (\'zip\', \'gzip\', \'bz2\', \'xz\', \'zst\', \'infer\', None) | Compression mode for the output.                                      | `'zip','gzip','bz2','xz','zst','infer',None` |
+| time_stamp   | datetime                                                       | Timestamp written to the Stata file header.                           | `None`                                       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description   |
+|--------|--------|---------------|
+|        | None   |               |
+
+## Notes {.doc-section .doc-section-notes}
+
+- Stata variable labels are limited to 80 characters; longer labels are truncated.
+- Some older pandas versions may not support variable_labels=; a warning is emitted and
+  the file is written without variable labels in that case.
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> export_dta(df, "data/auto_out.dta", overwrite=True)
+>>> export_dta(df, "data/auto_out.dta", labels={"price": "Vehicle price"}, overwrite=True)
+```

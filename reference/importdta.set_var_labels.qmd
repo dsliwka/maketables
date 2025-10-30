@@ -1,0 +1,32 @@
+# importdta.set_var_labels { #maketables.importdta.set_var_labels }
+
+```python
+importdta.set_var_labels(
+    df,
+    labels,
+    *,
+    overwrite=True,
+    update_mtable_defaults=False,
+)
+```
+
+Set variable labels on a DataFrame and optionally sync them to MTable.DEFAULT_LABELS.
+
+Labels are stored in df.attrs['variable_labels'] as a plain dict. Only columns
+present in df are written.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                   | Type             | Description                                                                                            | Default    |
+|------------------------|------------------|--------------------------------------------------------------------------------------------------------|------------|
+| df                     | pandas.DataFrame | DataFrame to modify.                                                                                   | _required_ |
+| labels                 | dict             | Mapping {column_name: label} to set.                                                                   | _required_ |
+| overwrite              | bool             | If True, replace existing labels for given columns; if False, only fill missing.                       | `True`     |
+| update_mtable_defaults | bool             | If True, merge the resulting labels dict into MTable.DEFAULT_LABELS (respecting the overwrite policy). | `False`    |
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> set_var_labels(df, {"mpg": "Miles per gallon"}, update_mtable_defaults=True)
+>>> get_var_labels(df)
+```
