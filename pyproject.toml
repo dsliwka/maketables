@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "maketables"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     {name = "Alexander Fischer", email = "alexander-fischer1801@t-online.de"},
     {name = "Dirk Sliwka", email = "dirk.sliwka@uni-koeln.de"},
@@ -14,6 +14,21 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 
+keywords = ["tables", "statistics", "regression", "econometrics", "latex", "publication", "pyfixest", "statsmodels"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+
+
 dependencies = [
     "numpy>=1.20.0",
     "pandas>=1.3.0",
@@ -22,6 +37,13 @@ dependencies = [
     "python-docx>=0.8.11",
     "ipython>=7.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/py-econometrics/maketables"
+Documentation = "https://py-econometrics.github.io/maketables/"
+Repository = "https://github.com/py-econometrics/maketables"
+Issues = "https://github.com/py-econometrics/maketables/issues"
+
 
 
 [project.optional-dependencies]
@@ -64,6 +86,7 @@ default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 pystata = { features = ["pystata", "docs"], solve-group = "default" }
+publish = { features = ["publish"], solve-group = "default" }
 
 [tool.pixi.feature.dev.tasks]
 check = "pre-commit run --all-files"
@@ -72,6 +95,26 @@ check = "pre-commit run --all-files"
 run-all-notebooks = "jupyter nbconvert --execute --to notebook --inplace DTable.ipynb ETable.ipynb DocxTables.ipynb LatexTables.ipynb WritingPapers.ipynb getting-started.ipynb"
 docs-preview = "quarto preview"
 docs-install-tex = "quarto install tinytex"
+
+[tool.pixi.feature.publish.pypi-dependencies]
+build = ">=1.0"
+twine = ">=5.0"
+
+[tool.pixi.feature.publish.tasks]
+# Step 1: Clean old builds
+clean = { cmd = "python -c \"import shutil; import pathlib; [shutil.rmtree(p, ignore_errors=True) for p in [pathlib.Path('dist'), pathlib.Path('build')] + list(pathlib.Path('.').glob('*.egg-info'))]\"" }
+
+# Step 2: Build the package (depends on clean, so clean runs first)
+build = { cmd = "python -m build", depends-on = ["clean"] }
+
+# Step 3: Check the built package for errors
+check = { cmd = "twine check dist/*", depends-on = ["build"] }
+
+# Step 4a: Upload to TestPyPI (for testing)
+upload-test = { cmd = "twine upload --repository testpypi dist/*", depends-on = ["check"] }
+
+# Step 4b: Upload to PyPI (production)
+upload = { cmd = "twine upload dist/*", depends-on = ["check"] }
 
 [tool.ruff]
 line-length = 88

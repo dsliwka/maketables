@@ -2,7 +2,13 @@ from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
-import pyfixest as pf
+
+# Optional imports
+try:
+    import pyfixest as pf
+    HAS_PYFIXEST = True
+except ImportError:
+    HAS_PYFIXEST = False
 
 from .dtable import DTable
 
@@ -71,6 +77,14 @@ class BTable(DTable):
         notes: str = "",
         **kwargs,
     ):
+        if not HAS_PYFIXEST:
+            raise ImportError(
+                "BTable requires pyfixest. Install it with:\n"
+                "  pip install pyfixest\n"
+                "or\n"
+                "  pip install maketables[pystata]"
+            )
+
         assert group in df.columns, f"group column '{group}' not in DataFrame."
         for v in vars:
             assert v in df.columns, f"Variable '{v}' not in DataFrame."
