@@ -7,22 +7,24 @@ website:
   description: "A Python package for creating publication-ready tables"
   navbar:
     left:
-      - href: getting-started.ipynb
+      - href: docs/getting-started.ipynb
         text: Getting Started
-      - href: ETable.ipynb
+      - href: docs/ETable.ipynb
         text: Regressions
-      - href: DTable.ipynb
+      - href: docs/DTable.ipynb
         text: Descriptives
-      - href: DocxTables.ipynb
+      - href: docs/DocxTables.ipynb
         text: Word
-      - href: LatexTables.ipynb
+      - href: docs/LatexTables.ipynb
         text: LaTeX
-      - href: WritingPapers.ipynb
+      - href: docs/WritingPapers.ipynb
         text: Writing Papers
       - text: Resources
         menu:
-          - href: pystataIntegration.ipynb
+          - href: docs/pystataIntegration.ipynb
             text: "Stata Integration"
+          - href: docs/UsingLabels.ipynb
+            text: "Using Variable Labels"
       - text: "API Reference"
         file: reference/index.qmd
 
@@ -70,4 +72,4 @@ exclude:
   - ".venv/"
   - "__pycache__/"
   - "mystuff/"
-  - "docs/"
+  - "output/"
