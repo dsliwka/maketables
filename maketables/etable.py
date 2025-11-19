@@ -8,15 +8,24 @@ from typing import Any, ClassVar
 
 import numpy as np
 import pandas as pd
-from pyfixest.estimation.feiv_ import Feiv
-from pyfixest.estimation.feols_ import Feols
-from pyfixest.estimation.fepois_ import Fepois
-from pyfixest.estimation.FixestMulti_ import FixestMulti
+
+# Make pyfixest imports optional
+try:
+    from pyfixest.estimation.feiv_ import Feiv
+    from pyfixest.estimation.feols_ import Feols
+    from pyfixest.estimation.fepois_ import Fepois
+    from pyfixest.estimation.FixestMulti_ import FixestMulti
+    HAS_PYFIXEST = True
+except ImportError:
+    HAS_PYFIXEST = False
+    # Create dummy classes for isinstance checks
+    class Feiv: pass
+    class Feols: pass
+    class Fepois: pass
+    class FixestMulti: pass
 
 from .extractors import ModelExtractor, get_extractor
 from .mtable import MTable
-
-ModelInputType = FixestMulti | Feols | Fepois | Feiv | list[Feols | Fepois | Feiv]
 
 
 class ETable(MTable):
@@ -158,7 +167,7 @@ class ETable(MTable):
 
     def __init__(
         self,
-        models: ModelInputType,
+        models: Any, 
         *,
         signif_code: list | None = None,
         coef_fmt: str | None = None,
@@ -620,18 +629,18 @@ class ETable(MTable):
 
 
 def _post_processing_input_checks(
-    models: ModelInputType,
+    models: Any,  
     check_duplicate_model_names: bool = False,
     rename_models: dict[str, str] | None = None,
-) -> list[Feols | Fepois | Feiv]:
+) -> list[Any]:  
     """
     Perform input checks for post-processing models.
 
     Parameters
     ----------
-        models : Union[List[Union[Feols, Fepois, Feiv]], FixestMulti]
-                The models to be checked. This can either be a list of models
-                (Feols, Fepois, Feiv) or a single FixestMulti object.
+        models : Any
+                The models to be checked. This can be a list of models
+                or a single FixestMulti object for pyfixest.
         check_duplicate_model_names : bool, optional
                 Whether to check for duplicate model names. Default is False.
                 Mostly used to avoid overlapping models in plots created via
@@ -642,30 +651,34 @@ def _post_processing_input_checks(
 
     Returns
     -------
-        List[Union[Feols, Fepois]]
-            A list of checked and validated models. The returned list contains only
-            Feols and Fepois types.
+        list[Any]
+            A list of checked and validated models.
 
     Raises
     ------
         TypeError: If the models argument is not of the expected type.
 
     """
-    models_list: list[Feols | Fepois | Feiv] = []
+    models_list: list[Any] = []  
 
     if isinstance(models, (Feols, Fepois, Feiv)):
         models_list = [models]
     elif isinstance(models, FixestMulti):
         models_list = models.to_list()
     elif isinstance(models, (list, ValuesView)):
-        if all(isinstance(m, (Feols, Fepois, Feiv)) for m in models):
-            models_list = models
-        else:
-            raise TypeError(
-                "All elements in the models list must be instances of Feols, Feiv, or Fepois."
-            )
+        # Accept any list of models (not just pyfixest)
+        models_list = list(models)
     else:
-        raise TypeError("Invalid type for models argument.")
+        # Single model of any type
+        models_list = [models]
+
+    # The rest of this function only applies to pyfixest models
+    if not HAS_PYFIXEST:
+        return models_list
+
+    # Only check pyfixest-specific attributes if we have pyfixest models
+    if not all(isinstance(m, (Feols, Fepois, Feiv)) for m in models_list):
+        return models_list
 
     if check_duplicate_model_names or rename_models is not None:
         all_model_names = [model._model_name for model in models_list]

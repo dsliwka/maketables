@@ -4034,8 +4034,8 @@ packages:
   requires_python: '>=3.8'
 - pypi: ./
   name: maketables
-  version: 0.1.1
-  sha256: 3ee522f6f1e6125382e2c9f608382bc3e552fcd900e4a8d20ef213a14a7ee47b
+  version: 0.1.3
+  sha256: ab52518104e8d848e36b763099d7b9d64fc5869c81e8a16c883828991eefa10d
   requires_dist:
   - numpy>=1.20.0
   - pandas>=1.3.0
