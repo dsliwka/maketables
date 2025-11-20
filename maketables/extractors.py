@@ -22,9 +22,16 @@ except Exception:
     Feols = Fepois = Feiv = ()  # type: ignore
 
 try:
-    from linearmodels.iv import IV2SLSResults, IVGMMResults
-    from linearmodels.panel import PanelOLSResults, RandomEffectsResults
+    # Import linearmodels result classes (not model classes!)
+    from linearmodels.panel.results import PanelResults
+    from linearmodels.iv.results import IVResults
+    HAS_LINEARMODELS = True
+    # All panel results inherit from PanelResults
+    # All IV results inherit from IVResults (including AbsorbingLS)
+    PanelOLSResults = RandomEffectsResults = PanelResults
+    IV2SLSResults = IVGMMResults = IVResults
 except Exception:
+    HAS_LINEARMODELS = False
     PanelOLSResults = RandomEffectsResults = IV2SLSResults = IVGMMResults = ()  # type: ignore
 
 
@@ -307,7 +314,7 @@ class PyFixestExtractor:
         "adj_r2_within": "_adj_r2_within",
         "rmse": "_rmse",
         "fvalue": "_F_stat",
-        "fstat_1st": "_f_stat_1st_stage",
+        "f_statistic": "_f_stat_1st_stage",
         # pyfixest may return a sequence; take the first element
         "deviance": lambda m: (
             (getattr(m, "deviance", None)[0])
@@ -506,24 +513,34 @@ class LinearmodelsExtractor:
 
     def can_handle(self, model: Any) -> bool:
         """Check if this extractor can handle the given model."""
-        # If linearmodels types are empty tuples, it means linearmodels is not available
+        # If linearmodels types are empty tuples, linearmodels is not available
         if PanelOLSResults == ():
             return False
         
+        # Check module first (fast check)
         mod = type(model).__module__ or ""
-        if mod.startswith("linearmodels."):
-            # Core results interface in linearmodels
-            return (
-                hasattr(model, "params")
-                and hasattr(model, "pvalues")
-                and hasattr(model, "std_errors")
-            )
-        return False
+        if not mod.startswith("linearmodels."):
+            return False
+        
+        # Check if it's a linearmodels result type
+        # Need to handle both PanelResults and IVResults (AbsorbingLS is IVResults)
+        if isinstance(model, (PanelOLSResults, IV2SLSResults)):
+            return True
+        
+        # Fallback: check for required attributes
+        return (
+            hasattr(model, "params")
+            and hasattr(model, "pvalues")
+            and (hasattr(model, "std_errors") or hasattr(model, "std_error"))
+        )
 
     def coef_table(self, model: Any) -> pd.DataFrame:
         """Extract coefficient table from a linearmodels fitted model."""
         params = pd.Series(model.params)
-        se = pd.Series(getattr(model, "std_errors", np.nan), index=params.index)
+        
+        # Handle both std_errors (panel) and std_error (IV/AbsorbingLS)
+        se_attr = "std_errors" if hasattr(model, "std_errors") else "std_error"
+        se = pd.Series(getattr(model, se_attr, np.nan), index=params.index)
         pvalues = pd.Series(getattr(model, "pvalues", np.nan), index=params.index)
         tstats = getattr(model, "tstats", None)
 
@@ -550,27 +567,82 @@ class LinearmodelsExtractor:
             ("model", "dependent", "name"),
             ("model", "dependent", "var_name"),
             ("model", "dependent", "pandas", "name"),
+            ("model", "dependent", "vars", 0),  # AbsorbingLS stores vars as list
         ]:
             val = _follow(model, list(chain))
             if isinstance(val, str):
                 if chain[-1] == "formula" and "~" in val:
                     return val.split("~", 1)[0].strip()
                 return val
+        
+        # For AbsorbingLS, try to get column name from dependent DataFrame
+        mdl = getattr(model, "model", None)
+        if mdl is not None:
+            dep = getattr(mdl, "dependent", None)
+            if dep is not None:
+                if hasattr(dep, "cols"):
+                    # dep.cols contains the column names
+                    cols = dep.cols
+                    if isinstance(cols, list) and len(cols) > 0:
+                        return cols[0]
+                elif hasattr(dep, "dataframe") and hasattr(dep.dataframe, "columns"):
+                    return dep.dataframe.columns[0]
+        
         return "y"
 
     def fixef_string(self, model: Any) -> str | None:
-        """Extract fixed effects string from a linearmodels fitted model."""
+        """
+        Extract fixed effects string from a linearmodels fitted model.
+        
+        For PanelOLS: Returns actual index names (e.g., "nr+year")
+        For AbsorbingLS: Returns absorbed variable names (e.g., "firm_id+year")
+        """
         mdl = getattr(model, "model", None)
         if mdl is None:
             return None
+        
+        # Check if this is an AbsorbingLS model
+        model_type = type(mdl).__name__
+        if model_type == "AbsorbingLS":
+            # For AbsorbingLS, the absorb parameter is stored as _absorb
+            absorb_data = getattr(mdl, "_absorb", None)
+            if absorb_data is not None:
+                # absorb_data is the DataFrame that was passed as absorb parameter
+                if hasattr(absorb_data, "columns"):
+                    return "+".join(absorb_data.columns.tolist())
+                # Fallback: if it's a Categorical object with pandas attribute
+                if hasattr(absorb_data, "pandas") and hasattr(absorb_data.pandas, "columns"):
+                    return "+".join(absorb_data.pandas.columns.tolist())
+            return None
+        
+        # For PanelOLS/RandomEffects models
+        has_entity = getattr(mdl, "entity_effects", False)
+        has_time = getattr(mdl, "time_effects", False)
+        has_other = getattr(mdl, "other_effects", None)
+        
+        if not (has_entity or has_time or has_other):
+            return None
+        
+        # Try to extract actual variable names from panel structure
+        entity_name = "entity"
+        time_name = "time"
+        
+        dependent = getattr(mdl, "dependent", None)
+        if dependent is not None and hasattr(dependent, "dataframe"):
+            idx = dependent.dataframe.index
+            if hasattr(idx, "names") and len(idx.names) >= 2:
+                entity_name = idx.names[0] or "entity"
+                time_name = idx.names[1] or "time"
+        
+        # Build fixed effects string
         parts = []
-        if getattr(mdl, "entity_effects", False):
-            parts.append("entity")
-        if getattr(mdl, "time_effects", False):
-            parts.append("time")
-        other = getattr(mdl, "other_effects", None)
-        if other:
+        if has_entity:
+            parts.append(entity_name)
+        if has_time:
+            parts.append(time_name)
+        if has_other:
             parts.append("other")
+        
         return "+".join(parts) if parts else None
 
     # Unified stat keys -> linearmodels attributes/callables
@@ -600,17 +672,8 @@ class LinearmodelsExtractor:
             if hasattr(m, "root_mean_squared_error")
             else (float(m.s2) ** 0.5 if hasattr(m, "s2") and m.s2 is not None else None)
         ),
-        # IV diagnostics (if present on IV results)
-        "j_stat": lambda m: getattr(getattr(m, "j_statistic", None), "stat", None),
-        "j_pvalue": lambda m: getattr(getattr(m, "j_statistic", None), "pval", None),
-        "first_stage_f": lambda m: (
-            # take the first-stage F from the first endogenous if available
-            (
-                lambda fs: getattr(next(iter(fs.values())), "f_statistic", None).stat
-                if isinstance(fs, dict) and fs
-                else None
-            )(getattr(m, "first_stage", None))
-        ),
+        # IV diagnostics: TODO
+       
     }
 
     def stat(self, model: Any, key: str) -> Any:
@@ -651,7 +714,6 @@ class LinearmodelsExtractor:
         return {
             k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
         }
-
 
 # Register built-ins
 clear_extractors()

@@ -71,6 +71,11 @@ pystata = [
     "stata-setup>=0.1.0",
 ]
 
+linearmodels = [
+    "linearmodels>=4.0",
+    "statsmodels>=0.13.0",
+]
+
 [tool.pixi.feature.dev.dependencies]
 quarto = ">=1.8.25,<2"
 
@@ -86,6 +91,7 @@ default = { solve-group = "default" }
 dev = { features = ["dev"], solve-group = "default" }
 docs = { features = ["docs"], solve-group = "default" }
 pystata = { features = ["pystata", "docs"], solve-group = "default" }
+linearmodels = { features = ["linearmodels", "docs"], solve-group = "default" }
 publish = { features = ["publish"], solve-group = "default" }
 
 [tool.pixi.feature.dev.tasks]
