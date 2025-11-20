@@ -155,7 +155,26 @@ def get_extractor(model: Any) -> ModelExtractor:
                 return ex
         except Exception:
             continue
-    raise TypeError(f"No extractor available for model type: {type(model).__name__}")
+    
+    # Build helpful error message
+    model_type = type(model).__name__
+    model_module = type(model).__module__
+    
+    error_msg = (
+        f"No extractor available for model type: {model_type} from {model_module}\n\n"
+        f"Registered extractors ({len(_EXTRACTOR_REGISTRY)}):\n"
+    )
+    
+    for i, extractor in enumerate(_EXTRACTOR_REGISTRY, 1):
+        extractor_name = type(extractor).__name__
+        error_msg += f"  {i}. {extractor_name}\n"
+    
+    error_msg += (
+        "\nTo add support for additional model types, implement the ModelExtractor protocol "
+        "and use register_extractor()."
+    )
+    
+    raise TypeError(error_msg)
 
 
 # ---------- small helpers ----------
@@ -235,6 +254,9 @@ class PyFixestExtractor:
 
     def can_handle(self, model: Any) -> bool:
         """Check if model is a pyfixest model type."""
+        # If pyfixest types are empty tuples, it means pyfixest is not available
+        if Feols == ():
+            return False
         try:
             return isinstance(model, (Feols, Fepois, Feiv))
         except Exception:
@@ -484,6 +506,10 @@ class LinearmodelsExtractor:
 
     def can_handle(self, model: Any) -> bool:
         """Check if this extractor can handle the given model."""
+        # If linearmodels types are empty tuples, it means linearmodels is not available
+        if PanelOLSResults == ():
+            return False
+        
         mod = type(model).__module__ or ""
         if mod.startswith("linearmodels."):
             # Core results interface in linearmodels
@@ -492,7 +518,6 @@ class LinearmodelsExtractor:
                 and hasattr(model, "pvalues")
                 and hasattr(model, "std_errors")
             )
-        # Fallback: attribute-based detection (avoid grabbing statsmodels)
         return False
 
     def coef_table(self, model: Any) -> pd.DataFrame:

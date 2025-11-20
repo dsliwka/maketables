@@ -9,21 +9,6 @@ from typing import Any, ClassVar
 import numpy as np
 import pandas as pd
 
-# Make pyfixest imports optional
-try:
-    from pyfixest.estimation.feiv_ import Feiv
-    from pyfixest.estimation.feols_ import Feols
-    from pyfixest.estimation.fepois_ import Fepois
-    from pyfixest.estimation.FixestMulti_ import FixestMulti
-    HAS_PYFIXEST = True
-except ImportError:
-    HAS_PYFIXEST = False
-    # Create dummy classes for isinstance checks
-    class Feiv: pass
-    class Feols: pass
-    class Fepois: pass
-    class FixestMulti: pass
-
 from .extractors import ModelExtractor, get_extractor
 from .mtable import MTable
 
@@ -33,15 +18,15 @@ class ETable(MTable):
     Regression table builder on top of MTable.
 
     ETable extracts coefficients and model statistics from supported model
-    objects (e.g., pyfixest Feols/Fepois/Feiv, FixestMulti, and statsmodels
-    fitted results such as OLS/GLM), assembles a
-    publication-style table, and delegates rendering/export to MTable.
+    objects, assembles a publication-style table, and delegates rendering/export to MTable.
 
     Parameters
     ----------
-    models : FixestMulti | Feols | Fepois | Feiv | statsmodels results | list[...]
-        One or more fitted models. A FixestMulti is expanded into its models.
-        Statsmodels support includes fitted results.
+    models : 
+        One or more fitted models. Accepts single models, lists, or multi-model 
+        containers (e.g., pyfixest's FixestMulti). Supported packages are 
+        automatically detected via registered extractors (see extractors.py).
+        Built-in support: pyfixest, statsmodels, linearmodels.
     signif_code : list[float], optional
         Three ascending p-value cutoffs for significance stars, default
         ETable.DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05].
@@ -327,13 +312,21 @@ class ETable(MTable):
     # ---------- Dispatch helpers (package detection) ----------
 
     def _normalize_models(self, models: Any) -> list[Any]:
-        # Expand FixestMulti if present, otherwise wrap single model into a list
-        if isinstance(models, FixestMulti):
+        """
+        Normalize models to a list, expanding multi-model containers.
+        
+        Uses duck typing to detect FixestMulti-like objects (anything with a to_list() method).
+        This keeps etable.py package-agnostic.
+        """
+        # Check for multi-model container (has to_list method)
+        if hasattr(models, 'to_list') and callable(getattr(models, 'to_list', None)):
             return models.to_list()
-        if isinstance(models, (Feols, Fepois, Feiv)):
-            return [models]
+        
+        # Handle lists/tuples/ValuesView
         if isinstance(models, (list, tuple, ValuesView)):
             return list(models)
+        
+        # Single model
         return [models]
 
     def _get_extractor(self, model: Any) -> ModelExtractor:
@@ -628,93 +621,6 @@ class ETable(MTable):
         return pd.MultiIndex.from_arrays(header_levels)
 
 
-def _post_processing_input_checks(
-    models: Any,  
-    check_duplicate_model_names: bool = False,
-    rename_models: dict[str, str] | None = None,
-) -> list[Any]:  
-    """
-    Perform input checks for post-processing models.
-
-    Parameters
-    ----------
-        models : Any
-                The models to be checked. This can be a list of models
-                or a single FixestMulti object for pyfixest.
-        check_duplicate_model_names : bool, optional
-                Whether to check for duplicate model names. Default is False.
-                Mostly used to avoid overlapping models in plots created via
-                pf.coefplot() and pf.iplot().
-        rename_models : dict, optional
-                A dictionary to rename the models. The keys are the original model names
-                and the values are the new model names.
-
-    Returns
-    -------
-        list[Any]
-            A list of checked and validated models.
-
-    Raises
-    ------
-        TypeError: If the models argument is not of the expected type.
-
-    """
-    models_list: list[Any] = []  
-
-    if isinstance(models, (Feols, Fepois, Feiv)):
-        models_list = [models]
-    elif isinstance(models, FixestMulti):
-        models_list = models.to_list()
-    elif isinstance(models, (list, ValuesView)):
-        # Accept any list of models (not just pyfixest)
-        models_list = list(models)
-    else:
-        # Single model of any type
-        models_list = [models]
-
-    # The rest of this function only applies to pyfixest models
-    if not HAS_PYFIXEST:
-        return models_list
-
-    # Only check pyfixest-specific attributes if we have pyfixest models
-    if not all(isinstance(m, (Feols, Fepois, Feiv)) for m in models_list):
-        return models_list
-
-    if check_duplicate_model_names or rename_models is not None:
-        all_model_names = [model._model_name for model in models_list]
-
-    if check_duplicate_model_names:
-        # create model_name_plot attribute to differentiate between models with the
-        # same model_name / model formula
-        for model in models_list:
-            model._model_name_plot = model._model_name
-
-        counter = Counter(all_model_names)
-        duplicate_model_names = [item for item, count in counter.items() if count > 1]
-
-        for duplicate_model in duplicate_model_names:
-            duplicates = [
-                model for model in models_list if model._model_name == duplicate_model
-            ]
-            for i, model in enumerate(duplicates):
-                model._model_name_plot = f"Model {i}: {model._model_name}"
-                warnings.warn(
-                    f"The _model_name attribute {model._model_name}' is duplicated for models in the `models` you provided. To avoid overlapping model names / plots, the _model_name_plot attribute has been changed to '{model._model_name_plot}'.",
-                    stacklevel=2,
-                )
-
-        if rename_models is not None:
-            model_name_diff = set(rename_models.keys()) - set(all_model_names)
-            if model_name_diff:
-                warnings.warn(
-                    f"""
-                    The following model names specified in rename_models are not found in the models:
-                    {model_name_diff}
-                    """,
-                    stacklevel=2,
-                )
-
-    return models_list
 
 
 def _format_number(x: float, format_spec: str | None = None) -> str:
