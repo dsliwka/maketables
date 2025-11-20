@@ -29,7 +29,7 @@ class ETable(MTable):
         Built-in support: pyfixest, statsmodels, linearmodels.
     signif_code : list[float], optional
         Three ascending p-value cutoffs for significance stars, default
-        ETable.DEFAULT_SIGNIF_CODE = [0.001, 0.01, 0.05].
+        ETable.DEFAULT_SIGNIF_CODE = [0.01, 0.05, 0.10].
     coef_fmt : str, optional
         Cell layout for each coefficient. Tokens:
           - 'b' (estimate), 'se' (std. error), 't' (t value), 'p' (p-value),
@@ -117,7 +117,7 @@ class ETable(MTable):
     """
 
     # ---- Class defaults ----
-    DEFAULT_SIGNIF_CODE: ClassVar[list[float]] = [0.001, 0.01, 0.05]
+    DEFAULT_SIGNIF_CODE: ClassVar[list[float]] = [0.01, 0.05, 0.10]
     DEFAULT_COEF_FMT: ClassVar[str] = "b:.3f \n (se:.3f)"
     DEFAULT_MODEL_STATS: ClassVar[list[str]] = ["N", "r2"]
     # Canonical stat key -> printable label (used if model_stats_labels is None)
