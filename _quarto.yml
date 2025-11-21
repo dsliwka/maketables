@@ -19,6 +19,8 @@ website:
         text: LaTeX
       - href: docs/WritingPapers.ipynb
         text: Writing Papers
+      - href: docs/AddingMethods.ipynb
+        text: Contributing Model Classes
       - text: Resources
         menu:
           - href: docs/pystataIntegration.ipynb
