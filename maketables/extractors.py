@@ -22,6 +22,11 @@ except Exception:
     Feols = Fepois = Feiv = ()  # type: ignore
 
 try:
+    from duckreg.estimators import DuckRegression
+except Exception:
+    DuckRegression = ()  # type: ignore
+
+try:
     # Import linearmodels result classes (not model classes!)
     from linearmodels.panel.results import PanelResults
     from linearmodels.iv.results import IVResults
@@ -297,7 +302,17 @@ class PyFixestExtractor:
 
     def fixef_string(self, model: Any) -> str | None:
         """Extract fixed effects specification string from pyfixest model."""
-        return getattr(model, "_fixef", None)
+        fixef = getattr(model, "_fixef", None)
+        if fixef is None:
+            return None
+        # Ensure we return a string (pyfixest might store it in various formats)
+        if isinstance(fixef, str):
+            return fixef
+        # If it's a list or other iterable, join with +
+        if isinstance(fixef, (list, tuple)):
+            return "+".join(str(f) for f in fixef)
+        # Otherwise convert to string
+        return str(fixef)
 
     # Build a clean map of unified stat keys -> pyfixest attributes/callables
     STAT_MAP: ClassVar[dict[str, Any]] = {
@@ -626,13 +641,14 @@ class LinearmodelsExtractor:
         # Try to extract actual variable names from panel structure
         entity_name = "entity"
         time_name = "time"
-        
+
         dependent = getattr(mdl, "dependent", None)
         if dependent is not None and hasattr(dependent, "dataframe"):
             idx = dependent.dataframe.index
             if hasattr(idx, "names") and len(idx.names) >= 2:
-                entity_name = idx.names[0] or "entity"
-                time_name = idx.names[1] or "time"
+                # Ensure we get strings, not integers or other types
+                entity_name = str(idx.names[0]) if idx.names[0] is not None else "entity"
+                time_name = str(idx.names[1]) if idx.names[1] is not None else "time"
         
         # Build fixed effects string
         parts = []
@@ -715,8 +731,176 @@ class LinearmodelsExtractor:
             k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
         }
 
+
+class DuckRegExtractor:
+    """
+    Extractor for duckreg models (DuckRegression).
+
+    Handles models from the duckreg package. Note that duckreg only provides
+    point_estimate and standard_error attributes, so p-values and t-statistics
+    need to be computed from these.
+    """
+
+    def can_handle(self, model: Any) -> bool:
+        """Check if model is a DuckRegression model type."""
+        # If DuckRegression type is empty tuple, duckreg is not available
+        if DuckRegression == ():
+            return False
+        try:
+            return isinstance(model, DuckRegression)
+        except Exception:
+            return False
+
+    def coef_table(self, model: Any) -> pd.DataFrame:
+        """
+        Extract coefficient table from duckreg model.
+
+        Since duckreg only provides point_estimate and standard_error,
+        we compute t-statistics and p-values assuming normal distribution.
+
+        Returns
+        -------
+            DataFrame with columns: Estimate, Std. Error, t value, and Pr(>|t|).
+        """
+        from scipy import stats
+
+        # Get point estimates and standard errors
+        point_estimate = getattr(model, "point_estimate", None)
+        vcov = getattr(model, "vcov", None)
+        standard_error = np.sqrt(np.diag(vcov))
+
+        if point_estimate is None or standard_error is None:
+            raise ValueError(
+                "DuckRegExtractor: model must have 'point_estimate' and 'standard_error' attributes."
+            )
+
+        # Get variable names from the model
+        covars = getattr(model, "covars", [])
+        fevars = getattr(model, "fevars", [])
+        var_names = covars + fevars if covars else None
+
+        # Convert to pandas Series if needed, using proper variable names
+        if not isinstance(point_estimate, pd.Series):
+            if var_names is not None:
+                # DuckRegression prepends intercept to coefficients, so add it to var_names
+                var_names_with_intercept = ["_cons"] + list(var_names)
+                point_estimate = pd.Series(point_estimate, index=var_names_with_intercept)
+            else:
+                point_estimate = pd.Series(point_estimate)
+
+        # Ensure index names are strings
+        if point_estimate.index.dtype != 'object':
+            point_estimate.index = point_estimate.index.astype(str)
+
+        if not isinstance(standard_error, pd.Series):
+            standard_error = pd.Series(standard_error, index=point_estimate.index)
+
+        # Compute t-statistics
+        t_values = point_estimate / standard_error
+
+        # Compute p-values (two-tailed test)
+        p_values = 2 * (1 - stats.norm.cdf(np.abs(t_values)))
+
+        df = pd.DataFrame(
+            {
+                "Estimate": pd.to_numeric(point_estimate, errors="coerce"),
+                "Std. Error": pd.to_numeric(standard_error, errors="coerce"),
+                "t value": pd.to_numeric(t_values, errors="coerce"),
+                "Pr(>|t|)": pd.to_numeric(p_values, errors="coerce"),
+            },
+            index=point_estimate.index,
+        )
+
+        return df[["Estimate", "Std. Error", "t value", "Pr(>|t|)"]]
+
+    def depvar(self, model: Any) -> str:
+        """Extract dependent variable name from duckreg model."""
+        # DuckRegression stores outcome variable in outcome_var attribute
+        outcome_var = getattr(model, "outcome_var", None)
+        if isinstance(outcome_var, str):
+            return outcome_var
+        return "y"
+
+    def fixef_string(self, model: Any) -> str | None:
+        """
+        Extract fixed effects specification from duckreg model.
+
+        DuckRegression uses fevars (fixed effect variables) specified in the formula.
+        """
+        return None
+
+    # Unified stat keys -> duckreg attributes/callables
+    # Note: DuckRegression does not provide model statistics like N, r2, etc.
+    STAT_MAP: ClassVar[dict[str, Any]] = {}
+
+    def stat(self, model: Any, key: str) -> Any:
+        """
+        Extract a statistic from the duckreg model using STAT_MAP.
+
+        Args:
+            model: DuckRegression model object.
+            key: Statistic key (e.g., "N", "r2").
+
+        Returns
+        -------
+            The requested statistic value or None if not available.
+        """
+        spec = self.STAT_MAP.get(key)
+        if spec is None:
+            return None
+        val = _get_attr(model, spec)
+        if key == "N" and val is not None:
+            try:
+                return int(val)
+            except Exception:
+                return val
+        return val
+
+    def vcov_info(self, model: Any) -> dict[str, Any]:
+        """
+        Extract variance-covariance matrix information from duckreg model.
+
+        DuckRegression uses cluster_col for clustering and n_bootstraps for bootstrap SE.
+        """
+        cluster_col = getattr(model, "cluster_col", None)
+        n_bootstraps = getattr(model, "n_bootstraps", None)
+
+        # Determine vcov_type based on available information
+        vcov_type = None
+        if n_bootstraps and n_bootstraps > 0:
+            vcov_type = "iid bootstrap"
+        if cluster_col:
+            vcov_type = "cluster bootstrap" if vcov_type is None else f"{vcov_type}+clustered"
+
+        return {
+            "vcov_type": vcov_type,
+            "clustervar": cluster_col,
+        }
+
+    def var_labels(self, model: Any) -> dict[str, str] | None:
+        """Extract variable labels from the duckreg model's data if available."""
+        # Try to get the original data DataFrame
+        df = getattr(model, "data", None)
+        if df is None:
+            df = getattr(model, "_data", None)
+
+        if isinstance(df, pd.DataFrame):
+            try:
+                return get_var_labels(df, include_defaults=True)
+            except Exception:
+                return None
+        return None
+
+    def supported_stats(self, model: Any) -> set[str]:
+        """Return set of statistics available for the given duckreg model."""
+        return {
+            k for k, spec in self.STAT_MAP.items() if _get_attr(model, spec) is not None
+        }
+
+
 # Register built-ins
 clear_extractors()
 register_extractor(PyFixestExtractor())
 register_extractor(LinearmodelsExtractor())
+register_extractor(DuckRegExtractor())
 register_extractor(StatsmodelsExtractor())
