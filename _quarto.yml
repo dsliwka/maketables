@@ -19,6 +19,10 @@ website:
         text: LaTeX
       - href: docs/WritingPapers.ipynb
         text: Writing Papers
+      - href: docs/SupportedModelClasses.md
+        text: Supported Models
+      - href: docs/AddingMethods.ipynb
+        text: Contributing Models
       - text: Resources
         menu:
           - href: docs/pystataIntegration.ipynb

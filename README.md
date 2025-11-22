@@ -16,6 +16,14 @@ The package supports multiple output formats including:
 - LaTeX
 - Microsoft Word (docx) documents
 
+## Model Support
+
+`maketables` supports creating regression tables for models from the following packages: 
+
+- [PyFixest](https://github.com/py-econometrics/pyfixest)
+- [statsmodels](https://github.com/statsmodels/statsmodels)
+- [linearmodels](https://github.com/bashtage/linearmodels)
+
 ## Origin
 
 MakeTables originated as the table output functionality within the [pyfixest](https://github.com/py-econometrics/pyfixest) package and has been moved to this standalone package to provide broader table creation capabilities also supporting other statistical packages.
